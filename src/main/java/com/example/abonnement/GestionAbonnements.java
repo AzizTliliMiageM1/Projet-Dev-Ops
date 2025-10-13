@@ -3,10 +3,12 @@ package com.example.abonnement;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter;
 
 public class GestionAbonnements {
     private List<Abonnement> listeAbonnements;
@@ -87,7 +89,8 @@ public class GestionAbonnements {
 
         double prixMensuel = lireDouble("Prix mensuel");
 
-        Abonnement nouvelAbonnement = new Abonnement(nomService, dateDebut, dateFin, prixMensuel, clientName);
+        // Lors de l'ajout, la dernière utilisation est par défaut la date de début
+        Abonnement nouvelAbonnement = new Abonnement(nomService, dateDebut, dateFin, prixMensuel, clientName, dateDebut);
         listeAbonnements.add(nouvelAbonnement);
         System.out.println("Abonnement ajouté avec succès !\n");
         sauvegarderAbonnements();
@@ -217,6 +220,68 @@ public class GestionAbonnements {
         }
     }
 
+    // Nouvelle Fonctionnalité 6: Enregistrer une utilisation pour un abonnement
+    public void enregistrerUtilisation() {
+        System.out.println("\n--- Enregistrer une utilisation ---");
+        if (listeAbonnements.isEmpty()) {
+            System.out.println("Aucun abonnement enregistré.");
+            return;
+        }
+
+        afficherTousAbonnements();
+        System.out.print("Entrez le numéro de l'abonnement pour lequel enregistrer l'utilisation: ");
+        int index = -1;
+        try {
+            index = Integer.parseInt(scanner.nextLine()) - 1;
+        } catch (NumberFormatException e) {
+            System.out.println("Entrée invalide. Veuillez entrer un nombre.");
+            return;
+        }
+
+        if (index >= 0 && index < listeAbonnements.size()) {
+            Abonnement abonnement = listeAbonnements.get(index);
+            LocalDate dateUtilisation = lireDate("Date de la dernière utilisation (laisser vide pour aujourd'hui)");
+            if (dateUtilisation == null) {
+                dateUtilisation = LocalDate.now();
+            }
+            abonnement.setDerniereUtilisation(dateUtilisation);
+            System.out.println("Utilisation enregistrée pour l'abonnement de " + abonnement.getClientName() + " le " + dateUtilisation + "\n");
+            sauvegarderAbonnements();
+        } else {
+            System.out.println("Numéro d'abonnement invalide.");
+        }
+    }
+
+    // Nouvelle Fonctionnalité 7: Vérifier les alertes d'utilisation
+    public void verifierAlertesUtilisation() {
+        System.out.println("\n--- Vérification des alertes d'utilisation ---");
+        if (listeAbonnements.isEmpty()) {
+            System.out.println("Aucun abonnement enregistré.");
+            return;
+        }
+
+        boolean alerteTrouvee = false;
+        for (Abonnement abonnement : listeAbonnements) {
+            if (abonnement.estActif() && abonnement.getDerniereUtilisation() != null) {
+                long joursDepuisUtilisation = ChronoUnit.DAYS.between(abonnement.getDerniereUtilisation(), LocalDate.now());
+                // Exemple d'alerte: si pas utilisé depuis plus de 30 jours
+                if (joursDepuisUtilisation > 30) {
+                    System.out.println("ALERTE pour " + abonnement.getClientName() + " (Service: " + abonnement.getNomService() + "):");
+                    System.out.println("  - Abonnement actif mais non utilisé depuis " + joursDepuisUtilisation + " jours.");
+                    System.out.println("  - Dernière utilisation: " + abonnement.getDerniereUtilisation().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+                    System.out.println("  - Coût mensuel: " + String.format("%.2f€", abonnement.getPrixMensuel()));
+                    System.out.println("  - Pensez à l'utiliser ou à le résilier pour éviter des frais inutiles !\n");
+                    alerteTrouvee = true;
+                }
+            }
+        }
+
+        if (!alerteTrouvee) {
+            System.out.println("Aucune alerte d'utilisation trouvée pour les abonnements actifs.\n");
+        }
+        System.out.println("-------------------------------------\n");
+    }
+
     // Sauvegarder les abonnements dans un fichier
     private void sauvegarderAbonnements() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FICHIER_ABONNEMENTS))) {
@@ -224,6 +289,7 @@ public class GestionAbonnements {
                 writer.write(abonnement.toCsvString());
                 writer.newLine();
             }
+            System.out.println("Abonnements sauvegardés dans " + FICHIER_ABONNEMENTS);
         } catch (IOException e) {
             System.err.println("Erreur lors de la sauvegarde des abonnements: " + e.getMessage());
         }
@@ -233,7 +299,8 @@ public class GestionAbonnements {
     private void chargerAbonnements() {
         File fichier = new File(FICHIER_ABONNEMENTS);
         if (!fichier.exists()) {
-            return; // Pas de fichier, on commence avec une liste vide
+            System.out.println("Fichier de sauvegarde non trouvé. Démarrage avec une liste vide.");
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FICHIER_ABONNEMENTS))) {
@@ -241,10 +308,11 @@ public class GestionAbonnements {
             while ((line = reader.readLine()) != null) {
                 try {
                     listeAbonnements.add(Abonnement.fromCsvString(line));
-                } catch (Exception e) {
-                    System.err.println("Erreur lors de la lecture d'une ligne du fichier de sauvegarde, ligne ignorée: " + line);
+                } catch (Exception e) { // Catch toutes les exceptions pour une robustesse accrue lors du chargement
+                    System.err.println("Erreur lors de la lecture d'une ligne du fichier de sauvegarde, ligne ignorée: " + line + " - " + e.getMessage());
                 }
             }
+            System.out.println(listeAbonnements.size() + " abonnements chargés depuis " + FICHIER_ABONNEMENTS);
         } catch (IOException e) {
             System.err.println("Erreur lors du chargement des abonnements: " + e.getMessage());
         }
@@ -262,7 +330,9 @@ public class GestionAbonnements {
             System.out.println("3. Modifier un abonnement");
             System.out.println("4. Supprimer un abonnement");
             System.out.println("5. Rechercher un abonnement");
-            System.out.println("6. Quitter");
+            System.out.println("6. Enregistrer une utilisation");
+            System.out.println("7. Vérifier les alertes d'utilisation");
+            System.out.println("8. Quitter");
             System.out.print("Votre choix: ");
             choix = 0; // Initialiser pour éviter les erreurs si l'entrée est invalide
             try {
@@ -289,12 +359,18 @@ public class GestionAbonnements {
                     app.rechercherAbonnement();
                     break;
                 case 6:
+                    app.enregistrerUtilisation();
+                    break;
+                case 7:
+                    app.verifierAlertesUtilisation();
+                    break;
+                case 8:
                     System.out.println("Merci d'avoir utilisé l'application. Au revoir !");
                     break;
                 default:
                     System.out.println("Choix invalide. Veuillez réessayer.");
             }
-        } while (choix != 6);
+        } while (choix != 8);
 
         app.scanner.close();
     }
