@@ -41,6 +41,27 @@ public class Abonnement {
         return clientName;
     }
 
+    // Setters (ajoutés pour permettre la modification des abonnements)
+    public void setNomService(String nomService) {
+        this.nomService = nomService;
+    }
+
+    public void setDateDebut(LocalDate dateDebut) {
+        this.dateDebut = dateDebut;
+    }
+
+    public void setDateFin(LocalDate dateFin) {
+        this.dateFin = dateFin;
+    }
+
+    public void setPrixMensuel(double prixMensuel) {
+        this.prixMensuel = prixMensuel;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
     // Méthode pour vérifier si l'abonnement est actif
     public boolean estActif() {
         LocalDate aujourdHui = LocalDate.now();
@@ -63,6 +84,31 @@ public class Abonnement {
                "  Prix Mensuel: " + String.format("%.2f€", prixMensuel) + "\n" +
                "  Statut: " + statut + joursInfo + "\n" +
                "-------------------------------";
+    }
+
+    // Méthode pour convertir l'abonnement en une chaîne de caractères pour la sauvegarde
+    public String toCsvString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return String.format("%s;%s;%s;%.2f;%s",
+                nomService,
+                dateDebut.format(formatter),
+                dateFin.format(formatter),
+                prixMensuel,
+                clientName);
+    }
+
+    // Méthode statique pour créer un Abonnement à partir d'une chaîne de caractères (pour le chargement)
+    public static Abonnement fromCsvString(String csvString) {
+        String[] parts = csvString.split(";");
+        if (parts.length != 5) {
+            throw new IllegalArgumentException("Format CSV invalide pour l'abonnement: " + csvString);
+        }
+        String nomService = parts[0];
+        LocalDate dateDebut = LocalDate.parse(parts[1]);
+        LocalDate dateFin = LocalDate.parse(parts[2]);
+        double prixMensuel = Double.parseDouble(parts[3]);
+        String clientName = parts[4];
+        return new Abonnement(nomService, dateDebut, dateFin, prixMensuel, clientName);
     }
 }
 
