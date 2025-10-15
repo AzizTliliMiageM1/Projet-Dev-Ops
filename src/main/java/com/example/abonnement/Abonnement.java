@@ -170,7 +170,7 @@ public class Abonnement {
         return (s == null) ? "" : s;
     }
 
-    // --- Bonus: égalité/hash pour collections & tests ---
+    // --- Bonus: égalité/hash pour collectTu peux refaire les fiches sans mettre d'axe d'amélioration mais améliore les codes dans le sens agrandit les met les commantaires que quand c est necessaire et le reste c exécellent pour les fiche techniqueions & tests ---
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
