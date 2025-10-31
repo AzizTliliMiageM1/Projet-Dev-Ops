@@ -4,10 +4,16 @@
   --muted:#6c757d;
 }
 body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-.card .title{font-weight:600}
-#cards .card{border-radius:12px}
-.price-badge{background:linear-gradient(90deg,var(--accent),#e83e8c);color:white;padding:6px 10px;border-radius:999px;font-weight:600}
+.card .title{font-weight:700;font-size:1.05rem}
+#cards .card{border-radius:12px;box-shadow:0 6px 18px rgba(20,20,30,0.06);border:0}
+.price-badge{background:linear-gradient(90deg,var(--accent),#e83e8c);color:white;padding:6px 12px;border-radius:999px;font-weight:700}
 .small-muted{color:var(--muted);font-size:.9rem}
+
+.navbar{border-bottom-left-radius:8px;border-bottom-right-radius:8px}
+.card .title .muted{font-weight:400;color:var(--muted)}
+.dashboard-card{border-radius:12px;padding:10px}
+.dashboard-count{font-size:1.4rem;font-weight:700}
+.btn-rounded{border-radius:999px}
 
 @media (max-width:767px){
   .navbar-brand{font-size:1.05rem}
