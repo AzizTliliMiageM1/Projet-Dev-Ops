@@ -18,6 +18,11 @@ public class Abonnement {
         this(nomService, dateDebut, dateFin, prixMensuel, clientName, LocalDate.now(), "Non classé"); // Par défaut, dernière utilisation est aujourd'hui, catégorie par défaut
     }
 
+    // Constructeur avec derniereUtilisation (compatibilité avec l'ancien code qui passait 6 arguments)
+    public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
+        this(nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé");
+    }
+
     // Nouveau constructeur avec derniereUtilisation et categorie
     public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation, String categorie) {
         this.nomService = nomService;
@@ -129,7 +134,8 @@ public class Abonnement {
     // Méthode statique pour créer un Abonnement à partir d'une chaîne de caractères (pour le chargement)
     public static Abonnement fromCsvString(String csvString) {
         String[] parts = csvString.split(";");
-        if (parts.length != 7) { // Le nombre de parties a changé (6 -> 7)
+        // Support both old format (6 parts: no category) and new format (7 parts: with category)
+        if (parts.length != 6 && parts.length != 7) {
             throw new IllegalArgumentException("Format CSV invalide pour l'abonnement: " + csvString);
         }
         String nomService = parts[0];
@@ -137,9 +143,48 @@ public class Abonnement {
         LocalDate dateFin = LocalDate.parse(parts[2]);
         double prixMensuel = Double.parseDouble(parts[3]);
         String clientName = parts[4];
-        LocalDate derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
-        String categorie = parts[6]; // Chargement de la catégorie
+        LocalDate derniereUtilisation = null;
+        String categorie = "Non classé";
+        if (parts.length == 6) {
+            // old format: parts[5] == derniereUtilisation
+            derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
+        } else if (parts.length == 7) {
+            derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
+            categorie = parts[6];
+        }
         return new Abonnement(nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, categorie);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Abonnement that = (Abonnement) o;
+
+        if (Double.compare(that.prixMensuel, prixMensuel) != 0) return false;
+        if (!nomService.equals(that.nomService)) return false;
+        if (!dateDebut.equals(that.dateDebut)) return false;
+        if (!dateFin.equals(that.dateFin)) return false;
+        if (!clientName.equals(that.clientName)) return false;
+        if (derniereUtilisation != null ? !derniereUtilisation.equals(that.derniereUtilisation) : that.derniereUtilisation != null)
+            return false;
+        return categorie != null ? categorie.equals(that.categorie) : that.categorie == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = nomService.hashCode();
+        result = 31 * result + dateDebut.hashCode();
+        result = 31 * result + dateFin.hashCode();
+        temp = Double.doubleToLongBits(prixMensuel);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + clientName.hashCode();
+        result = 31 * result + (derniereUtilisation != null ? derniereUtilisation.hashCode() : 0);
+        result = 31 * result + (categorie != null ? categorie.hashCode() : 0);
+        return result;
     }
 }
 

@@ -1,7 +1,9 @@
-package com.example.abonnement;
+package com.projet.dashboard;
 
 import java.util.List;
 import java.util.Map;
+
+import com.example.abonnement.Abonnement;
 
 public class DashboardStats {
     private double totalMonthlyCost;

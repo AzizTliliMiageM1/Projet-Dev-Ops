@@ -1,10 +1,17 @@
-package com.example.abonnement;
+package com.projet.repository;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.example.abonnement.Abonnement;
 
 public class FileAbonnementRepository implements AbonnementRepository {
     private final String filePath;
@@ -58,10 +65,8 @@ public class FileAbonnementRepository implements AbonnementRepository {
     @Override
     public void save(Abonnement abonnement) {
         List<Abonnement> abonnements = findAll();
-        // This method is primarily for adding new subscriptions. 
+        // This method is primarily for adding new subscriptions.
         // For updates, the list should be modified and then saveAll called.
-        // For simplicity in this context, we'll assume 'save' adds if not present, but a real repo would handle IDs.
-        // Since we are using list index as ID for now, this method will be less used directly for updates.
         abonnements.add(abonnement);
         saveAll(abonnements);
     }
@@ -73,5 +78,3 @@ public class FileAbonnementRepository implements AbonnementRepository {
         saveAll(abonnements);
     }
 }
-
-touch src/main/java/com/tonpackage/r

@@ -1,12 +1,16 @@
-package com.example.abonnement;
+package com.projet.service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.example.abonnement.Abonnement;
+import com.projet.dashboard.DashboardStats;
+import com.projet.repository.AbonnementRepository;
 
 public class AbonnementServiceImpl implements AbonnementService {
     private AbonnementRepository abonnementRepository;
