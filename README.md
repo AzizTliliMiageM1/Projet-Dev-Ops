@@ -43,6 +43,28 @@ curl -X POST http://localhost:4567/api/abonnements -H "Content-Type: application
 
 Note sur l'ID : l'API utilise pour l'instant l'index dans la liste (0-based). Pour production, il faut ajouter un champ `id` persistant.
 
+## Interface web moderne
+
+J'ai ajouté une UI web responsive (Bootstrap + JS) servie par le serveur API. Elle est plus agréable qu'une fenêtre Swing et fonctionne dans des environnements sans affichage graphique (headless).
+
+Pour l'ouvrir :
+1. Démarre le serveur API :
+```bash
+mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+```
+2. Ouvre ton navigateur et va sur :
+```
+http://localhost:4567
+```
+
+L'interface propose :
+- affichage responsive en cartes (compatible mobile)
+- bouton Ajouter / Supprimer
+- import/export JSON
+- couleurs et styles modernes
+
+Si tu utilises Codespaces ou un conteneur distant, expose le port 4567 dans ta workspace / forward port pour l'ouvrir depuis ton navigateur local.
+
 ## Structure du Projet
 
 Le projet suit une structure Maven standard, ce qui le rend facile à comprendre et à étendre :
@@ -86,7 +108,7 @@ mvn exec:java -Dexec.mainClass=com.example.abonnement.GestionAbonnements
 ```
 
 - Option B (si vous voulez lancer le JAR directement) :
-  - Par défaut, `mvn package` ne produit pas d'uber-jar (les dépendances ne sont pas incluses). Si vous voulez un seul fichier exécutable, il faut ajouter le plugin `maven-shade-plugin` au `pom.xml` (je peux le faire si tu veux). Sinon, lance le JAR produit en t'assurant que le classpath contient les dépendances.
+  - Par défaut, `mvn package` ne produit pas d'uber-jar (les dépendances ne sont pas incluses). Si vous voulez un seul fichier exécutable, il faut ajouter le plugin `maven-shade-plugin` au `pom.xml` . Sinon, lance le JAR produit en t'assurant que le classpath contient les dépendances.
 
 ```bash
 java -jar target/gestion-abonnements-1.0-SNAPSHOT.jar
