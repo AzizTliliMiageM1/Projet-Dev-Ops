@@ -12,9 +12,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.example.abonnement.Abonnement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileAbonnementRepository implements AbonnementRepository {
     private final String filePath;
+    private static final Logger logger = LoggerFactory.getLogger(FileAbonnementRepository.class);
 
     public FileAbonnementRepository(String filePath) {
         this.filePath = filePath;
@@ -28,16 +31,37 @@ public class FileAbonnementRepository implements AbonnementRepository {
             return abonnements; // Retourne une liste vide si le fichier n'existe pas
         }
 
+        boolean migrated = false;
+        List<String> originalLines = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            abonnements = reader.lines()
-                    .filter(line -> !line.trim().isEmpty())
-                    .map(Abonnement::fromCsvString)
-                    .collect(Collectors.toList());
+            originalLines = reader.lines().filter(line -> !line.trim().isEmpty()).collect(Collectors.toList());
+            for (String line : originalLines) {
+                try {
+                    Abonnement a = Abonnement.fromCsvString(line);
+                    abonnements.add(a);
+                    // detect old-format (6 parts) and mark for migration
+                    if (line.split(";").length == 6) {
+                        migrated = true;
+                    }
+                } catch (IllegalArgumentException ex) {
+                    logger.warn("Ligne ignorée lors du chargement (format invalide): {} -> {}", line, ex.getMessage());
+                }
+            }
         } catch (IOException e) {
-            System.err.println("Erreur lors du chargement des abonnements depuis le fichier: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.err.println("Erreur de format dans le fichier d'abonnements: " + e.getMessage());
+            logger.error("Erreur lors du chargement des abonnements depuis le fichier: {}", e.getMessage());
         }
+
+        if (migrated) {
+            // Réécrire le fichier avec le nouveau format (catégorie ajoutée)
+            try {
+                saveAll(abonnements);
+                logger.info("Migration du fichier '{}' réalisée (anciennes lignes mises à jour).", filePath);
+            } catch (Exception e) {
+                logger.error("Erreur lors de la migration du fichier d'abonnements: {}", e.getMessage());
+            }
+        }
+
+        logger.info("{} abonnements chargés depuis {}", abonnements.size(), filePath);
         return abonnements;
     }
 
@@ -48,8 +72,9 @@ public class FileAbonnementRepository implements AbonnementRepository {
                 writer.write(abonnement.toCsvString());
                 writer.newLine();
             }
+            logger.info("{} abonnements sauvegardés dans {}", abonnements.size(), filePath);
         } catch (IOException e) {
-            System.err.println("Erreur lors de la sauvegarde des abonnements dans le fichier: " + e.getMessage());
+            logger.error("Erreur lors de la sauvegarde des abonnements dans le fichier: {}", e.getMessage());
         }
     }
 
