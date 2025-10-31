@@ -19,6 +19,30 @@ Pour une description détaillée de chaque fonctionnalité, y compris les person
 *   **Persistance des Données** : Pour que les abonnements ne soient pas perdus à chaque fermeture de l'application, toutes les données sont automatiquement sauvegardées dans un fichier texte (`abonnements.txt`) et rechargées au démarrage. C'est une introduction simple mais efficace à la persistance des données.
 *   **Gestion des Dates** : Utilisation des classes modernes `java.time` pour une manipulation précise et facile des dates (début, fin d'abonnement, dernière utilisation).
 
+## API REST (optionnel)
+
+Une petite API REST a été ajoutée pour exposer les abonnements (utile pour tester depuis un navigateur ou un script). Le serveur est minimal et basé sur Spark Java.
+
+Endpoints disponibles :
+- GET  /api/abonnements        -> liste des abonnements (JSON)
+- GET  /api/abonnements/:id    -> abonnement par index (0-based)
+- POST /api/abonnements        -> ajoute un abonnement (JSON)
+- PUT  /api/abonnements/:id    -> met à jour un abonnement par index
+- DELETE /api/abonnements/:id  -> supprime un abonnement par index
+
+Pour lancer l'API localement :
+```bash
+mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+```
+
+Exemples curl :
+```bash
+curl -s http://localhost:4567/api/abonnements
+curl -X POST http://localhost:4567/api/abonnements -H "Content-Type: application/json" -d '@exemple.json'
+```
+
+Note sur l'ID : l'API utilise pour l'instant l'index dans la liste (0-based). Pour production, il faut ajouter un champ `id` persistant.
+
 ## Structure du Projet
 
 Le projet suit une structure Maven standard, ce qui le rend facile à comprendre et à étendre :
@@ -52,13 +76,28 @@ Le projet suit une structure Maven standard, ce qui le rend facile à comprendre
 1.  **Prérequis** : Assurez-vous d'avoir le Java Development Kit (JDK) version 11 ou plus récent et Apache Maven installés sur votre machine.
 2.  **Compilation** : Ouvrez un terminal, naviguez jusqu'au répertoire racine du projet (là où se trouve le fichier `pom.xml`), et exécutez la commande suivante :
     ```bash
-    mvn clean install
+    mvn clean package
     ```
-3.  **Exécution** : Une fois la compilation réussie, un fichier JAR exécutable sera généré dans le dossier `target/`. Vous pouvez lancer l'application avec :
-    ```bash
-    java -jar target/gestion-abonnements-1.0-SNAPSHOT.jar
-    ```
+3.  **Exécution** :
 
-L'application démarrera et vous présentera un menu interactif en console. Vous pourrez alors tester toutes les fonctionnalités.
+- Option A (recommandée pour le développement — fournit le classpath complet) :
+```bash
+mvn exec:java -Dexec.mainClass=com.example.abonnement.GestionAbonnements
+```
+
+- Option B (si vous voulez lancer le JAR directement) :
+  - Par défaut, `mvn package` ne produit pas d'uber-jar (les dépendances ne sont pas incluses). Si vous voulez un seul fichier exécutable, il faut ajouter le plugin `maven-shade-plugin` au `pom.xml` (je peux le faire si tu veux). Sinon, lance le JAR produit en t'assurant que le classpath contient les dépendances.
+
+```bash
+java -jar target/gestion-abonnements-1.0-SNAPSHOT.jar
+```
+
+L'application démarrera et vous présentera un menu interactif en console.
 
 Ce projet est une excellente démonstration des compétences en programmation Java, couvrant la POO, la gestion des collections, les E/S, la persistance et une touche d'intelligence métier avec les alertes d'utilisation. Il est prêt à être présenté et peut servir de base pour des évolutions futures !
+
+## À propos du build GitHub (CI)
+
+Si tu as vu une erreur du type `Tests run: 5, Failures: 1` sur GitHub Actions (échec sur `ApiServerIntegrationTest` avec `expected 201 but was 400`), c'était dû à la désérialisation JSON : la classe `Abonnement` n'avait pas de constructeur sans-argument, donc Jackson renvoyait 400 lors du POST dans le test d'intégration. J'ai ajouté un constructeur sans-argument et committé le fix; les tests passent maintenant localement et dans les runs récents.
+
+Si l'action GitHub continue de montrer l'erreur, vérifie que le workflow GitHub a bien été déclenché après le commit de correction (push sur `main`) et que la cache n'empêche pas le nouvel artefact. Je peux aussi mettre à jour le workflow pour afficher les rapports de tests détaillés.
