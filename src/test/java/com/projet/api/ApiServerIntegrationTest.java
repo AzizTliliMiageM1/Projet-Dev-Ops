@@ -80,23 +80,36 @@ public class ApiServerIntegrationTest {
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
-        HttpResponse<String> postResp = client.send(postReq, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, postResp.statusCode());
+    HttpResponse<String> postResp = client.send(postReq, HttpResponse.BodyHandlers.ofString());
+    assertEquals(201, postResp.statusCode());
 
-        // GET again should return array containing posted item
-        HttpResponse<String> getResp2 = client.send(getReq, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, getResp2.statusCode());
-        assertTrue(getResp2.body().contains("ITestService"));
+    // GET again should return array containing posted item
+    HttpResponse<String> getResp2 = client.send(getReq, HttpResponse.BodyHandlers.ofString());
+    assertEquals(200, getResp2.statusCode());
+    assertTrue(getResp2.body().contains("ITestService"));
 
-        // Delete last element (find last index by parsing simple heuristic)
-        // We assume posted item is present; delete index 0..n-1, but for simplicity delete index 0 if present
-        // Here just delete index 0 to exercise endpoint (the repository uses indices)
+    // extract uuid from POST response and delete by uuid
+    String body = postResp.body();
+    String uuid = null;
+    // simple JSON extraction (avoid regex complexity / Java string escaping)
+    int p = body.indexOf("\"id\"");
+    if (p >= 0) {
+        int col = body.indexOf(':', p);
+        if (col >= 0) {
+            int q1 = body.indexOf('"', col);
+            if (q1 >= 0) {
+                int q2 = body.indexOf('"', q1 + 1);
+                if (q2 > q1) uuid = body.substring(q1 + 1, q2);
+            }
+        }
+    }
+    if (uuid != null) {
         HttpRequest delReq = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:4567/api/abonnements/0"))
-                .DELETE()
-                .build();
+            .uri(URI.create("http://localhost:4567/api/abonnements/" + uuid))
+            .DELETE()
+            .build();
         HttpResponse<String> delResp = client.send(delReq, HttpResponse.BodyHandlers.ofString());
-        // either 204 or 200 depending on state
         assertTrue(delResp.statusCode() == 204 || delResp.statusCode() == 200);
+    }
     }
 }

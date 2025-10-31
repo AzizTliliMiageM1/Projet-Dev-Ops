@@ -3,8 +3,10 @@ package com.example.abonnement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 public class Abonnement {
+    private String id; // UUID string persistant
     private String nomService;
     private LocalDate dateDebut;
     private LocalDate dateFin;
@@ -15,12 +17,13 @@ public class Abonnement {
 
     // Constructeur original mis à jour
     public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName) {
-        this(nomService, dateDebut, dateFin, prixMensuel, clientName, LocalDate.now(), "Non classé"); // Par défaut, dernière utilisation est aujourd'hui, catégorie par défaut
+        this(UUID.randomUUID().toString(), nomService, dateDebut, dateFin, prixMensuel, clientName, LocalDate.now(), "Non classé"); // génère un id
     }
 
     // Constructeur sans-argument nécessaire pour la désérialisation Jackson
     public Abonnement() {
         // valeurs par défaut simples
+        this.id = UUID.randomUUID().toString();
         this.nomService = "";
         this.dateDebut = LocalDate.now();
         this.dateFin = LocalDate.now();
@@ -30,13 +33,14 @@ public class Abonnement {
         this.categorie = "Non classé";
     }
 
-    // Constructeur avec derniereUtilisation (compatibilité avec l'ancien code qui passait 6 arguments)
-    public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
-        this(nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé");
+    // Constructeur avec derniereUtilisation (compatibilité)
+    public Abonnement(String id, String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
+        this(id, nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé");
     }
 
-    // Nouveau constructeur avec derniereUtilisation et categorie
-    public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation, String categorie) {
+    // Nouveau constructeur avec id, derniereUtilisation et categorie
+    public Abonnement(String id, String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation, String categorie) {
+        this.id = (id == null || id.isBlank()) ? UUID.randomUUID().toString() : id;
         this.nomService = nomService;
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
@@ -45,6 +49,20 @@ public class Abonnement {
         this.derniereUtilisation = derniereUtilisation;
         this.categorie = categorie;
     }
+
+    // Compatibilité : constructeur avec derniereUtilisation + categorie (sans id)
+    public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation, String categorie) {
+        this(UUID.randomUUID().toString(), nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, categorie);
+    }
+
+    // Compatibilité : constructeur avec derniereUtilisation (sans id, sans categorie)
+    public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
+        this(UUID.randomUUID().toString(), nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé");
+    }
+
+    // getter/setter for id
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
     // Getters
     public String getNomService() {
@@ -104,6 +122,7 @@ public class Abonnement {
         this.categorie = categorie;
     }
 
+
     // Méthode pour vérifier si l'abonnement est actif
     public boolean estActif() {
         LocalDate aujourdHui = LocalDate.now();
@@ -133,38 +152,65 @@ public class Abonnement {
     // Méthode pour convertir l'abonnement en une chaîne de caractères pour la sauvegarde
     public String toCsvString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return String.format("%s;%s;%s;%.2f;%s;%s;%s",
-                nomService,
+    // CSV format: id;nomService;dateDebut;dateFin;prixMensuel;clientName;derniereUtilisation;categorie
+    return String.format("%s;%s;%s;%s;%.2f;%s;%s;%s",
+        id,
+        nomService,
                 dateDebut.format(formatter),
                 dateFin.format(formatter),
                 prixMensuel,
                 clientName,
                 derniereUtilisation != null ? derniereUtilisation.format(formatter) : "",
-                categorie); // Sauvegarde de la catégorie
+        categorie); // Sauvegarde de la catégorie
     }
 
     // Méthode statique pour créer un Abonnement à partir d'une chaîne de caractères (pour le chargement)
     public static Abonnement fromCsvString(String csvString) {
         String[] parts = csvString.split(";");
-        // Support both old format (6 parts: no category) and new format (7 parts: with category)
-        if (parts.length != 6 && parts.length != 7) {
-            throw new IllegalArgumentException("Format CSV invalide pour l'abonnement: " + csvString);
-        }
-        String nomService = parts[0];
-        LocalDate dateDebut = LocalDate.parse(parts[1]);
-        LocalDate dateFin = LocalDate.parse(parts[2]);
-        double prixMensuel = Double.parseDouble(parts[3]);
-        String clientName = parts[4];
+        // New CSV format with id: 8 parts (id + existing 7 fields)
+        // Support also older formats (6 or 7 parts) for backward compatibility
+        String id = null;
+        String nomService;
+        LocalDate dateDebut;
+        LocalDate dateFin;
+        double prixMensuel;
+        String clientName;
         LocalDate derniereUtilisation = null;
         String categorie = "Non classé";
-        if (parts.length == 6) {
-            // old format: parts[5] == derniereUtilisation
-            derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
+
+        if (parts.length == 8) {
+            id = parts[0];
+            nomService = parts[1];
+            dateDebut = LocalDate.parse(parts[2]);
+            dateFin = LocalDate.parse(parts[3]);
+            prixMensuel = Double.parseDouble(parts[4]);
+            clientName = parts[5];
+            derniereUtilisation = parts[6].isEmpty() ? null : LocalDate.parse(parts[6]);
+            categorie = parts[7];
         } else if (parts.length == 7) {
+            // old new-format without id: nomService;dateDebut;dateFin;prix;client;derniere;categorie
+            nomService = parts[0];
+            dateDebut = LocalDate.parse(parts[1]);
+            dateFin = LocalDate.parse(parts[2]);
+            prixMensuel = Double.parseDouble(parts[3]);
+            clientName = parts[4];
             derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
             categorie = parts[6];
+            id = UUID.randomUUID().toString();
+        } else if (parts.length == 6) {
+            // legacy format: nomService;dateDebut;dateFin;prix;client;derniereUtilisation
+            nomService = parts[0];
+            dateDebut = LocalDate.parse(parts[1]);
+            dateFin = LocalDate.parse(parts[2]);
+            prixMensuel = Double.parseDouble(parts[3]);
+            clientName = parts[4];
+            derniereUtilisation = parts[5].isEmpty() ? null : LocalDate.parse(parts[5]);
+            id = UUID.randomUUID().toString();
+        } else {
+            throw new IllegalArgumentException("Format CSV invalide pour l'abonnement: " + csvString);
         }
-        return new Abonnement(nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, categorie);
+
+        return new Abonnement(id, nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, categorie);
     }
 
     @Override

@@ -11,9 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.example.abonnement.Abonnement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.example.abonnement.Abonnement;
 
 public class FileAbonnementRepository implements AbonnementRepository {
     private final String filePath;
@@ -40,7 +41,9 @@ public class FileAbonnementRepository implements AbonnementRepository {
                     Abonnement a = Abonnement.fromCsvString(line);
                     abonnements.add(a);
                     // detect old-format (6 parts) and mark for migration
-                    if (line.split(";").length == 6) {
+                    int parts = line.split(";").length;
+                    if (parts == 6 || parts == 7) {
+                        // old formats without uuid (6 legacy, 7 new without id)
                         migrated = true;
                     }
                 } catch (IllegalArgumentException ex) {
@@ -88,6 +91,11 @@ public class FileAbonnementRepository implements AbonnementRepository {
     }
 
     @Override
+    public Optional<Abonnement> findByUuid(String uuid) {
+        return findAll().stream().filter(a -> uuid != null && uuid.equals(a.getId())).findFirst();
+    }
+
+    @Override
     public void save(Abonnement abonnement) {
         List<Abonnement> abonnements = findAll();
         // This method is primarily for adding new subscriptions.
@@ -100,6 +108,13 @@ public class FileAbonnementRepository implements AbonnementRepository {
     public void delete(Abonnement abonnement) {
         List<Abonnement> abonnements = findAll();
         abonnements.remove(abonnement);
+        saveAll(abonnements);
+    }
+
+    @Override
+    public void deleteByUuid(String uuid) {
+        List<Abonnement> abonnements = findAll();
+        abonnements.removeIf(a -> uuid != null && uuid.equals(a.getId()));
         saveAll(abonnements);
     }
 }

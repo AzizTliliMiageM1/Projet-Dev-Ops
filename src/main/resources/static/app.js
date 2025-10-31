@@ -63,15 +63,15 @@ function render(list){
 
     const btns = document.createElement('div');
   const edit = document.createElement('button'); edit.className='btn btn-sm btn-outline-primary me-2'; edit.innerHTML='<i class="fa fa-pen me-1"></i>Modifier';
-  edit.onclick = ()=> openEditModal(a.__idx, a);
+  edit.onclick = ()=> openEditModal(a.__uuid, a);
   const useBtn = document.createElement('button'); useBtn.className='btn btn-sm btn-success me-2'; useBtn.innerHTML='<i class="fa fa-check me-1"></i>Utilisé';
-  useBtn.onclick = async ()=>{ await registerUsage(a.__idx); load(); };
+  useBtn.onclick = async ()=>{ await registerUsage(a.__uuid); load(); };
   const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerHTML='<i class="fa fa-trash me-1"></i>Supprimer';
-  del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ await fetch(`${apiBase}/${a.__idx}`, {method:'DELETE'}); load(); }}
+  del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ const id = a.__uuid; await fetch(`${apiBase}/${id}`, {method:'DELETE'}); load(); }}
 
-  // selection checkbox for bulk actions
+  // selection checkbox for bulk actions (store uuid only)
   const selectBox = document.createElement('input'); selectBox.type='checkbox'; selectBox.className='form-check-input me-2 select-abonnement';
-  selectBox.dataset.idx = a.__idx;
+  selectBox.dataset.uuid = a.__uuid || '';
 
     btns.appendChild(edit); btns.appendChild(useBtn); btns.appendChild(del);
     bottom.appendChild(price); bottom.appendChild(btns);
@@ -94,16 +94,16 @@ function render(list){
 
 async function load(){
   const all = await fetchAll();
-  // attach original index to each item so API calls keep stable references
-  const withIdx = all.map((it, i) => ({...it, __idx: i}));
-  renderDashboard(withIdx);
+  // attach uuid to each item
+  const withUuid = all.map((it) => ({...it, __uuid: it.id}));
+  renderDashboard(withUuid);
 
   // apply search filter if present
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   const status = (document.getElementById('statusFilter')?.value || 'all');
   const sortBy = (document.getElementById('sortSelect')?.value || 'none');
 
-  let filtered = withIdx.filter(a => {
+  let filtered = withUuid.filter(a => {
     if (!q) return true;
     return (a.clientName||'').toLowerCase().includes(q) || (a.nomService||'').toLowerCase().includes(q);
   });
@@ -156,9 +156,9 @@ document.getElementById('bulkDeleteBtn')?.addEventListener('click', async ()=>{
   const checks = Array.from(document.querySelectorAll('.select-abonnement:checked'));
   if (checks.length === 0){ alert('Aucun abonnement sélectionné'); return; }
   if (!confirm(`Supprimer ${checks.length} abonnements sélectionnés ?`)) return;
-  // gather indexes, sort descending to avoid shifting
-  const idxs = checks.map(c=>parseInt(c.dataset.idx)).sort((a,b)=>b-a);
-  for(const id of idxs){ await fetch(`${apiBase}/${id}`, {method:'DELETE'}); }
+  // gather uuid ids and delete sequentially
+  const ids = checks.map(c => c.dataset.uuid).filter(Boolean);
+  for(const id of ids){ await fetch(`${apiBase}/${id}`, {method:'DELETE'}); }
   load();
 });
 
@@ -166,7 +166,7 @@ document.getElementById('searchInput')?.addEventListener('input', ()=> load());
 document.getElementById('alertsBtn')?.addEventListener('click', async ()=>{
   const all = await fetchAll();
   const alerts = all.filter(a => isActive(a) && a.derniereUtilisation && daysBetween(new Date(a.derniereUtilisation), new Date()) > 30)
-                    .map((it,i)=> ({...it, __idx:i}));
+                    .map((it)=> ({...it, __uuid: it.id}));
   render(alerts);
 });
 
@@ -225,10 +225,11 @@ document.getElementById('saveEditBtn').addEventListener('click', async ()=>{
 
 async function registerUsage(idx){
   const all = await fetchAll();
-  if (idx < 0 || idx >= all.length) return;
-  const a = all[idx];
+  // idx is expected to be uuid
+  let a = all.find(x => x.id === idx);
+  if (!a) return;
   a.derniereUtilisation = new Date().toISOString().split('T')[0];
-  await fetch(`${apiBase}/${idx}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(a)});
+  await fetch(`${apiBase}/${a.id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(a)});
 }
 
 load();

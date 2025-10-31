@@ -60,23 +60,11 @@ public class ApiServer {
 
             get("/abonnements/:id", (req, res) -> {
                 res.type("application/json");
-                try {
-                    int id = Integer.parseInt(req.params(":id"));
-                    var opt = repo.findById(id);
-                    if (opt.isEmpty()) {
-                        res.status(404);
-                        return "{\"error\":\"Not found\"}";
-                    }
-                    try {
-                        return mapper.writeValueAsString(opt.get());
-                    } catch (Exception e) {
-                        res.status(500);
-                        return "{\"error\":\"serialization error\"}";
-                    }
-                } catch (NumberFormatException e) {
-                    res.status(400);
-                    return "{\"error\":\"Invalid id\"}";
-                }
+                String pid = req.params(":id");
+                // treat :id as UUID only
+                var opt = repo.findByUuid(pid);
+                if (opt.isEmpty()) { res.status(404); return "{\"error\":\"Not found\"}"; }
+                try { return mapper.writeValueAsString(opt.get()); } catch (Exception e) { res.status(500); return "{\"error\":\"serialization error\"}"; }
             });
 
             post("/abonnements", (req, res) -> {
@@ -94,40 +82,29 @@ public class ApiServer {
             });
 
             put("/abonnements/:id", (req, res) -> {
-                try {
-                    int id = Integer.parseInt(req.params(":id"));
-                    List<Abonnement> all = repo.findAll();
-                    if (id < 0 || id >= all.size()) {
-                        res.status(404);
-                        return "{\"error\":\"Not found\"}";
-                    }
-                    Abonnement updated = mapper.readValue(req.body(), Abonnement.class);
-                    all.set(id, updated);
-                    repo.saveAll(all);
-                    res.type("application/json");
-                    return mapper.writeValueAsString(updated);
-                } catch (NumberFormatException e) {
-                    res.status(400);
-                    return "{\"error\":\"Invalid id\"}";
+                String pid = req.params(":id");
+                Abonnement updated = mapper.readValue(req.body(), Abonnement.class);
+                var opt = repo.findByUuid(pid);
+                if (opt.isEmpty()) { res.status(404); return "{\"error\":\"Not found\"}"; }
+                // ensure updated has same id
+                updated.setId(pid);
+                // fetch all, replace matching uuid
+                List<Abonnement> all = repo.findAll();
+                for (int i=0;i<all.size();i++){
+                    if (pid.equals(all.get(i).getId())) { all.set(i, updated); break; }
                 }
+                repo.saveAll(all);
+                res.type("application/json");
+                return mapper.writeValueAsString(updated);
             });
 
             delete("/abonnements/:id", (req, res) -> {
-                try {
-                    int id = Integer.parseInt(req.params(":id"));
-                    List<Abonnement> all = repo.findAll();
-                    if (id < 0 || id >= all.size()) {
-                        res.status(404);
-                        return "{\"error\":\"Not found\"}";
-                    }
-                    Abonnement toDelete = all.get(id);
-                    repo.delete(toDelete);
-                    res.status(204);
-                    return "";
-                } catch (NumberFormatException e) {
-                    res.status(400);
-                    return "{\"error\":\"Invalid id\"}";
-                }
+                String pid = req.params(":id");
+                var opt = repo.findByUuid(pid);
+                if (opt.isEmpty()) { res.status(404); return "{\"error\":\"Not found\"}"; }
+                repo.deleteByUuid(pid);
+                res.status(204);
+                return "";
             });
         });
 
