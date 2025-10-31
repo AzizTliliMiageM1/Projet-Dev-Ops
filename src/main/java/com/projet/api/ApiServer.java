@@ -70,14 +70,27 @@ public class ApiServer {
             post("/abonnements", (req, res) -> {
                 try {
                     Abonnement a = mapper.readValue(req.body(), Abonnement.class);
+                    // server-side validation
+                    if (a.getNomService() == null || a.getNomService().isBlank()) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","nomService manquant")); }
+                    if (a.getDateDebut() == null) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","dateDebut manquante")); }
+                    if (a.getDateFin() == null) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","dateFin manquante")); }
+                    if (a.getClientName() == null || a.getClientName().isBlank()) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","clientName manquant")); }
+                    if (a.getPrixMensuel() < 0) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","prixMensuel invalide")); }
+
+                    // ensure id exists
+                    if (a.getId() == null || a.getId().isBlank()) a.setId(java.util.UUID.randomUUID().toString());
                     repo.save(a);
                     res.status(201);
                     res.type("application/json");
                     return mapper.writeValueAsString(a);
-                } catch (Exception e) {
+                } catch (com.fasterxml.jackson.databind.JsonMappingException e) {
                     res.status(400);
                     res.type("application/json");
-                    return "{\"error\":\"Bad request: " + e.getMessage() + "\"}";
+                    return mapper.writeValueAsString(java.util.Map.of("error","JSON invalide: " + e.getMessage()));
+                } catch (Exception e) {
+                    res.status(500);
+                    res.type("application/json");
+                    return mapper.writeValueAsString(java.util.Map.of("error","Erreur interne"));
                 }
             });
 

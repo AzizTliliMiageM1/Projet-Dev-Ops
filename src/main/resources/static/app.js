@@ -128,9 +128,31 @@ document.getElementById('addForm').addEventListener('submit', async (e)=>{
     clientName: document.getElementById('clientName').value,
     categorie: document.getElementById('categorie').value || 'Non classé'
   };
-  await fetch(apiBase, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-  document.getElementById('addForm').reset();
-  load();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const original = btn.innerHTML;
+  // disable and show spinner
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Ajout...';
+  // clear flash
+  const flash = document.getElementById('flash'); flash.innerHTML = '';
+  try {
+    const r = await fetch(apiBase, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    if (r.status === 201) {
+      const created = await r.json();
+      flash.innerHTML = `<div class="alert alert-success">Abonnement ajouté (id: ${created.id}).</div>`;
+      document.getElementById('addForm').reset();
+      load();
+    } else {
+      let msg = 'Erreur lors de la création';
+      try { const err = await r.json(); if (err && err.error) msg = err.error; if (err && err.message) msg = err.message; } catch(e){}
+      flash.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
+    }
+  } catch (err) {
+    flash.innerHTML = `<div class="alert alert-danger">Erreur réseau: ${err.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
 });
 
 document.getElementById('refreshBtn').addEventListener('click', load);
