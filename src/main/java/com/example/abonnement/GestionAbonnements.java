@@ -1,5 +1,9 @@
 package com.example.abonnement;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -10,14 +14,26 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Classe principale de l'application. Gère le menu console et les actions.
+ * Commentaires écrits de manière simple, comme dans un projet étudiant.
+ */
 public class GestionAbonnements {
     private List<Abonnement> listeAbonnements;
     private Scanner scanner;
     private static final String FICHIER_ABONNEMENTS = "abonnements.txt";
 
+    // Jackson mapper pour export/import JSON
+    private final ObjectMapper objectMapper;
+
     public GestionAbonnements() {
         this.listeAbonnements = new ArrayList<>();
         this.scanner = new Scanner(System.in);
+        // Préparer mapper JSON pour LocalDate
+        this.objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         chargerAbonnements(); // Charger les abonnements au démarrage
     }
 
@@ -189,11 +205,52 @@ public class GestionAbonnements {
         }
 
         if (index >= 0 && index < listeAbonnements.size()) {
-            Abonnement abonnementSupprime = listeAbonnements.remove(index);
-            System.out.println("Abonnement de " + abonnementSupprime.getClientName() + " pour " + abonnementSupprime.getNomService() + " supprimé avec succès !\n");
-            sauvegarderAbonnements();
+            Abonnement abonnementSupprime = listeAbonnements.get(index);
+            // Confirmation avant suppression — bonne pratique pour éviter les erreurs
+            System.out.print("Confirmer la suppression de l'abonnement de " + abonnementSupprime.getClientName() + " pour " + abonnementSupprime.getNomService() + " ? (o/N): ");
+            String confirm = scanner.nextLine().trim().toLowerCase();
+            if (confirm.equals("o") || confirm.equals("oui")) {
+                listeAbonnements.remove(index);
+                System.out.println("Abonnement supprimé avec succès !\n");
+                sauvegarderAbonnements();
+            } else {
+                System.out.println("Suppression annulée.");
+            }
         } else {
             System.out.println("Numéro d'abonnement invalide.");
+        }
+    }
+
+    // Exporter la liste en JSON
+    public void exporterJson() {
+        System.out.print("Chemin du fichier JSON (par défaut abonnements.json): ");
+        String path = scanner.nextLine().trim();
+        if (path.isEmpty()) path = "abonnements.json";
+        try (Writer writer = new FileWriter(path)) {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(writer, listeAbonnements);
+            System.out.println("Export JSON effectué dans : " + path);
+        } catch (IOException e) {
+            System.out.println("Erreur lors de l'export JSON: " + e.getMessage());
+        }
+    }
+
+    // Importer depuis un fichier JSON (ajoute les abonnements au list)
+    public void importerJson() {
+        System.out.print("Chemin du fichier JSON à importer: ");
+        String path = scanner.nextLine().trim();
+        if (path.isEmpty()) {
+            System.out.println("Aucun fichier fourni.");
+            return;
+        }
+        try (Reader reader = new FileReader(path)) {
+            Abonnement[] arr = objectMapper.readValue(reader, Abonnement[].class);
+            for (Abonnement a : arr) {
+                listeAbonnements.add(a);
+            }
+            sauvegarderAbonnements();
+            System.out.println("Import JSON réussi. " + arr.length + " abonnements ajoutés.");
+        } catch (IOException e) {
+            System.out.println("Erreur lors de l'import JSON: " + e.getMessage());
         }
     }
 
@@ -332,7 +389,9 @@ public class GestionAbonnements {
             System.out.println("5. Rechercher un abonnement");
             System.out.println("6. Enregistrer une utilisation");
             System.out.println("7. Vérifier les alertes d'utilisation");
-            System.out.println("8. Quitter");
+            System.out.println("8. Exporter en JSON");
+            System.out.println("9. Importer depuis JSON");
+            System.out.println("10. Quitter");
             System.out.print("Votre choix: ");
             choix = 0; // Initialiser pour éviter les erreurs si l'entrée est invalide
             try {
@@ -365,6 +424,12 @@ public class GestionAbonnements {
                     app.verifierAlertesUtilisation();
                     break;
                 case 8:
+                    app.exporterJson();
+                    break;
+                case 9:
+                    app.importerJson();
+                    break;
+                case 10:
                     System.out.println("Merci d'avoir utilisé l'application. Au revoir !");
                     break;
                 default:
