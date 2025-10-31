@@ -18,6 +18,18 @@ public class Abonnement {
         this(nomService, dateDebut, dateFin, prixMensuel, clientName, LocalDate.now(), "Non classé"); // Par défaut, dernière utilisation est aujourd'hui, catégorie par défaut
     }
 
+    // Constructeur sans-argument nécessaire pour la désérialisation Jackson
+    public Abonnement() {
+        // valeurs par défaut simples
+        this.nomService = "";
+        this.dateDebut = LocalDate.now();
+        this.dateFin = LocalDate.now();
+        this.prixMensuel = 0.0;
+        this.clientName = "";
+        this.derniereUtilisation = null;
+        this.categorie = "Non classé";
+    }
+
     // Constructeur avec derniereUtilisation (compatibilité avec l'ancien code qui passait 6 arguments)
     public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
         this(nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé");
