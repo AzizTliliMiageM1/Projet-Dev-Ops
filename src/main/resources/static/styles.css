@@ -1,0 +1,15 @@
+:root{
+  --primary:#0d6efd;
+  --accent:#6610f2;
+  --muted:#6c757d;
+}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+.card .title{font-weight:600}
+#cards .card{border-radius:12px}
+.price-badge{background:linear-gradient(90deg,var(--accent),#e83e8c);color:white;padding:6px 10px;border-radius:999px;font-weight:600}
+.small-muted{color:var(--muted);font-size:.9rem}
+
+@media (max-width:767px){
+  .navbar-brand{font-size:1.05rem}
+  #cards .card{flex-direction:column}
+}
