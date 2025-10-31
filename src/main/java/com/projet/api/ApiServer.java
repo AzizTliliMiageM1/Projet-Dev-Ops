@@ -94,6 +94,77 @@ public class ApiServer {
                 }
             });
 
+            // Import JSON endpoint: accepts a JSON array of abonnements
+            post("/abonnements/import", (req, res) -> {
+                try {
+                    // read as array of Abonnement
+                    List<Abonnement> items = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<List<Abonnement>>(){});
+                    if (items == null || items.isEmpty()) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","no items to import")); }
+                    // basic validation and ensure ids
+                    List<Abonnement> toSave = new java.util.ArrayList<>();
+                    for (Abonnement a : items) {
+                        if (a.getNomService() == null || a.getNomService().isBlank()) continue;
+                        if (a.getDateDebut() == null || a.getDateFin() == null) continue;
+                        if (a.getClientName() == null || a.getClientName().isBlank()) continue;
+                        if (a.getPrixMensuel() < 0) continue;
+                        if (a.getId() == null || a.getId().isBlank()) a.setId(java.util.UUID.randomUUID().toString());
+                        toSave.add(a);
+                    }
+                    if (toSave.isEmpty()) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","no valid items to import")); }
+                    // merge with existing and save all
+                    List<Abonnement> existing = repo.findAll();
+                    existing.addAll(toSave);
+                    repo.saveAll(existing);
+                    res.status(201);
+                    return mapper.writeValueAsString(java.util.Map.of("imported", toSave.size()));
+                } catch (com.fasterxml.jackson.core.JsonParseException | com.fasterxml.jackson.databind.JsonMappingException e) {
+                    res.status(400);
+                    return mapper.writeValueAsString(java.util.Map.of("error","JSON invalide: " + e.getMessage()));
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(java.util.Map.of("error","Erreur interne lors de l'import"));
+                }
+            });
+
+            // Import JSON array endpoint: accepts a JSON array of abonnements
+            post("/abonnements/import", (req, res) -> {
+                res.type("application/json");
+                try {
+                    // parse body as array of Abonnement
+                    java.util.List<Abonnement> arr = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<java.util.List<Abonnement>>(){});
+                    if (arr == null || arr.isEmpty()) { res.status(400); return mapper.writeValueAsString(java.util.Map.of("error","fichier vide ou format invalide")); }
+
+                    java.util.List<Abonnement> existing = repo.findAll();
+                    java.util.List<String> errors = new java.util.ArrayList<>();
+                    int imported = 0;
+                    for (int i=0;i<arr.size();i++){
+                        Abonnement a = arr.get(i);
+                        // basic validation (reuse same rules)
+                        if (a.getNomService() == null || a.getNomService().isBlank()) { errors.add("index="+i+" nomService manquant"); continue; }
+                        if (a.getDateDebut() == null) { errors.add("index="+i+" dateDebut manquante"); continue; }
+                        if (a.getDateFin() == null) { errors.add("index="+i+" dateFin manquante"); continue; }
+                        if (a.getClientName() == null || a.getClientName().isBlank()) { errors.add("index="+i+" clientName manquant"); continue; }
+                        if (a.getPrixMensuel() < 0) { errors.add("index="+i+" prixMensuel invalide"); continue; }
+                        if (a.getId() == null || a.getId().isBlank()) a.setId(java.util.UUID.randomUUID().toString());
+                        existing.add(a);
+                        imported++;
+                    }
+                    // persist merged list
+                    repo.saveAll(existing);
+                    java.util.Map<String,Object> summary = new java.util.HashMap<>();
+                    summary.put("imported", imported);
+                    summary.put("errors", errors);
+                    res.status(201);
+                    return mapper.writeValueAsString(summary);
+                } catch (com.fasterxml.jackson.core.JsonParseException | com.fasterxml.jackson.databind.JsonMappingException e) {
+                    res.status(400);
+                    return mapper.writeValueAsString(java.util.Map.of("error","JSON invalide: "+e.getMessage()));
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(java.util.Map.of("error","Erreur interne"));
+                }
+            });
+
             put("/abonnements/:id", (req, res) -> {
                 String pid = req.params(":id");
                 Abonnement updated = mapper.readValue(req.body(), Abonnement.class);

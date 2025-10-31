@@ -192,29 +192,32 @@ document.getElementById('alertsBtn')?.addEventListener('click', async ()=>{
   render(alerts);
 });
 
-// Import JSON: accepts a file containing a JSON array of abonnement-like objects.
+// Import JSON: upload file to server endpoint which processes the whole array server-side
 // Each object should contain at least: clientName, nomService, dateDebut, dateFin.
 document.getElementById('importFile').addEventListener('change', async (e)=>{
   const f = e.target.files[0];
   if (!f) return;
-  const text = await f.text();
+  const flash = document.getElementById('flash'); flash.innerHTML = '';
+  const btn = document.getElementById('bulkDeleteBtn');
   try{
+    const text = await f.text();
+    // quick parse check
     const arr = JSON.parse(text);
     if (!Array.isArray(arr)){ alert('Le fichier doit contenir un tableau JSON'); return; }
-    // basic validation
-    const valid = [];
-    const invalid = [];
-    for(const it of arr){
-      if (it && it.nomService && it.clientName && it.dateDebut && it.dateFin) valid.push(it);
-      else invalid.push(it);
+    if (!confirm(`Importer ${arr.length} objets depuis le fichier ?`)) return;
+    // send whole array to server import endpoint
+    const r = await fetch(`${apiBase}/import`, {method:'POST', headers:{'Content-Type':'application/json'}, body:text});
+    if (r.status === 201) {
+      const info = await r.json();
+      flash.innerHTML = `<div class="alert alert-success">Import réussi : ${info.imported} abonnements ajoutés.</div>`;
+      load();
+    } else {
+      let msg = 'Erreur lors de l\'import';
+      try { const err = await r.json(); if (err && err.error) msg = err.error; } catch(e){}
+      flash.innerHTML = `<div class="alert alert-danger">${msg}</div>`;
     }
-    if (valid.length === 0){ alert('Aucun objet valide à importer (attendu: clientName, nomService, dateDebut, dateFin)'); return; }
-    if (!confirm(`Importer ${valid.length} abonnements valides${invalid.length?(' (et ignorer '+invalid.length+' invalides)'):''} ?`)) return;
-    for(const it of valid){ await fetch(apiBase,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(it)}); }
-    alert(`Import terminé: ${valid.length} abonnements ajoutés.`);
-    load();
   }
-  catch(err){ console.error(err); alert('Fichier JSON invalide ou erreur de lecture'); }
+  catch(err){ console.error(err); flash.innerHTML = `<div class="alert alert-danger">Fichier JSON invalide ou erreur: ${err.message}</div>`; }
 });
 
 // Edit modal logic
