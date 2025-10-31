@@ -26,6 +26,13 @@ public class GestionAbonnements {
     // Jackson mapper pour export/import JSON
     private final ObjectMapper objectMapper;
 
+    // Couleurs ANSI simples pour améliorer l'interface console
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+
     public GestionAbonnements() {
         this.listeAbonnements = new ArrayList<>();
         this.scanner = new Scanner(System.in);
@@ -114,16 +121,24 @@ public class GestionAbonnements {
 
     // Fonctionnalité 2: Afficher tous les abonnements
     public void afficherTousAbonnements() {
-        System.out.println("\n--- Liste de tous les abonnements ---");
+        System.out.println("\n" + ANSI_CYAN + "=== Liste de tous les abonnements ===" + ANSI_RESET);
         if (listeAbonnements.isEmpty()) {
-            System.out.println("Aucun abonnement enregistré pour le moment.");
+            System.out.println(ANSI_YELLOW + "Aucun abonnement enregistré pour le moment." + ANSI_RESET);
         } else {
+            // Affichage sous forme de tableau simple
+            System.out.printf(ANSI_GREEN + "%-4s | %-20s | %-10s | %-10s | %-8s | %-12s" + ANSI_RESET + "\n",
+                    "#", "Client", "Service", "Début", "Fin", "Prix/mois");
+            System.out.println("----+----------------------+------------+------------+----------+-------------");
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (int i = 0; i < listeAbonnements.size(); i++) {
-                System.out.println("Abonnement N°" + (i + 1) + ":");
-                System.out.println(listeAbonnements.get(i));
+                Abonnement a = listeAbonnements.get(i);
+                String debut = a.getDateDebut() != null ? a.getDateDebut().format(fmt) : "-";
+                String fin = a.getDateFin() != null ? a.getDateFin().format(fmt) : "-";
+                System.out.printf("%-4d | %-20s | %-10s | %-10s | %-8s | %-12s\n",
+                        (i + 1), truncate(a.getClientName(), 20), truncate(a.getNomService(), 10), debut, fin, String.format("%.2f€", a.getPrixMensuel()));
             }
         }
-        System.out.println("-------------------------------------\n");
+        System.out.println(ANSI_CYAN + "======================================" + ANSI_RESET + "\n");
     }
 
     // Fonctionnalité 3: Modifier un abonnement
@@ -184,6 +199,12 @@ public class GestionAbonnements {
         } else {
             System.out.println("Numéro d'abonnement invalide.");
         }
+    }
+
+    // Petite utilitaire pour tronquer des champs trop longs
+    private String truncate(String s, int max) {
+        if (s == null) return "";
+        return s.length() <= max ? s : s.substring(0, max - 3) + "...";
     }
 
     // Fonctionnalité 4: Supprimer un abonnement
@@ -380,7 +401,8 @@ public class GestionAbonnements {
         GestionAbonnements app = new GestionAbonnements();
         int choix;
 
-        do {
+    // Boucle principale du menu. On sort avec l'option 10 (Quitter).
+    do {
             System.out.println("\n===== Menu de Gestion des Abonnements =====");
             System.out.println("1. Ajouter un nouvel abonnement");
             System.out.println("2. Afficher tous les abonnements");
@@ -435,7 +457,7 @@ public class GestionAbonnements {
                 default:
                     System.out.println("Choix invalide. Veuillez réessayer.");
             }
-        } while (choix != 8);
+    } while (choix != 10);
 
         app.scanner.close();
     }
