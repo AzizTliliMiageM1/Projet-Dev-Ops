@@ -43,3 +43,7 @@ Notes de conception
 -------------------
 - Implementation simple avec Jackson pour la sérialisation JSON.
 - L'approche favorise la simplicité et la compatibilité.
+
+Diagramme
+---------
+![Diagramme de l'Interface Console](Fiche_Fonctionnalite_Interface_Console_Diagram.svg)
