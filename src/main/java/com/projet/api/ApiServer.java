@@ -15,6 +15,7 @@ import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.put;
+import static spark.Spark.staticFiles;
 
 /**
  * Petit serveur HTTP REST pour exposer les abonnements.
@@ -28,6 +29,8 @@ import static spark.Spark.put;
 public class ApiServer {
     public static void main(String[] args) {
         port(4567);
+        // Servir les fichiers statiques (UI web) depuis resources/static
+        staticFiles.location("/static");
         String dataFile = "abonnements.txt"; // même fichier que l'app console
         AbonnementRepository repo = new FileAbonnementRepository(dataFile);
 
