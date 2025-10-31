@@ -40,6 +40,8 @@ function renderDashboard(list){
 }
 
 function render(list){
+  // list is expected to contain objects with a special '__idx' property
+  // which denotes the original index in the full array returned by the API.
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
   list.forEach((a, idx) => {
@@ -56,19 +58,27 @@ function render(list){
     let lastUse = a.derniereUtilisation ? new Date(a.derniereUtilisation).toLocaleDateString() : 'N/A';
     stats.innerText = `${activeStatus} · Dernière utilisation: ${lastUse}`;
 
-    const bottom = document.createElement('div'); bottom.className='d-flex justify-content-between align-items-center mt-2';
+  const bottom = document.createElement('div'); bottom.className='d-flex justify-content-between align-items-center mt-2';
     const price = document.createElement('div'); price.className='price-badge'; price.innerText = (a.prixMensuel||0).toFixed(2) + '€';
 
     const btns = document.createElement('div');
     const edit = document.createElement('button'); edit.className='btn btn-sm btn-outline-primary me-2'; edit.innerText='Modifier';
-    edit.onclick = ()=> openEditModal(idx, a);
+  edit.onclick = ()=> openEditModal(a.__idx, a);
     const useBtn = document.createElement('button'); useBtn.className='btn btn-sm btn-success me-2'; useBtn.innerText='Utilisé';
-    useBtn.onclick = async ()=>{ await registerUsage(idx); load(); };
-    const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerText='Supprimer';
-    del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ await fetch(`${apiBase}/${idx}`, {method:'DELETE'}); load(); }}
+  useBtn.onclick = async ()=>{ await registerUsage(a.__idx); load(); };
+  const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerText='Supprimer';
+  del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ await fetch(`${apiBase}/${a.__idx}`, {method:'DELETE'}); load(); }}
+
+  // selection checkbox for bulk actions
+  const selectBox = document.createElement('input'); selectBox.type='checkbox'; selectBox.className='form-check-input me-2 select-abonnement';
+  selectBox.dataset.idx = a.__idx;
 
     btns.appendChild(edit); btns.appendChild(useBtn); btns.appendChild(del);
     bottom.appendChild(price); bottom.appendChild(btns);
+
+  // insert selection before title
+  const hdr = document.createElement('div'); hdr.className='d-flex align-items-center';
+  hdr.appendChild(selectBox); hdr.appendChild(title);
 
     // alert badge
     const alertBadge = document.createElement('div');
@@ -77,20 +87,34 @@ function render(list){
       alertBadge.innerHTML = `<div class="badge bg-danger mb-2">Inactif ${daysSince}j</div>`;
     }
 
-    c.appendChild(title); c.appendChild(meta); c.appendChild(stats); if (alertBadge.innerHTML) c.appendChild(alertBadge); c.appendChild(bottom);
+    c.appendChild(hdr); c.appendChild(meta); c.appendChild(stats); if (alertBadge.innerHTML) c.appendChild(alertBadge); c.appendChild(bottom);
     col.appendChild(c); cards.appendChild(col);
   })
 }
 
 async function load(){
   const all = await fetchAll();
-  renderDashboard(all);
+  // attach original index to each item so API calls keep stable references
+  const withIdx = all.map((it, i) => ({...it, __idx: i}));
+  renderDashboard(withIdx);
+
   // apply search filter if present
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-  const filtered = all.filter(a => {
+  const status = (document.getElementById('statusFilter')?.value || 'all');
+  const sortBy = (document.getElementById('sortSelect')?.value || 'none');
+
+  let filtered = withIdx.filter(a => {
     if (!q) return true;
     return (a.clientName||'').toLowerCase().includes(q) || (a.nomService||'').toLowerCase().includes(q);
   });
+
+  if (status === 'actifs') filtered = filtered.filter(isActive);
+  else if (status === 'expires') filtered = filtered.filter(a => !isActive(a));
+
+  if (sortBy === 'nom') filtered.sort((a,b)=> (a.clientName||'').localeCompare(b.clientName||''));
+  else if (sortBy === 'dateDebut') filtered.sort((a,b)=> new Date(a.dateDebut) - new Date(b.dateDebut));
+  else if (sortBy === 'dateFin') filtered.sort((a,b)=> new Date(a.dateFin) - new Date(b.dateFin));
+
   render(filtered);
 }
 
@@ -117,19 +141,48 @@ document.getElementById('exportBtn').addEventListener('click', async ()=>{
   const a = document.createElement('a'); a.href = url; a.download = 'abonnements_export.json'; a.click();
 });
 
+// bulk delete handler
+document.getElementById('bulkDeleteBtn')?.addEventListener('click', async ()=>{
+  const checks = Array.from(document.querySelectorAll('.select-abonnement:checked'));
+  if (checks.length === 0){ alert('Aucun abonnement sélectionné'); return; }
+  if (!confirm(`Supprimer ${checks.length} abonnements sélectionnés ?`)) return;
+  // gather indexes, sort descending to avoid shifting
+  const idxs = checks.map(c=>parseInt(c.dataset.idx)).sort((a,b)=>b-a);
+  for(const id of idxs){ await fetch(`${apiBase}/${id}`, {method:'DELETE'}); }
+  load();
+});
+
 document.getElementById('searchInput')?.addEventListener('input', ()=> load());
 document.getElementById('alertsBtn')?.addEventListener('click', async ()=>{
   const all = await fetchAll();
-  const alerts = all.filter(a => isActive(a) && a.derniereUtilisation && daysBetween(new Date(a.derniereUtilisation), new Date()) > 30);
+  const alerts = all.filter(a => isActive(a) && a.derniereUtilisation && daysBetween(new Date(a.derniereUtilisation), new Date()) > 30)
+                    .map((it,i)=> ({...it, __idx:i}));
   render(alerts);
 });
 
+// Import JSON: accepts a file containing a JSON array of abonnement-like objects.
+// Each object should contain at least: clientName, nomService, dateDebut, dateFin.
 document.getElementById('importFile').addEventListener('change', async (e)=>{
   const f = e.target.files[0];
   if (!f) return;
   const text = await f.text();
-  try{ const arr = JSON.parse(text); for(const it of arr){ await fetch(apiBase,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(it)}); } load(); }
-  catch(err){ alert('Fichier invalide'); }
+  try{
+    const arr = JSON.parse(text);
+    if (!Array.isArray(arr)){ alert('Le fichier doit contenir un tableau JSON'); return; }
+    // basic validation
+    const valid = [];
+    const invalid = [];
+    for(const it of arr){
+      if (it && it.nomService && it.clientName && it.dateDebut && it.dateFin) valid.push(it);
+      else invalid.push(it);
+    }
+    if (valid.length === 0){ alert('Aucun objet valide à importer (attendu: clientName, nomService, dateDebut, dateFin)'); return; }
+    if (!confirm(`Importer ${valid.length} abonnements valides${invalid.length?(' (et ignorer '+invalid.length+' invalides)'):''} ?`)) return;
+    for(const it of valid){ await fetch(apiBase,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(it)}); }
+    alert(`Import terminé: ${valid.length} abonnements ajoutés.`);
+    load();
+  }
+  catch(err){ console.error(err); alert('Fichier JSON invalide ou erreur de lecture'); }
 });
 
 // Edit modal logic

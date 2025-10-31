@@ -27,11 +27,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 import com.example.abonnement.Abonnement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.projet.repository.AbonnementRepository;
 import com.projet.repository.FileAbonnementRepository;
 
@@ -47,6 +49,12 @@ public class GestionAbonnementsGui extends JFrame {
 
     public GestionAbonnementsGui() {
         super("Gestion d'abonnements — Interface graphique");
+        // Installer un look moderne (FlatLaf)
+        try {
+            FlatLightLaf.install();
+        } catch (Exception ex) {
+            // ignore si l'installation échoue
+        }
         this.repo = new FileAbonnementRepository("abonnements.txt");
         this.listModel = new DefaultListModel<>();
         this.abonnementJList = new JList<>(listModel);
@@ -64,30 +72,37 @@ public class GestionAbonnementsGui extends JFrame {
     }
 
     private void initUi() {
-        JPanel root = new JPanel(new BorderLayout(10, 10));
-        root.setBorder(new EmptyBorder(10, 10, 10, 10));
+    JPanel root = new JPanel(new BorderLayout(10, 10));
+    root.setBorder(new EmptyBorder(12, 12, 12, 12));
+    root.setBackground(Color.decode("#F6F9FC"));
 
-        // Header
-        JLabel title = new JLabel("Gestion d'abonnements");
-        title.setFont(new Font("SansSerif", Font.BOLD, 20));
-        title.setForeground(new Color(33, 37, 41));
-        root.add(title, BorderLayout.NORTH);
+    // Header (panel coloré)
+    JPanel header = new JPanel(new BorderLayout());
+    header.setBackground(Color.decode("#3B82F6"));
+    header.setBorder(new EmptyBorder(12, 12, 12, 12));
+    JLabel title = new JLabel("Gestion d'abonnements");
+    title.setFont(new Font("SansSerif", Font.BOLD, 22));
+    title.setForeground(Color.white);
+    header.add(title, BorderLayout.WEST);
+    root.add(header, BorderLayout.NORTH);
 
         // Center: list with custom renderer
         abonnementJList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            JPanel p = new JPanel(new BorderLayout());
-            p.setBorder(new EmptyBorder(6, 6, 6, 6));
+            JPanel p = new JPanel(new BorderLayout(4, 4));
+            p.setBorder(new EmptyBorder(8, 8, 8, 8));
+            p.setBackground(Color.white);
+            p.setOpaque(true);
+            p.setBorder(new LineBorder(Color.decode("#E6EEF8"), 1, true));
             JLabel l = new JLabel(value.getClientName() + " — " + value.getNomService());
-            l.setFont(new Font("SansSerif", Font.PLAIN, 14));
-            JLabel sub = new JLabel("De " + value.getDateDebut() + " à " + value.getDateFin() + " — " + String.format("%.2f€", value.getPrixMensuel()));
+            l.setFont(new Font("SansSerif", Font.BOLD, 14));
+            l.setForeground(Color.decode("#0F172A"));
+            JLabel sub = new JLabel("De " + (value.getDateDebut() != null ? value.getDateDebut().toString() : "-") + " à " + (value.getDateFin() != null ? value.getDateFin().toString() : "-") + " — " + String.format("%.2f€", value.getPrixMensuel()));
             sub.setFont(new Font("SansSerif", Font.PLAIN, 12));
-            sub.setForeground(Color.DARK_GRAY);
+            sub.setForeground(Color.decode("#475569"));
             p.add(l, BorderLayout.NORTH);
             p.add(sub, BorderLayout.SOUTH);
             if (isSelected) {
-                p.setBackground(new Color(220, 235, 255));
-            } else {
-                p.setBackground(Color.WHITE);
+                p.setBackground(Color.decode("#E0F2FE"));
             }
             return p;
         });
@@ -96,9 +111,10 @@ public class GestionAbonnementsGui extends JFrame {
         root.add(scroll, BorderLayout.CENTER);
 
         // Right: buttons
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
-        buttons.setBorder(new EmptyBorder(0, 10, 0, 0));
+    JPanel buttons = new JPanel();
+    buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+    buttons.setBorder(new EmptyBorder(0, 10, 0, 0));
+    buttons.setBackground(Color.decode("#F6F9FC"));
 
         JButton addBtn = createButton("Ajouter", new Color(40, 167, 69));
         addBtn.addActionListener(this::onAdd);

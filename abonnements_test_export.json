@@ -1,0 +1,17 @@
+[ {
+  "nomService" : "BNParibas",
+  "dateDebut" : "2026-05-06",
+  "dateFin" : "2029-08-06",
+  "prixMensuel" : 1500.0,
+  "clientName" : "Aziz",
+  "derniereUtilisation" : "2026-05-06",
+  "categorie" : "Non classé"
+}, {
+  "nomService" : "Test Service",
+  "dateDebut" : "2025-10-01",
+  "dateFin" : "2026-10-01",
+  "prixMensuel" : 4.99,
+  "clientName" : "Test Client",
+  "derniereUtilisation" : "2025-10-01",
+  "categorie" : "Non classé"
+} ]

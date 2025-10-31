@@ -31,8 +31,16 @@ public class ApiServer {
         port(4567);
         // Servir les fichiers statiques (UI web) depuis resources/static
         staticFiles.location("/static");
-        String dataFile = "abonnements.txt"; // même fichier que l'app console
-        AbonnementRepository repo = new FileAbonnementRepository(dataFile);
+        String repoType = System.getenv().getOrDefault("REPO", "file");
+        AbonnementRepository repo;
+        if ("db".equalsIgnoreCase(repoType)) {
+            // Use H2 embedded DB file 'abonnements-db' in working dir
+            String jdbc = System.getProperty("JDBC_URL", "jdbc:h2:./abonnements-db;AUTO_SERVER=TRUE");
+            repo = new com.projet.repository.DatabaseAbonnementRepository(jdbc);
+        } else {
+            String dataFile = "abonnements.txt"; // même fichier que l'app console
+            repo = new FileAbonnementRepository(dataFile);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());

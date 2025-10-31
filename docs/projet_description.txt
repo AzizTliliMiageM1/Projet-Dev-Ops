@@ -53,4 +53,17 @@ Limitations / prochaines étapes :
 - Ajouter validation côté API (dates invalides, prix négatif) et renvoyer des codes d'erreur appropriés.
 - Produire un uber-jar (maven-shade) si tu veux un seul JAR exécutable.
 
-Fait avec style étudiant — j'espère que ça te plaît :) 
+Nouvelles fonctionnalités (UI web)
+---------------------------------
+- Import JSON amélioré : l'UI permet d'importer un fichier JSON contenant un tableau d'abonnements. Le front-end
+  valide basiquement chaque objet (champs requis : clientName, nomService, dateDebut, dateFin) et envoie les
+  objets valides au serveur via POST. Les objets invalides sont ignorés et signalés.
+- Filtres & tri : la web UI propose maintenant un filtre par statut (Tous / Actifs / Expirés) et un tri (par nom
+  client, date de début, date de fin) côté client.
+- Suppression multiple : possibilité de sélectionner plusieurs abonnements puis de supprimer la sélection en
+  une fois.
+
+Documentation associée :
+- `docs/Fiche_Fonctionnalite_Import_JSON.md` décrit le flux d'import JSON, les validations et les limites.
+
+Où trouver l'UI : http://localhost:4567 (servie par l'ApiServer)
