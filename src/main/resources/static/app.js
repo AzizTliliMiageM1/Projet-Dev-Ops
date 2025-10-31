@@ -62,11 +62,11 @@ function render(list){
     const price = document.createElement('div'); price.className='price-badge'; price.innerText = (a.prixMensuel||0).toFixed(2) + '€';
 
     const btns = document.createElement('div');
-    const edit = document.createElement('button'); edit.className='btn btn-sm btn-outline-primary me-2'; edit.innerText='Modifier';
+  const edit = document.createElement('button'); edit.className='btn btn-sm btn-outline-primary me-2'; edit.innerHTML='<i class="fa fa-pen me-1"></i>Modifier';
   edit.onclick = ()=> openEditModal(a.__idx, a);
-    const useBtn = document.createElement('button'); useBtn.className='btn btn-sm btn-success me-2'; useBtn.innerText='Utilisé';
+  const useBtn = document.createElement('button'); useBtn.className='btn btn-sm btn-success me-2'; useBtn.innerHTML='<i class="fa fa-check me-1"></i>Utilisé';
   useBtn.onclick = async ()=>{ await registerUsage(a.__idx); load(); };
-  const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerText='Supprimer';
+  const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerHTML='<i class="fa fa-trash me-1"></i>Supprimer';
   del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ await fetch(`${apiBase}/${a.__idx}`, {method:'DELETE'}); load(); }}
 
   // selection checkbox for bulk actions
@@ -140,6 +140,16 @@ document.getElementById('exportBtn').addEventListener('click', async ()=>{
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a'); a.href = url; a.download = 'abonnements_export.json'; a.click();
 });
+
+// visual feedback for refresh: add spinner briefly
+const originalRefreshHtml = document.getElementById('refreshBtn').innerHTML;
+async function showRefreshing(){
+  const btn = document.getElementById('refreshBtn');
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Chargement...';
+  await new Promise(r => setTimeout(r, 600));
+  btn.innerHTML = originalRefreshHtml;
+}
+document.getElementById('refreshBtn').addEventListener('click', async ()=>{ await showRefreshing(); load(); });
 
 // bulk delete handler
 document.getElementById('bulkDeleteBtn')?.addEventListener('click', async ()=>{

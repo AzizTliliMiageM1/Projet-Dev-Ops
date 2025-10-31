@@ -32,7 +32,15 @@ Endpoints disponibles :
 
 Pour lancer l'API localement :
 ```bash
+
+# Lancer l'API (par défaut file-backed)
 mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+
+# Lancer l'API avec H2 (DB embarquée, persistance) :
+REPO=db mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+
+# Lancer l'API avec H2 en mémoire (utile pour tests rapides) :
+REPO=db mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer -DJDBC_URL=jdbc:h2:mem:abos;DB_CLOSE_DELAY=-1
 ```
 
 Exemples curl :
@@ -51,6 +59,8 @@ Pour l'ouvrir :
 1. Démarre le serveur API :
 ```bash
 mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+# Ou avec la DB embarquée :
+REPO=db mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
 ```
 2. Ouvre ton navigateur et va sur :
 ```

@@ -30,3 +30,14 @@ body{
   .navbar-brand{font-size:1.05rem}
   #cards .card{flex-direction:column}
 }
+
+/* Header polish */
+.navbar{background:linear-gradient(90deg,var(--primary),#4f46e5)}
+.navbar .navbar-brand{color:white}
+.navbar .btn-outline-light{border-color:rgba(255,255,255,0.15);color:white}
+
+/* Buttons */
+.btn-sm { padding: 0.35rem 0.6rem; }
+
+/* empty state */
+.empty-state{padding:40px;text-align:center;color:var(--muted);background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));border-radius:10px}
