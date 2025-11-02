@@ -81,14 +81,7 @@ public class FileAbonnementRepository implements AbonnementRepository {
         }
     }
 
-    @Override
-    public Optional<Abonnement> findById(int id) {
-        List<Abonnement> abonnements = findAll();
-        if (id >= 0 && id < abonnements.size()) {
-            return Optional.of(abonnements.get(id));
-        }
-        return Optional.empty();
-    }
+
 
     @Override
     public Optional<Abonnement> findByUuid(String uuid) {

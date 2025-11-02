@@ -18,36 +18,59 @@ import org.slf4j.LoggerFactory;
 import com.example.abonnement.Abonnement;
 
 /**
- * Repository minimal utilisant H2 (ou autre JDBC) pour stocker les abonnements.
- * Important: pour rester compatible avec l'API existante qui utilise des indices 0-based
- * comme identifiants, les méthodes findById/delete/put utilisent l'index comme OFFSET
- * dans les requêtes ORDER BY id.
+ * Implémentation JDBC simple pour H2 (ou autre via JDBC URL) de AbonnementRepository.
+ * Utilise une table `abonnements` avec une colonne id (UUID stockée en texte).
  */
 public class DatabaseAbonnementRepository implements AbonnementRepository {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseAbonnementRepository.class);
     private final String jdbcUrl;
+    private final String username;
+    private final String password;
 
+    public DatabaseAbonnementRepository() {
+        this(System.getenv("JDBC_URL") != null ? System.getenv("JDBC_URL") : "jdbc:h2:./data/abonnements-db",
+             System.getenv("JDBC_USER"), System.getenv("JDBC_PASS"));
+    }
+
+    /**
+     * Convenience constructor used by ApiServer when passing a single JDBC URL string.
+     */
     public DatabaseAbonnementRepository(String jdbcUrl) {
+        this(jdbcUrl, System.getenv("JDBC_USER"), System.getenv("JDBC_PASS"));
+    }
+
+    public DatabaseAbonnementRepository(String jdbcUrl, String username, String password) {
         this.jdbcUrl = jdbcUrl;
-        try (Connection c = getConnection(); Statement s = c.createStatement()) {
-        s.execute("CREATE TABLE IF NOT EXISTS abonnements ("
-            + "id VARCHAR(36) PRIMARY KEY,"
-            + "nom_service VARCHAR(255),"
-            + "date_debut DATE,"
-            + "date_fin DATE,"
-            + "prix_mensuel DOUBLE,"
-            + "client_name VARCHAR(255),"
-            + "derniere_utilisation DATE,"
-            + "categorie VARCHAR(255)"
-            + ")");
+        this.username = username;
+        this.password = password;
+        try {
+            ensureTable();
         } catch (SQLException e) {
-            logger.error("Erreur initialisation DB: {}", e.getMessage(), e);
-            throw new RuntimeException(e);
+            logger.error("Erreur lors de l'initialisation de la base: {}", e.getMessage(), e);
         }
     }
 
     private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(jdbcUrl);
+        if (username == null || username.isEmpty()) {
+            return DriverManager.getConnection(jdbcUrl);
+        }
+        return DriverManager.getConnection(jdbcUrl, username, password);
+    }
+
+    private void ensureTable() throws SQLException {
+        String ddl = "CREATE TABLE IF NOT EXISTS abonnements ("
+                + "id VARCHAR(64) PRIMARY KEY,"
+                + "nom_service VARCHAR(255),"
+                + "date_debut DATE,"
+                + "date_fin DATE,"
+                + "prix_mensuel DOUBLE,"
+                + "client_name VARCHAR(255),"
+                + "derniere_utilisation DATE,"
+                + "categorie VARCHAR(255)"
+                + ")";
+        try (Connection c = getConnection(); Statement st = c.createStatement()) {
+            st.execute(ddl);
+        }
     }
 
     @Override
@@ -64,8 +87,8 @@ public class DatabaseAbonnementRepository implements AbonnementRepository {
                 String client = rs.getString(6);
                 Date last = rs.getDate(7);
                 String cat = rs.getString(8);
-                LocalDate ldDeb = dDeb != null ? dDeb.toLocalDate() : LocalDate.now();
-                LocalDate ldFin = dFin != null ? dFin.toLocalDate() : LocalDate.now();
+                LocalDate ldDeb = dDeb != null ? dDeb.toLocalDate() : null;
+                LocalDate ldFin = dFin != null ? dFin.toLocalDate() : null;
                 LocalDate ldLast = last != null ? last.toLocalDate() : null;
                 Abonnement a = new Abonnement(id, nom, ldDeb, ldFin, prix, client, ldLast, cat != null ? cat : "Non classé");
                 out.add(a);
@@ -108,83 +131,6 @@ public class DatabaseAbonnementRepository implements AbonnementRepository {
     }
 
     @Override
-    public Optional<Abonnement> findById(int id) {
-        // id here is treated as offset in ordered set
-        String sql = "SELECT id, nom_service, date_debut, date_fin, prix_mensuel, client_name, derniere_utilisation, categorie FROM abonnements ORDER BY id LIMIT 1 OFFSET ?";
-        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    String uuid = rs.getString(1);
-                    String nom = rs.getString(2);
-                    Date dDeb = rs.getDate(3);
-                    Date dFin = rs.getDate(4);
-                    double prix = rs.getDouble(5);
-                    String client = rs.getString(6);
-                    Date last = rs.getDate(7);
-                    String cat = rs.getString(8);
-                    LocalDate ldDeb = dDeb != null ? dDeb.toLocalDate() : LocalDate.now();
-                    LocalDate ldFin = dFin != null ? dFin.toLocalDate() : LocalDate.now();
-                    LocalDate ldLast = last != null ? last.toLocalDate() : null;
-                    Abonnement a = new Abonnement(uuid, nom, ldDeb, ldFin, prix, client, ldLast, cat != null ? cat : "Non classé");
-                    return Optional.of(a);
-                }
-            }
-        } catch (SQLException e) {
-            logger.error("Erreur findById DB: {}", e.getMessage(), e);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public void save(Abonnement abonnement) {
-        String insertSql = "INSERT INTO abonnements (id, nom_service, date_debut, date_fin, prix_mensuel, client_name, derniere_utilisation, categorie) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(insertSql)) {
-            ps.setString(1, abonnement.getId());
-            ps.setString(2, abonnement.getNomService());
-            ps.setDate(3, abonnement.getDateDebut() != null ? Date.valueOf(abonnement.getDateDebut()) : null);
-            ps.setDate(4, abonnement.getDateFin() != null ? Date.valueOf(abonnement.getDateFin()) : null);
-            ps.setDouble(5, abonnement.getPrixMensuel());
-            ps.setString(6, abonnement.getClientName());
-            ps.setDate(7, abonnement.getDerniereUtilisation() != null ? Date.valueOf(abonnement.getDerniereUtilisation()) : null);
-            ps.setString(8, abonnement.getCategorie());
-            ps.executeUpdate();
-            logger.info("Abonnement inséré: {} - {}", abonnement.getClientName(), abonnement.getNomService());
-        } catch (SQLException e) {
-            logger.error("Erreur insert DB: {}", e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void delete(Abonnement abonnement) {
-        // find its offset in the ordered list and delete by id
-        List<Abonnement> all = findAll();
-        int idx = -1;
-        for (int i = 0; i < all.size(); i++) {
-            if (all.get(i).equals(abonnement)) { idx = i; break; }
-        }
-        if (idx == -1) return;
-        // get db id at offset
-        String idSql = "SELECT id FROM abonnements ORDER BY id LIMIT 1 OFFSET ?";
-        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(idSql)) {
-            ps.setInt(1, idx);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    long dbId = rs.getLong(1);
-                    String uuid = rs.getString(1);
-                    try (PreparedStatement del = c.prepareStatement("DELETE FROM abonnements WHERE id = ?")) {
-                        del.setString(1, uuid);
-                        del.executeUpdate();
-                        logger.info("Abonnement supprimé id={}", uuid);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            logger.error("Erreur delete DB: {}", e.getMessage(), e);
-        }
-    }
-
-    @Override
     public Optional<Abonnement> findByUuid(String uuid) {
         String sql = "SELECT id, nom_service, date_debut, date_fin, prix_mensuel, client_name, derniere_utilisation, categorie FROM abonnements WHERE id = ?";
         try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
@@ -199,8 +145,8 @@ public class DatabaseAbonnementRepository implements AbonnementRepository {
                     String client = rs.getString(6);
                     Date last = rs.getDate(7);
                     String cat = rs.getString(8);
-                    LocalDate ldDeb = dDeb != null ? dDeb.toLocalDate() : LocalDate.now();
-                    LocalDate ldFin = dFin != null ? dFin.toLocalDate() : LocalDate.now();
+                    LocalDate ldDeb = dDeb != null ? dDeb.toLocalDate() : null;
+                    LocalDate ldFin = dFin != null ? dFin.toLocalDate() : null;
                     LocalDate ldLast = last != null ? last.toLocalDate() : null;
                     Abonnement a = new Abonnement(id, nom, ldDeb, ldFin, prix, client, ldLast, cat != null ? cat : "Non classé");
                     return Optional.of(a);
@@ -210,6 +156,32 @@ public class DatabaseAbonnementRepository implements AbonnementRepository {
             logger.error("Erreur findByUuid DB: {}", e.getMessage(), e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void save(Abonnement abonnement) {
+        String insertSql = "MERGE INTO abonnements (id, nom_service, date_debut, date_fin, prix_mensuel, client_name, derniere_utilisation, categorie) KEY(id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        // H2 supports MERGE; for other DBs this may need to be adjusted.
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(insertSql)) {
+            ps.setString(1, abonnement.getId());
+            ps.setString(2, abonnement.getNomService());
+            ps.setDate(3, abonnement.getDateDebut() != null ? Date.valueOf(abonnement.getDateDebut()) : null);
+            ps.setDate(4, abonnement.getDateFin() != null ? Date.valueOf(abonnement.getDateFin()) : null);
+            ps.setDouble(5, abonnement.getPrixMensuel());
+            ps.setString(6, abonnement.getClientName());
+            ps.setDate(7, abonnement.getDerniereUtilisation() != null ? Date.valueOf(abonnement.getDerniereUtilisation()) : null);
+            ps.setString(8, abonnement.getCategorie());
+            ps.executeUpdate();
+            logger.info("Abonnement inséré/mis à jour: {} - {}", abonnement.getClientName(), abonnement.getNomService());
+        } catch (SQLException e) {
+            logger.error("Erreur insert/update DB: {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void delete(Abonnement abonnement) {
+        if (abonnement == null || abonnement.getId() == null) return;
+        deleteByUuid(abonnement.getId());
     }
 
     @Override

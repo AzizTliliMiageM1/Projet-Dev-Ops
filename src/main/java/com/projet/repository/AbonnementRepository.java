@@ -12,7 +12,6 @@ import com.example.abonnement.Abonnement;
 public interface AbonnementRepository {
 	List<Abonnement> findAll();
 	void saveAll(List<Abonnement> abonnements);
-	Optional<Abonnement> findById(int id);
 	Optional<Abonnement> findByUuid(String uuid);
 	void save(Abonnement abonnement);
 	void delete(Abonnement abonnement);
