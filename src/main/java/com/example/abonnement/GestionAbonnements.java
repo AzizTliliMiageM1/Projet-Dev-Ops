@@ -51,6 +51,12 @@ public class GestionAbonnements {
         chargerAbonnements(); // Charger les abonnements au démarrage
     }
 
+    // >>> AJOUT: getter public pour exposer la liste aux autres couches (service/API)
+    public List<Abonnement> getListeAbonnements() {
+        return listeAbonnements;
+    }
+    // <<<
+
     // Méthode utilitaire pour lire une date de l'utilisateur
     private LocalDate lireDate(String prompt) {
         LocalDate date = null;
@@ -368,7 +374,8 @@ public class GestionAbonnements {
     }
 
     // Sauvegarder les abonnements dans un fichier
-    private void sauvegarderAbonnements() {
+    // >>> CHANGEMENT: visibilité public (au lieu de private) pour que le service puisse l'appeler
+    public void sauvegarderAbonnements() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FICHIER_ABONNEMENTS))) {
             for (Abonnement abonnement : listeAbonnements) {
                 writer.write(abonnement.toCsvString());
@@ -379,6 +386,7 @@ public class GestionAbonnements {
             System.err.println("Erreur lors de la sauvegarde des abonnements: " + e.getMessage());
         }
     }
+    // <<<
 
     // Charger les abonnements depuis un fichier
     private void chargerAbonnements() {
@@ -408,8 +416,8 @@ public class GestionAbonnements {
         GestionAbonnements app = new GestionAbonnements();
         int choix;
 
-    // Boucle principale du menu. On sort avec l'option 10 (Quitter).
-    do {
+        // Boucle principale du menu. On sort avec l'option 10 (Quitter).
+        do {
             System.out.println("\n===== Menu de Gestion des Abonnements =====");
             System.out.println("1. Ajouter un nouvel abonnement");
             System.out.println("2. Afficher tous les abonnements");
@@ -464,9 +472,8 @@ public class GestionAbonnements {
                 default:
                     System.out.println("Choix invalide. Veuillez réessayer.");
             }
-    } while (choix != 10);
+        } while (choix != 10);
 
         app.scanner.close();
     }
 }
-
