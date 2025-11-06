@@ -1,79 +1,68 @@
 :root{
-  --primary:#0d6efd;
-  --primary-2:#4f46e5;
-  --accent:#f43f5e; /* rose framboise */
-  --teal:#14b8a6;
-  --amber:#f59e0b;
-  --slate:#0f172a;
-  --muted:#6b7280;
-  --card:#ffffff;
-  --bg-grad-1:#eef5ff;
-  --bg-grad-2:#f7f9ff;
+  /* même palette que home.css */
+  --ink:#0f172a; --muted:#667085;
+  --primary:#2f6ef0; --primary-2:#8b5cf6;
+  --accent:#f43f5e; --teal:#1e7d8a; --amber:#f59e0b;
+  --card:#ffffff; --bg-grad-1:#eef5ff; --bg-grad-2:#f7f9ff;
+  --border:#e5e7eb; --radius:16px; --shadow:0 10px 30px rgba(2,6,23,.10);
 }
 
 /* Base */
 *{box-sizing:border-box}
 body{
-  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial;
   background: linear-gradient(180deg,var(--bg-grad-1),var(--bg-grad-2));
-  color:#1f2937;
+  color:var(--ink);
 }
 
-/* Hero */
+/* Hero (dégradé cohérent) */
 .app-hero{
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(79,70,229,.35), transparent 60%),
-              radial-gradient(900px 500px at 100% 0%, rgba(13,110,253,.35), transparent 60%),
-              linear-gradient(90deg, #536dfe, #7c4dff);
+  background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(47,110,240,.35), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(139,92,246,.30), transparent 60%),
+    linear-gradient(90deg, #2f6ef0, #8b5cf6);
   color:#fff;
 }
 .brand-badge{
-  width:42px;height:42px;border-radius:12px;
-  display:grid;place-items:center;
-  background:rgba(255,255,255,.15);backdrop-filter: blur(4px);
-  font-size:18px
+  width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+  background:rgba(255,255,255,.15);backdrop-filter: blur(6px);font-size:18px
 }
 .app-title{font-weight:800;letter-spacing:.2px}
-.app-subtitle{opacity:.9;font-size:.9rem}
+.app-subtitle{opacity:.92;font-size:.92rem}
 
 /* Buttons */
 .btn-white{background:#fff;border:0;box-shadow:0 6px 18px rgba(0,0,0,.08)}
-.btn-glass{
-  background: rgba(255,255,255,.15);
-  color:#fff;border:1px solid rgba(255,255,255,.2)
-}
+.btn-glass{background: rgba(255,255,255,.15); color:#fff;border:1px solid rgba(255,255,255,.25)}
 .btn-glass:hover{background:rgba(255,255,255,.25);color:#fff}
 
-/* Panels / Cards */
-.shadow-soft{box-shadow:0 10px 30px rgba(15,20,40,.08)}
-.panel{border-radius:16px;overflow:hidden;background:var(--card)}
+/* Toolbar */
+.toolbar .form-control,.toolbar .form-select{border-radius:12px}
+
+/* Cartes / panneaux */
+.shadow-soft{box-shadow:var(--shadow)}
+.panel{border-radius:var(--radius);overflow:hidden;background:var(--card)}
 .panel-header{
   padding:12px 16px;background:linear-gradient(90deg,#e8f0ff,#eef2ff);
-  display:flex;align-items:center;justify-content:space-between
+  display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)
 }
 .panel-header .circle{
-  width:28px;height:28px;border-radius:999px;display:grid;place-items:center;
-  color:#fff;background:linear-gradient(135deg,var(--primary),var(--primary-2))
+  width:28px;height:28px;border-radius:999px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2))
 }
-.panel-header .circle.soft{
-  background:linear-gradient(135deg,var(--amber),#ffd166)
-}
+.panel-header .circle.soft{background:linear-gradient(135deg,var(--amber),#ffd166)}
 .panel-body{padding:16px}
 
-/* Toolbar */
-.toolbar .form-control,.toolbar .form-select{border-radius:10px}
-
-/* KPI Dashboard (rempli par JS) */
+/* KPI (remplis par JS) */
 .dashboard-card{
   border-radius:14px;padding:14px;background:rgba(255,255,255,.75);
-  backdrop-filter: blur(8px);
-  border:1px solid rgba(13,110,253,.08)
+  backdrop-filter: blur(8px); border:1px solid rgba(13,110,253,.08)
 }
-.dashboard-card .dashboard-count{font-size:1.5rem;font-weight:800}
+.dashboard-card .dashboard-count{font-size:1.5rem;font-weight:800;color:var(--primary)}
 .small-muted{color:var(--muted);font-size:.9rem}
 
-/* Abonnement cards (conteneur #cards) */
+/* Cartes d’abonnements (#cards) */
 #cards .card{
-  border-radius:16px;border:0;background:var(--card);
+  border-radius:16px;border:1px solid var(--border);background:var(--card);
   box-shadow:0 12px 28px rgba(15,20,40,.08);
   transition: transform .15s ease, box-shadow .15s ease;
 }
@@ -88,23 +77,63 @@ body{
 /* Empty state */
 .empty-state{
   width:100%;text-align:center;padding:48px;border-radius:16px;
-  background:linear-gradient(180deg,rgba(255,255,255,.65),rgba(255,255,255,.3));
-  border:1px dashed rgba(15,20,40,.12); color:#64748b
+  background:linear-gradient(180deg,rgba(255,255,255,.75),rgba(255,255,255,.40));
+  border:1px dashed rgba(15,20,40,.14); color:#64748b
 }
 .empty-state .emoji{font-size:38px;margin-bottom:6px}
 
-/* Utilities */
+/* Utilitaires */
 .btn-amber{background:var(--amber);color:#111;border:0}
 .btn-amber:hover{filter:brightness(.95)}
 .btn-icon{border:0;background:transparent;color:#334155}
 .btn-icon:hover{color:#111}
 
-/* Navbar (if used) */
-.navbar{background:linear-gradient(90deg,var(--primary),var(--primary-2))}
-.navbar .navbar-brand{color:#fff}
-.navbar .btn-outline-light{border-color:rgba(255,255,255,.2);color:#fff}
+/* Inputs */
+.form-control, .form-select{border:1px solid var(--border); border-radius:12px}
+.form-control:focus, .form-select:focus{
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(47,110,240,.12)
+}
 
-/* Responsive polish */
+/* Responsive */
 @media (max-width: 768px){
-  .app-title{font-size:1.1rem}
+  .app-title{font-size:1.15rem}
+}
+/* ====== Carte : structure nouvelle ====== */
+.sub-card { position: relative; border-radius: 18px; background:#fff; border:1px solid #eef0f4;
+  box-shadow:0 12px 28px rgba(15,20,40,.08); padding:18px 18px 16px; overflow:hidden; }
+.sub-card:hover{ box-shadow:0 18px 44px rgba(15,20,40,.12); transform:translateY(-2px); transition:.15s ease; }
+
+/* Prix en haut GAUCHE (sans empiéter) */
+.price-badge.left {
+  position:absolute; top:12px; left:12px;
+  background:linear-gradient(135deg,#7c3aed,#f43f5e); color:#fff;
+  padding:6px 12px; border-radius:999px; font-weight:800; z-index:2;
+}
+.sub-card-inner { padding-top:46px; } /* espace réservé pour le badge prix */
+
+/* Titre + checkbox */
+.sub-title { display:flex; align-items:center; gap:8px; font-weight:800; font-size:1.06rem; }
+.sub-meta { color:#667085; margin-top:2px; }
+
+/* Bloc actions : pile + split 50/50 */
+.actions-stack { margin-top:12px; }
+.btn-used-full { width:100%; padding:10px 14px; border-radius:12px; border:0; font-weight:700;
+  background:linear-gradient(90deg,#10b981,#16a34a); color:#fff; }
+.btn-used-full:hover{ filter:saturate(110%); }
+
+.actions-split { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px; }
+.btn-edit-split { background:#e8f0ff; color:#2563eb; border:0; padding:10px 12px; border-radius:12px; font-weight:700; }
+.btn-edit-split:hover{ background:#dbe7ff; }
+.btn-delete-split { background:#ef4444; color:#fff; border:0; padding:10px 12px; border-radius:12px; font-weight:700; }
+.btn-delete-split:hover{ background:#dc2626; }
+
+/* Harmonise checkbox dans le titre */
+.sub-check { width:16px; height:16px; accent-color:#2f6ef0; }
+
+/* Optionnel: fine barre de couleur à gauche */
+.sub-card::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:6px;
+  background:linear-gradient(180deg,#2f6ef0,#8b5cf6);
+  border-top-left-radius:18px; border-bottom-left-radius:18px;
 }

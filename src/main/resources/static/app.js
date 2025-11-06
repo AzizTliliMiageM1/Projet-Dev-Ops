@@ -1,5 +1,15 @@
 const apiBase = '/api/abonnements';
 
+/* ---------- helpers ---------- */
+function escapeHtml(s){
+  return String(s ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#39;");
+}
+
 async function fetchAll(){
   const r = await fetch(apiBase);
   if (!r.ok) return [];
@@ -18,6 +28,7 @@ function daysBetween(d1, d2){
   return diff;
 }
 
+/* ---------- dashboard ---------- */
 function renderDashboard(list){
   const dash = document.getElementById('dashboard');
   dash.innerHTML = '';
@@ -39,66 +50,86 @@ function renderDashboard(list){
   dash.appendChild(makeCard('Alertes', alerts, 'crimson'));
 }
 
+/* ---------- cartes (NOUVEAU LAYOUT) ---------- */
 function render(list){
-  // list is expected to contain objects with a special '__idx' property
-  // which denotes the original index in the full array returned by the API.
   const cards = document.getElementById('cards');
   cards.innerHTML = '';
-  list.forEach((a, idx) => {
-    const col = document.createElement('div'); col.className='col-12 col-md-6';
-    const c = document.createElement('div'); c.className='card p-3';
-    const title = document.createElement('div'); title.className='title'; title.innerText = a.clientName + ' — ' + a.nomService;
-    const meta = document.createElement('div'); meta.className='small-muted';
-    const debut = a.dateDebut || '-';
-    const fin = a.dateFin || '-';
-    meta.innerText = `De ${debut} à ${fin} · ${a.categorie || 'Non classé'}`;
 
-    const stats = document.createElement('div'); stats.className='mt-2 small-muted';
-    const activeStatus = isActive(a) ? 'Actif' : 'Expiré';
-    let lastUse = a.derniereUtilisation ? new Date(a.derniereUtilisation).toLocaleDateString() : 'N/A';
-    stats.innerText = `${activeStatus} · Dernière utilisation: ${lastUse}`;
+  list.forEach((a) => {
+    const col = document.createElement('div');
+    col.className = 'col-12 col-md-6';
 
-  const bottom = document.createElement('div'); bottom.className='d-flex justify-content-between align-items-center mt-2';
-    const price = document.createElement('div'); price.className='price-badge'; price.innerText = (a.prixMensuel||0).toFixed(2) + '€';
+    const clientName = a.clientName || '';
+    const nomService = a.nomService || '';
+    const dateDebut = a.dateDebut || '-';
+    const dateFin = a.dateFin || '-';
+    const categorie = a.categorie || 'Non classé';
+    const estActif = isActive(a);
+    const derniereUtilisation = a.derniereUtilisation
+      ? new Date(a.derniereUtilisation).toLocaleDateString()
+      : 'N/A';
+    const prixMensuel = Number(a.prixMensuel || 0);
 
-    const btns = document.createElement('div');
-  const edit = document.createElement('button'); edit.className='btn btn-sm btn-outline-primary me-2'; edit.innerHTML='<i class="fa fa-pen me-1"></i>Modifier';
-  edit.onclick = ()=> openEditModal(a.__uuid, a);
-  const useBtn = document.createElement('button'); useBtn.className='btn btn-sm btn-success me-2'; useBtn.innerHTML='<i class="fa fa-check me-1"></i>Utilisé';
-  useBtn.onclick = async ()=>{ await registerUsage(a.__uuid); load(); };
-  const del = document.createElement('button'); del.className='btn btn-sm btn-danger'; del.innerHTML='<i class="fa fa-trash me-1"></i>Supprimer';
-  del.onclick = async ()=>{ if(confirm('Confirmer la suppression ?')){ const id = a.__uuid; await fetch(`${apiBase}/${id}`, {method:'DELETE'}); load(); }}
+    const card = document.createElement('div');
+    card.className = 'sub-card';
+    card.innerHTML = `
+      <!-- Prix en haut à gauche -->
+      <div class="price-badge left">${prixMensuel.toFixed(2)}€</div>
 
-  // selection checkbox for bulk actions (store uuid only)
-  const selectBox = document.createElement('input'); selectBox.type='checkbox'; selectBox.className='form-check-input me-2 select-abonnement';
-  selectBox.dataset.uuid = a.__uuid || '';
+      <div class="sub-card-inner">
+        <div class="sub-title">
+          <input type="checkbox" class="sub-check select-abonnement" data-select data-uuid="${a.__uuid || ''}"/>
+          <span><strong>${escapeHtml(clientName)}</strong> — ${escapeHtml(nomService)}</span>
+        </div>
 
-    btns.appendChild(edit); btns.appendChild(useBtn); btns.appendChild(del);
-    bottom.appendChild(price); bottom.appendChild(btns);
+        <div class="sub-meta">
+          De ${escapeHtml(dateDebut)} à ${escapeHtml(dateFin)} · ${escapeHtml(categorie)}
+        </div>
+        <div class="sub-meta">
+          ${estActif ? "Actif" : "Expiré"} · Dernière utilisation: ${escapeHtml(derniereUtilisation)}
+        </div>
 
-  // insert selection before title
-  const hdr = document.createElement('div'); hdr.className='d-flex align-items-center';
-  hdr.appendChild(selectBox); hdr.appendChild(title);
+        <!-- Bouton pleine largeur -->
+        <div class="actions-stack">
+          <button class="btn-used-full" data-used>✅ Utilisé</button>
+        </div>
 
-    // alert badge
-    const alertBadge = document.createElement('div');
-    const daysSince = a.derniereUtilisation ? daysBetween(new Date(a.derniereUtilisation), new Date()) : null;
-    if (isActive(a) && daysSince !== null && daysSince > 30){
-      alertBadge.innerHTML = `<div class="badge bg-danger mb-2">Inactif ${daysSince}j</div>`;
-    }
+        <!-- Deux boutons 50/50 -->
+        <div class="actions-split">
+          <button class="btn-edit-split" data-edit>✏️ Modifier</button>
+          <button class="btn-delete-split" data-delete>🗑️ Supprimer</button>
+        </div>
+      </div>
+    `;
 
-    c.appendChild(hdr); c.appendChild(meta); c.appendChild(stats); if (alertBadge.innerHTML) c.appendChild(alertBadge); c.appendChild(bottom);
-    col.appendChild(c); cards.appendChild(col);
-  })
+    // Wiring des actions
+    card.querySelector('[data-used]').onclick = async () => {
+      await registerUsage(a.__uuid);
+      load();
+    };
+    card.querySelector('[data-edit]').onclick = () => {
+      openEditModal(a.__uuid, a);
+    };
+    card.querySelector('[data-delete]').onclick = async () => {
+      if (confirm('Confirmer la suppression ?')) {
+        await fetch(`${apiBase}/${a.__uuid}`, { method:'DELETE' });
+        load();
+      }
+    };
+
+    col.appendChild(card);
+    cards.appendChild(col);
+  });
 }
 
+/* ---------- chargement + filtres ---------- */
 async function load(){
   const all = await fetchAll();
   // attach uuid to each item
   const withUuid = all.map((it) => ({...it, __uuid: it.id}));
   renderDashboard(withUuid);
 
-  // apply search filter if present
+  // apply search/filter/sort
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   const status = (document.getElementById('statusFilter')?.value || 'all');
   const sortBy = (document.getElementById('sortSelect')?.value || 'none');
@@ -111,13 +142,14 @@ async function load(){
   if (status === 'actifs') filtered = filtered.filter(isActive);
   else if (status === 'expires') filtered = filtered.filter(a => !isActive(a));
 
-  if (sortBy === 'nom') filtered.sort((a,b)=> (a.clientName||'').localeCompare(b.clientName||''));
+  if (sortBy === 'nom') filtered.sort((a,b)=> (a.clientName||'').localeCompare(b.clientName||'')); 
   else if (sortBy === 'dateDebut') filtered.sort((a,b)=> new Date(a.dateDebut) - new Date(b.dateDebut));
   else if (sortBy === 'dateFin') filtered.sort((a,b)=> new Date(a.dateFin) - new Date(b.dateFin));
 
   render(filtered);
 }
 
+/* ---------- ajout ---------- */
 document.getElementById('addForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const payload = {
@@ -130,10 +162,8 @@ document.getElementById('addForm').addEventListener('submit', async (e)=>{
   };
   const btn = e.target.querySelector('button[type="submit"]');
   const original = btn.innerHTML;
-  // disable and show spinner
   btn.disabled = true;
   btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i>Ajout...';
-  // clear flash
   const flash = document.getElementById('flash'); flash.innerHTML = '';
   try {
     const r = await fetch(apiBase, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
@@ -155,6 +185,7 @@ document.getElementById('addForm').addEventListener('submit', async (e)=>{
   }
 });
 
+/* ---------- header / actions ---------- */
 document.getElementById('refreshBtn').addEventListener('click', load);
 document.getElementById('exportBtn').addEventListener('click', async ()=>{
   const data = await fetchAll();
@@ -163,7 +194,7 @@ document.getElementById('exportBtn').addEventListener('click', async ()=>{
   const a = document.createElement('a'); a.href = url; a.download = 'abonnements_export.json'; a.click();
 });
 
-// visual feedback for refresh: add spinner briefly
+// visual feedback for refresh
 const originalRefreshHtml = document.getElementById('refreshBtn').innerHTML;
 async function showRefreshing(){
   const btn = document.getElementById('refreshBtn');
@@ -173,17 +204,17 @@ async function showRefreshing(){
 }
 document.getElementById('refreshBtn').addEventListener('click', async ()=>{ await showRefreshing(); load(); });
 
-// bulk delete handler
+/* ---------- suppressions groupées ---------- */
 document.getElementById('bulkDeleteBtn')?.addEventListener('click', async ()=>{
   const checks = Array.from(document.querySelectorAll('.select-abonnement:checked'));
   if (checks.length === 0){ alert('Aucun abonnement sélectionné'); return; }
   if (!confirm(`Supprimer ${checks.length} abonnements sélectionnés ?`)) return;
-  // gather uuid ids and delete sequentially
   const ids = checks.map(c => c.dataset.uuid).filter(Boolean);
   for(const id of ids){ await fetch(`${apiBase}/${id}`, {method:'DELETE'}); }
   load();
 });
 
+/* ---------- filtres / alertes ---------- */
 document.getElementById('searchInput')?.addEventListener('input', ()=> load());
 document.getElementById('alertsBtn')?.addEventListener('click', async ()=>{
   const all = await fetchAll();
@@ -192,20 +223,16 @@ document.getElementById('alertsBtn')?.addEventListener('click', async ()=>{
   render(alerts);
 });
 
-// Import JSON: upload file to server endpoint which processes the whole array server-side
-// Each object should contain at least: clientName, nomService, dateDebut, dateFin.
+/* ---------- import JSON ---------- */
 document.getElementById('importFile').addEventListener('change', async (e)=>{
   const f = e.target.files[0];
   if (!f) return;
   const flash = document.getElementById('flash'); flash.innerHTML = '';
-  const btn = document.getElementById('bulkDeleteBtn');
   try{
     const text = await f.text();
-    // quick parse check
     const arr = JSON.parse(text);
     if (!Array.isArray(arr)){ alert('Le fichier doit contenir un tableau JSON'); return; }
     if (!confirm(`Importer ${arr.length} objets depuis le fichier ?`)) return;
-    // send whole array to server import endpoint
     const r = await fetch(`${apiBase}/import`, {method:'POST', headers:{'Content-Type':'application/json'}, body:text});
     if (r.status === 201) {
       const info = await r.json();
@@ -220,7 +247,7 @@ document.getElementById('importFile').addEventListener('change', async (e)=>{
   catch(err){ console.error(err); flash.innerHTML = `<div class="alert alert-danger">Fichier JSON invalide ou erreur: ${err.message}</div>`; }
 });
 
-// Edit modal logic
+/* ---------- édition ---------- */
 function openEditModal(idx, a){
   document.getElementById('editIndex').value = idx;
   document.getElementById('editClient').value = a.clientName || '';
@@ -248,13 +275,14 @@ document.getElementById('saveEditBtn').addEventListener('click', async ()=>{
   load();
 });
 
+/* ---------- usage ---------- */
 async function registerUsage(idx){
   const all = await fetchAll();
-  // idx is expected to be uuid
-  let a = all.find(x => x.id === idx);
+  const a = all.find(x => x.id === idx);
   if (!a) return;
   a.derniereUtilisation = new Date().toISOString().split('T')[0];
   await fetch(`${apiBase}/${a.id}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(a)});
 }
 
+/* ---------- go ---------- */
 load();
