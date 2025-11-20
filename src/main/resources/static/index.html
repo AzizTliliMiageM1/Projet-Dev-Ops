@@ -4,262 +4,705 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gestion d’abonnements</title>
+  <title>Dashboard - Gestion d'abonnements</title>
 
-  <!-- Bootstrap & fonts -->
+  <!-- Bootstrap & Fonts & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-  <!-- App styles -->
-  <link rel="stylesheet" href="/styles.css">
+  <style>
+    /* Variables et base */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      --warning-gradient: linear-gradient(135deg, #fcb045 0%, #fd1d1d 50%, #833ab4 100%);
+      --glass-bg: rgba(255, 255, 255, 0.25);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --shadow-soft: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      --shadow-hover: 0 15px 40px 0 rgba(31, 38, 135, 0.5);
+      --border-radius: 20px;
+      --animation-speed: 0.3s;
+    }
 
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--primary-gradient);
+      background-attachment: fixed;
+      min-height: 100vh;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    /* Glassmorphism Components */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      transition: all var(--animation-speed) ease;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Header futuriste */
+    .futuristic-header {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .logo-text h1 {
+      color: white;
+      font-weight: 800;
+      margin: 0;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-text p {
+      color: rgba(255, 255, 255, 0.8);
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Boutons modernes */
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      color: white;
+    }
+
+    .btn-primary-gradient {
+      background: var(--primary-gradient);
+      border: none;
+      color: white;
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 12px 24px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-gradient:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.5);
+      color: white;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .metric-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      text-align: center;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      transition: all var(--animation-speed) ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary-gradient);
+    }
+
+    .metric-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .metric-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: var(--primary-gradient);
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .metric-value {
+      font-size: 3rem;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .metric-label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    /* Search Bar Futuriste */
+    .search-section {
+      margin-bottom: 40px;
+    }
+
+    .search-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .search-title {
+      color: white;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-control-modern {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 15px;
+      color: white;
+      padding: 15px 20px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .form-control-modern:focus {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+      color: white;
+    }
+
+    .form-control-modern::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .form-label-modern {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    /* Subscription Cards */
+    .subscriptions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .subscription-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      transition: all var(--animation-speed) ease;
+      position: relative;
+    }
+
+    .subscription-card:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card-header-modern {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .service-name {
+      color: white;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 5px;
+    }
+
+    .client-name {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.95rem;
+    }
+
+    .card-body-modern {
+      padding: 20px;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+
+    .status-active {
+      background: var(--success-gradient);
+      color: white;
+    }
+
+    .status-warning {
+      background: var(--warning-gradient);
+      color: white;
+    }
+
+    .status-expired {
+      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      color: white;
+    }
+
+    .price-display {
+      font-size: 2rem;
+      font-weight: 800;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .date-info {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      margin: 10px 0;
+    }
+
+    /* Action Panel */
+    .action-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      position: sticky;
+      top: 100px;
+    }
+
+    .panel-title {
+      color: white;
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-soft);
+      grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 20px;
+    }
+
+    .empty-title {
+      color: white;
+      font-weight: 700;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .empty-text {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1.1rem;
+    }
+
+    /* Animations */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .animate-slide-in {
+      animation: slideIn 0.8s ease-out;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .subscriptions-grid {
+        grid-template-columns: 1fr;
+      }
+      .metric-value {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* Flash Messages */
+    .flash-message {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 15px;
+      border: 1px solid var(--glass-border);
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      color: white;
+      border-left: 4px solid #10b981;
+    }
+
+    /* Card Actions */
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-action {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      color: white;
+    }
+  </style>
 </head>
 
-<body class="bg-light">
-
-  <!-- Header -->
-  <header class="app-hero shadow-sm">
-    <div class="container d-flex align-items-center justify-content-between py-3">
-      <div class="d-flex align-items-center gap-3">
-        <div class="brand-badge"><i class="fa-solid fa-layer-group"></i></div>
-        <div>
-          <h1 class="app-title mb-0">Gestion d'abonnements</h1>
-          <p class="app-subtitle mb-0">Pilotez vos services — clair, rapide, coloré ✨</p>
+<body>
+  <!-- Header Futuriste -->
+  <header class="futuristic-header">
+    <div class="container py-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="logo-container">
+          <div class="logo-icon">
+            <i class="bi bi-layers" style="color: white; font-size: 1.5rem;"></i>
+          </div>
+          <div class="logo-text">
+            <h1>Dashboard Pro</h1>
+            <p>Gestion d'abonnements intelligente</p>
+          </div>
         </div>
-      </div>
-      <div class="d-flex gap-2">
-        <button id="refreshBtn" class="btn btn-glass btn-sm"><i class="fa-solid fa-rotate me-1"></i> Rafraîchir</button>
-        <a class="btn btn-outline-secondary btn-sm" href="/stats.html"><i class="fa-solid fa-chart-bar me-1"></i> Statistiques</a>
-        <a class="btn btn-outline-secondary btn-sm" href="/help.html"><i class="fa-regular fa-circle-question me-1"></i> Aide</a>
-        <a class="btn btn-white btn-sm" href="/home.html"><i class="fa-regular fa-window-restore me-1"></i> Accueil</a>
+        
+        <div class="d-flex gap-2">
+          <button id="refreshBtn" class="btn btn-glass btn-sm">
+            <i class="bi bi-arrow-clockwise me-1"></i> Sync
+          </button>
+          <a class="btn btn-glass btn-sm" href="/stats.html">
+            <i class="bi bi-graph-up me-1"></i> Analytics
+          </a>
+          <a class="btn btn-glass btn-sm" href="/help.html">
+            <i class="bi bi-question-circle me-1"></i> Support
+          </a>
+          <a class="btn btn-glass btn-sm" href="/home.html">
+            <i class="bi bi-house me-1"></i> Home
+          </a>
+        </div>
       </div>
     </div>
   </header>
 
   <main class="container py-4">
-    <!-- Barre de recherche et filtres -->
-    <section class="search-toolbar mb-4">
-      <div class="card border-0 shadow-soft">
-        <div class="card-body p-3">
-          <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-              <label class="form-label fw-semibold">🔍 Recherche</label>
-              <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par client ou service...">
+    <!-- Dashboard Metrics -->
+    <section class="dashboard-section mb-5 animate-slide-in">
+      <div class="dashboard-grid" id="dashboard">
+        <!-- Métriques injectées par JS -->
+      </div>
+    </section>
+
+    <!-- Search & Filters -->
+    <section class="search-section animate-slide-in">
+      <div class="search-container">
+        <h2 class="search-title">
+          <i class="bi bi-search"></i>
+          Recherche & Filtres Avancés
+        </h2>
+        
+        <div class="row g-4">
+          <div class="col-md-6">
+            <label class="form-label-modern">
+              <i class="bi bi-search me-2"></i>Recherche globale
+            </label>
+            <input type="text" id="searchInput" class="form-control form-control-modern" 
+                   placeholder="Rechercher par client, service, catégorie...">
+          </div>
+          
+          <div class="col-md-2">
+            <label class="form-label-modern">
+              <i class="bi bi-funnel me-2"></i>Statut
+            </label>
+            <select id="statusFilter" class="form-control form-control-modern">
+              <option value="">Tous</option>
+              <option value="actif">Actifs</option>
+              <option value="expire">Expirés</option>
+              <option value="bientot-expire">Bientôt expirés</option>
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label class="form-label-modern">
+              <i class="bi bi-sort-down me-2"></i>Tri
+            </label>
+            <select id="sortSelect" class="form-control form-control-modern">
+              <option value="date-desc">Plus récent</option>
+              <option value="date-asc">Plus ancien</option>
+              <option value="client-asc">Client A-Z</option>
+              <option value="prix-desc">Prix ↓</option>
+              <option value="prix-asc">Prix ↑</option>
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label class="form-label-modern" style="opacity: 0;">.</label>
+            <button id="alertesBtn" class="btn btn-primary-gradient w-100">
+              <i class="bi bi-bell me-1"></i> Alertes
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flash Messages -->
+    <div id="flash" class="animate-fade-in"></div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+      <!-- Subscriptions Grid -->
+      <div class="col-lg-8">
+        <div class="subscriptions-grid" id="cards">
+          <!-- État vide -->
+          <div class="empty-state" data-empty-hint>
+            <div class="empty-icon">
+              <i class="bi bi-inbox"></i>
             </div>
-            <div class="col-md-2">
-              <label class="form-label fw-semibold">📊 Statut</label>
-              <select id="statusFilter" class="form-select">
-                <option value="">Tous</option>
-                <option value="actif">Actif</option>
-                <option value="expire">Expiré</option>
-                <option value="bientot-expire">Bientôt expiré</option>
-              </select>
-            </div>
-            <div class="col-md-2">
-              <label class="form-label fw-semibold">🔄 Trier par</label>
-              <select id="sortSelect" class="form-select">
-                <option value="date-desc">Plus récent</option>
-                <option value="date-asc">Plus ancien</option>
-                <option value="client-asc">Client A-Z</option>
-                <option value="client-desc">Client Z-A</option>
-                <option value="prix-desc">Prix ↓</option>
-                <option value="prix-asc">Prix ↑</option>
-              </select>
-            </div>
-            <div class="col-md-4">
-              <button id="alertesBtn" class="btn btn-outline-warning">
-                <i class="fa-solid fa-bell me-1"></i>Alertes d'expiration
+            <h3 class="empty-title">Aucun abonnement</h3>
+            <p class="empty-text">Commencez par ajouter votre premier service via le panneau à droite</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div class="col-lg-4">
+        <div class="action-panel">
+          <!-- Formulaire d'ajout -->
+          <div class="mb-4">
+            <h3 class="panel-title">
+              <i class="bi bi-plus-circle"></i>
+              Nouveau Service
+            </h3>
+            
+            <form id="addForm" class="animate-fade-in">
+              <div class="mb-3">
+                <label class="form-label-modern">Client</label>
+                <input id="nomClient" class="form-control form-control-modern" 
+                       placeholder="Nom du client" required />
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label-modern">Service</label>
+                <input id="nomService" class="form-control form-control-modern" 
+                       placeholder="Ex: Netflix, Spotify..." required />
+              </div>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label class="form-label-modern">Début</label>
+                  <input id="dateDebut" type="date" class="form-control form-control-modern" required />
+                </div>
+                <div class="col-6">
+                  <label class="form-label-modern">Fin</label>
+                  <input id="dateFin" type="date" class="form-control form-control-modern" required />
+                </div>
+              </div>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label class="form-label-modern">Catégorie</label>
+                  <input id="categorie" class="form-control form-control-modern" 
+                         placeholder="Streaming, Cloud..." />
+                </div>
+                <div class="col-6">
+                  <label class="form-label-modern">Prix (€)</label>
+                  <input id="prixMensuel" type="number" min="0" step="0.01" 
+                         class="form-control form-control-modern" placeholder="0.00" />
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary-gradient w-100">
+                <i class="bi bi-plus-lg me-2"></i>Ajouter le service
+              </button>
+            </form>
+          </div>
+
+          <!-- Actions rapides -->
+          <div>
+            <h4 class="panel-title">
+              <i class="bi bi-lightning"></i>
+              Actions Rapides
+            </h4>
+            
+            <div class="d-grid gap-3">
+              <label class="btn btn-glass w-100" for="importFile">
+                <i class="bi bi-upload me-2"></i>Importer JSON
+              </label>
+              <input type="file" id="importFile" style="display: none;" accept=".json">
+              
+              <button id="exportBtn" class="btn btn-glass w-100">
+                <i class="bi bi-download me-2"></i>Exporter données
+              </button>
+              
+              <button id="clearAllBtn" class="btn btn-glass w-100">
+                <i class="bi bi-trash me-2"></i>Tout supprimer
               </button>
             </div>
           </div>
         </div>
       </div>
-    </section>
-
-    <!-- Dashboard -->
-    <section id="dashboard" class="row g-3 mb-4">
-      <!-- Remplis par app.js ; style dans CSS -->
-    </section>
-
-    <!-- Flash messages -->
-    <div id="flash" class="mb-3"></div>
-
-    <div class="row">
-      <!-- Liste -->
-      <div class="col-lg-8">
-        <div id="cards" class="row g-3">
-          <!-- Cartes injectées par app.js -->
-          <div class="empty-state" data-empty-hint>
-            <div class="emoji">🗂️</div>
-            <h6 class="mb-1">Aucun abonnement pour le moment</h6>
-            <p class="text-muted mb-0">Ajoutez-en via le panneau à droite, ou importez un JSON.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panneau secondaire -->
-      <div class="col-lg-4">
-        <!-- Ajouter -->
-        <div class="panel card border-0 shadow-soft mb-3">
-          <div class="panel-header">
-            <div class="d-flex align-items-center gap-2">
-              <span class="circle"><i class="fa-solid fa-plus"></i></span>
-              <span class="fw-semibold">Ajouter un abonnement</span>
-            </div>
-          </div>
-          <div class="panel-body">
-            <form id="addForm" class="vstack gap-2">
-              <div>
-                <label class="form-label">Client</label>
-                <input id="clientName" class="form-control form-control-sm" placeholder="Nom du client" required />
-              </div>
-              <div>
-                <label class="form-label">Service</label>
-                <input id="nomService" class="form-control form-control-sm" placeholder="Ex: Netflix, Orange…" required />
-              </div>
-              <div class="row g-2">
-                <div class="col">
-                  <label class="form-label">Début</label>
-                  <input id="dateDebut" type="date" class="form-control form-control-sm" required />
-                </div>
-                <div class="col">
-                  <label class="form-label">Fin</label>
-                  <input id="dateFin" type="date" class="form-control form-control-sm" required />
-                </div>
-              </div>
-              <div class="row g-2">
-                <div class="col">
-                  <label class="form-label">Catégorie</label>
-                  <input id="categorie" class="form-control form-control-sm" placeholder="Streaming, Télécom…" />
-                </div>
-                <div class="col">
-                  <label class="form-label">Prix mensuel (€)</label>
-                  <input id="prixMensuel" type="number" min="0" step="0.01" class="form-control form-control-sm" />
-                </div>
-              </div>
-              <div class="d-grid mt-2">
-                <button type="submit" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-plus me-1"></i> Ajouter
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="panel card border-0 shadow-soft">
-          <div class="panel-header">
-            <div class="d-flex align-items-center gap-2">
-              <span class="circle soft"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
-              <span class="fw-semibold">Actions</span>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div class="d-grid gap-2">
-              <button id="exportBtn" class="btn btn-amber"><i class="fa-regular fa-file-code me-1"></i> Exporter
-                JSON</button>
-              <button id="bulkDeleteBtn" class="btn btn-danger"><i class="fa-regular fa-trash-can me-1"></i> Supprimer
-                sélection</button>
-              <label class="form-label small text-muted mt-2 mb-1">Importer JSON (tableau d'objets)</label>
-              <input id="importFile" type="file" class="form-control" accept="application/json" />
-              <div class="form-text">
-                Chaque objet doit contenir : <code>clientName, nomService, dateDebut, dateFin</code>.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-
-    <!-- Toolbar de recherche en bas comme dans le screenshot -->
-    <section class="toolbar row g-2 align-items-center mb-3 mt-4">
-      <div class="col-12 col-lg-5">
-        <div class="input-group input-group-sm">
-          <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-          <input id="searchInput" class="form-control" placeholder="Rechercher client / service" />
-        </div>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-2">
-        <select id="statusFilter" class="form-select form-select-sm">
-          <option value="all">Tous</option>
-          <option value="actifs">Actifs</option>
-          <option value="expires">Expirés</option>
-        </select>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-3">
-        <select id="sortSelect" class="form-select form-select-sm">
-          <option value="dateDebut">Trier par date de début</option>
-          <option value="dateFin">Trier par date de fin</option>
-          <option value="prix">Trier par prix</option>
-          <option value="client">Trier par client</option>
-        </select>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-2 text-sm-end">
-        <button id="alertsBtn" class="btn btn-outline-danger btn-sm w-100 w-sm-auto">
-          <i class="fa-solid fa-bell me-1"></i> Alertes inactivité
-        </button>
-      </div>
-    </section>
-
-
-
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Modifier un abonnement</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <form id="editForm" class="vstack gap-2">
-              <input type="hidden" id="editIndex" />
-              <div>
-                <label class="form-label">Client</label>
-                <input id="editClient" class="form-control form-control-sm" required />
-              </div>
-              <div>
-                <label class="form-label">Service</label>
-                <input id="editService" class="form-control form-control-sm" required />
-              </div>
-              <div class="row g-2">
-                <div class="col">
-                  <label class="form-label">Début</label>
-                  <input id="editDebut" type="date" class="form-control form-control-sm" required />
-                </div>
-                <div class="col">
-                  <label class="form-label">Fin</label>
-                  <input id="editFin" type="date" class="form-control form-control-sm" required />
-                </div>
-              </div>
-              <div class="row g-2">
-                <div class="col">
-                  <label class="form-label">Catégorie</label>
-                  <input id="editCategorie" class="form-control form-control-sm" />
-                </div>
-                <div class="col">
-                  <label class="form-label">Prix mensuel (€)</label>
-                  <input id="editPrix" type="number" min="0" step="0.01" class="form-control form-control-sm" />
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
-            <button id="saveEditBtn" class="btn btn-primary btn-sm">Enregistrer</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </main>
 
-  <!-- Bootstrap bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- App JS -->
-  <script src="/app.js"></script>
+  <!-- Modal d'édition -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content" style="background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--border-radius);">
+        <div class="modal-header border-bottom border-white-50">
+          <h5 class="modal-title text-white">Modifier l'abonnement</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <input type="hidden" id="editIndex" />
+            <div class="mb-3">
+              <label class="form-label-modern">Client</label>
+              <input id="editClient" class="form-control form-control-modern" required />
+            </div>
+            <div class="mb-3">
+              <label class="form-label-modern">Service</label>
+              <input id="editService" class="form-control form-control-modern" required />
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label-modern">Début</label>
+                <input id="editDebut" type="date" class="form-control form-control-modern" required />
+              </div>
+              <div class="col-6">
+                <label class="form-label-modern">Fin</label>
+                <input id="editFin" type="date" class="form-control form-control-modern" required />
+              </div>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label-modern">Catégorie</label>
+                <input id="editCategorie" class="form-control form-control-modern" />
+              </div>
+              <div class="col-6">
+                <label class="form-label-modern">Prix (€)</label>
+                <input id="editPrix" type="number" min="0" step="0.01" class="form-control form-control-modern" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer border-top border-white-50">
+          <button class="btn btn-glass" data-bs-dismiss="modal">Annuler</button>
+          <button id="saveEditBtn" class="btn btn-primary-gradient">
+            <i class="bi bi-check-lg me-1"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/app.js"></script>
 </body>
 
 </html>
