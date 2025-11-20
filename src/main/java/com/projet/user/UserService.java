@@ -1,5 +1,5 @@
 package com.projet.user;
 
 public interface UserService {
-    boolean register(String email, String password);
+    String register(String email, String password);
 }

@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileUserRepository implements UserRepository {
 
@@ -12,7 +14,10 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
         try (FileWriter fw = new FileWriter(file, true)) {
-            fw.write(user.getEmail() + ";" + user.getPassword() + ";" + user.isConfirmed() + "\n");
+            fw.write(user.getEmail() + ";" 
+                    + user.getPassword() + ";" 
+                    + user.isConfirmed() + ";" 
+                    + user.getConfirmationToken() + "\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -25,12 +30,58 @@ public class FileUserRepository implements UserRepository {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(";");
                 if (p[0].equals(email)) {
-                    User u = new User(p[0], p[1]);
+                    User u = new User(p[0], p[1], p[3]);
                     u.setConfirmed(Boolean.parseBoolean(p[2]));
                     return u;
                 }
             }
         } catch (Exception e) {}
         return null;
+    }
+
+    @Override
+    public User findByToken(String token) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] p = line.split(";");
+                if (p.length > 3 && p[3].equals(token)) {
+                    User u = new User(p[0], p[1], p[3]);
+                    u.setConfirmed(Boolean.parseBoolean(p[2]));
+                    return u;
+                }
+            }
+        } catch (Exception e) {}
+        return null;
+    }
+
+    @Override
+    public void update(User user) {
+        try {
+            List<String> lines = new ArrayList<>();
+
+            if (!file.exists()) return;
+
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] p = line.split(";");
+                    if (p[0].equals(user.getEmail())) {
+                        line = user.getEmail() + ";" 
+                             + user.getPassword() + ";" 
+                             + user.isConfirmed() + ";" 
+                             + user.getConfirmationToken();
+                    }
+                    lines.add(line);
+                }
+            }
+
+            FileWriter fw = new FileWriter(file);
+            for (String l : lines) fw.write(l + "\n");
+            fw.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

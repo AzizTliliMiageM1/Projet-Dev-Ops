@@ -1,16 +1,23 @@
 package com.projet.user;
 
+import java.util.UUID;
+
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository = new FileUserRepository();
 
     @Override
-    public boolean register(String email, String password) {
+    public String register(String email, String password) {
+
         if (repository.findByEmail(email) != null) {
-            return false; // email déjà utilisé
+            return null; // email déjà utilisé
         }
-        User u = new User(email, password);
-        repository.save(u);
-        return true;
+
+        String token = UUID.randomUUID().toString();
+
+        User user = new User(email, password, token);
+        repository.save(user);
+
+        return token;
     }
 }
