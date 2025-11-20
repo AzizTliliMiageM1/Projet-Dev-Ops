@@ -19,7 +19,7 @@
     <!-- Topbar -->
     <header class="border-bottom bg-white">
         <nav class="container navbar navbar-expand-lg py-3">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="/home.html">
                 <span class="brand-pill me-2">GA</span> Gestion d’abonnements
             </a>
             <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
@@ -30,148 +30,293 @@
                     <li class="nav-item"><a href="#features" class="nav-link">Fonctionnalités</a></li>
                     <li class="nav-item"><a href="#identify" class="nav-link">Identifier</a></li>
                     <li class="nav-item"><a href="#measure" class="nav-link">Mesurer</a></li>
+                    <li class="nav-item"><a href="/help.html" class="nav-link">Aide</a></li>
                     <li class="nav-item"><a href="#faq" class="nav-link">FAQ</a></li>
                 </ul>
                 <div class="ms-lg-3 d-flex gap-2">
-                    <a class="btn btn-outline-primary" href="/api/abonnements" target="_blank">API</a>
-                    <a class="btn btn-primary" href="/index.html">Ouvrir l’app</a>
+                    <a class="btn btn-outline-primary" href="/api.html">API</a>
+                    <a class="btn btn-primary" href="/index.html">Ouvrir l'app</a>
                 </div>
             </div>
         </nav>
     </header>
 
     <!-- Hero banner teal -->
-    <section class="hero-rail">
-        <div class="container py-5">
-            <div class="row align-items-center gy-4">
-                <div class="col-lg-7">
-                    <h1 class="display-6 fw-800 text-white mb-2">
-                        <i class="bi bi-people me-2"></i>Gestion des abonnements
-                    </h1>
-                    <p class="lead text-hero">
-                        Gérez vos propres abonnements, suivez l’activité et optimisez les coûts en quelques
-                        clics.
-                    </p>
-                    <div class="d-flex gap-2 mt-3">
-                        <a class="btn btn-light btn-lg" href="/index.html"><i class="bi bi-play-fill me-1"></i>Lancer
-                            l’application</a>
-                        <a class="btn btn-outline-light btn-lg" href="#features"><i
-                                class="bi bi-eye me-1"></i>Découvrir</a>
-                    </div>
-                    <ul class="hero-bullets mt-4">
-                        <li><i class="bi bi-check2-circle"></i> Vue d’ensemble des abonnements</li>
-                        <li><i class="bi bi-check2-circle"></i> Alertes d’inactivité à 30 jours</li>
-                        <li><i class="bi bi-check2-circle"></i> Import / Export JSON</li>
-                    </ul>
-                </div>
-                <div class="col-lg-5">
-                    <div class="mockup shadow-sm">
-                        <img src="https://media.istockphoto.com/id/1287677376/fr/photo/streaming-t%C3%A9l%C3%A9visuel-concept-de-mur-multim%C3%A9dia.jpg?s=612x612&w=0&k=20&c=xaatySDdC2d9oHApGtLo50_UPTDBMfNMYICtFfm1zVM="
-                            alt="aperçu" class="img-fluid rounded-4">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Features (4 cards) -->
-    <section id="features" class="section container">
-        <div class="text-center mb-4">
-            <h2 class="fw-800">Fonctionnalités clés</h2>
-            <p class="text-muted">Des modules pensés pour aller vite, bien et au bon coût.</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3">
-                <div class="card feature h-100">
-                    <div class="icon"><i class="bi bi-speedometer2"></i></div>
-                    <h5>Tableau de bord</h5>
-                    <p class="text-muted">Statuts, dépenses mensuelles et alertes visibles en un coup d’œil.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card feature h-100">
-                    <div class="icon"><i class="bi bi-bell"></i></div>
-                    <h5>Alertes d’inactivité</h5>
-                    <p class="text-muted">Repérez les abonnements inutilisés depuis 30 jours.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card feature h-100">
-                    <div class="icon"><i class="bi bi-box-arrow-in-down"></i></div>
-                    <h5>Import / Export</h5>
-                    <p class="text-muted">JSON simple pour migrer ou synchroniser vos données.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card feature h-100">
-                    <div class="icon"><i class="bi bi-shield-check"></i></div>
-                    <h5>H2 embarqué</h5>
-                    <p class="text-muted">Persistance locale fiable pour tester et prototyper.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Identify section -->
-    <section id="identify" class="section-alt">
+    <section class="py-5 bg-gradient" style="background: linear-gradient(135deg, #007bff, #6f42c1);">
         <div class="container">
-            <div class="row align-items-center gy-4">
-                <div class="col-lg-6 order-lg-2">
-                    <img class="img-fluid rounded-4 shadow-sm"
-                        src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72?q=80&w=1200&auto=format&fit=crop"
-                        alt="identifier" />
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-white">
+                    <h1 class="display-4 fw-bold mb-4">Gestion d'abonnements simplifiée</h1>
+                    <p class="lead mb-4">Pilotez tous vos services et abonnements depuis une interface moderne et intuitive. Surveillez, optimisez et maîtrisez vos coûts.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/index.html" class="btn btn-light btn-lg">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Commencer maintenant
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">
+                            <i class="bi bi-play-circle me-2"></i>Découvrir
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <div class="position-relative">
+                        <div class="bg-white rounded-4 shadow-lg p-4" style="transform: rotate(-5deg);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0 text-primary">Tableau de bord</h6>
+                                <span class="badge bg-success">Live</span>
+                            </div>
+                            <div class="row g-2 text-center">
+                                <div class="col-3">
+                                    <div class="bg-primary bg-opacity-10 rounded p-2">
+                                        <div class="h4 text-primary mb-0">24</div>
+                                        <small class="text-muted">Actifs</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-success bg-opacity-10 rounded p-2">
+                                        <div class="h4 text-success mb-0">3</div>
+                                        <small class="text-muted">Nouveaux</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-warning bg-opacity-10 rounded p-2">
+                                        <div class="h4 text-warning mb-0">2</div>
+                                        <small class="text-muted">Alertes</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="bg-info bg-opacity-10 rounded p-2">
+                                        <div class="h4 text-info mb-0">€89</div>
+                                        <small class="text-muted">Mois</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold mb-3">Fonctionnalités principales</h2>
+                <p class="lead text-muted">Tout ce dont vous avez besoin pour gérer efficacement vos abonnements</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center h-100">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 4rem; height: 4rem;">
+                            <i class="bi bi-plus-circle fs-2 text-primary"></i>
+                        </div>
+                        <h5>Gestion CRUD complète</h5>
+                        <p class="text-muted">Créez, lisez, modifiez et supprimez vos abonnements en quelques clics.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center h-100">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 4rem; height: 4rem;">
+                            <i class="bi bi-graph-up fs-2 text-success"></i>
+                        </div>
+                        <h5>Tableaux de bord</h5>
+                        <p class="text-muted">Visualisez vos statistiques avec des graphiques intuitifs et en temps réel.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center h-100">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 4rem; height: 4rem;">
+                            <i class="bi bi-bell fs-2 text-warning"></i>
+                        </div>
+                        <h5>Alertes d'inactivité</h5>
+                        <p class="text-muted">Soyez notifié des services sous-utilisés pour optimiser vos coûts.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Identify Section -->
+    <section id="identify" class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="display-6 fw-bold mb-4">Identifiez vos besoins</h2>
+                    <p class="lead text-muted mb-4">Analysez facilement tous vos abonnements et services pour prendre des décisions éclairées.</p>
+                    <ul class="list-unstyled">
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span>Vue d'ensemble de tous vos abonnements</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span>Catégorisation automatique des services</span>
+                        </li>
+                        <li class="d-flex align-items-center mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            <span>Détection des doublons et redondances</span>
+                        </li>
+                    </ul>
+                    <a href="/index.html" class="btn btn-primary">Commencer l'analyse</a>
                 </div>
                 <div class="col-lg-6">
-                    <h3 class="fw-800 mb-2">Identifiez les abonnements</h3>
-                    <p class="text-muted">Découvrez en quelques clics les services actifs, en doublon ou sous-utilisés.
-                    </p>
-                    <ul class="list-checked">
-                        <li>Filtres par équipe, coût et statut</li>
-                        <li>Vue chronologique des renouvellements</li>
-                        <li>Désactivation en un clic</li>
-                    </ul>
+                    <div class="bg-white rounded-4 shadow-lg p-4">
+                        <h6 class="text-primary mb-3">Vos services par catégorie</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-primary fw-bold">8</div>
+                                    <small class="text-muted">Streaming</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-success fw-bold">5</div>
+                                    <small class="text-muted">Productivité</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-warning fw-bold">3</div>
+                                    <small class="text-muted">Cloud</small>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-info fw-bold">2</div>
+                                    <small class="text-muted">Fitness</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Measure section -->
-    <section id="measure" class="section container">
-        <div class="row align-items-center gy-4">
-            <div class="col-lg-6">
-                <h3 class="fw-800 mb-2">Mesurez l’impact</h3>
-                <p class="text-muted">Suivez les économies et les usages pour piloter vos budgets.</p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <div class="kpi">
-                        <div class="kpi-value">-18%</div>
-                        <div class="kpi-label">dépenses moyennes</div>
+    <!-- Measure Section -->
+    <section id="measure" class="py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 order-lg-2 mb-4 mb-lg-0">
+                    <h2 class="display-6 fw-bold mb-4">Mesurez vos performances</h2>
+                    <p class="lead text-muted mb-4">Suivez l'utilisation de vos services et optimisez vos dépenses mensuelles.</p>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h2 text-primary mb-1">€127</div>
+                                <small class="text-muted">Économies ce mois</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <div class="h2 text-success mb-1">94%</div>
+                                <small class="text-muted">Services utilisés</small>
+                            </div>
+                        </div>
                     </div>
-                    <div class="kpi">
-                        <div class="kpi-value">30 j</div>
-                        <div class="kpi-label">seuil d’inactivité</div>
-                    </div>
-                    <div class="kpi">
-                        <div class="kpi-value">∞</div>
-                        <div class="kpi-label">abonnements</div>
+                    <a href="/stats.html" class="btn btn-primary mt-3">Voir les statistiques</a>
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div class="bg-gradient rounded-4 p-4 text-white" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <h6 class="mb-3">Tendance des coûts</h6>
+                        <div class="d-flex justify-content-between align-items-end" style="height: 120px;">
+                            <div class="bg-white bg-opacity-25 rounded" style="width: 20px; height: 60px;"></div>
+                            <div class="bg-white bg-opacity-50 rounded" style="width: 20px; height: 80px;"></div>
+                            <div class="bg-white bg-opacity-75 rounded" style="width: 20px; height: 45px;"></div>
+                            <div class="bg-white rounded" style="width: 20px; height: 100px;"></div>
+                            <div class="bg-white bg-opacity-50 rounded" style="width: 20px; height: 65px;"></div>
+                            <div class="bg-white bg-opacity-25 rounded" style="width: 20px; height: 40px;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-2">
+                            <small>Jan</small>
+                            <small>Fév</small>
+                            <small>Mar</small>
+                            <small>Avr</small>
+                            <small>Mai</small>
+                            <small>Jun</small>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <a class="btn btn-primary" href="/index.html">Essayer maintenant</a>
-                    <a class="btn btn-outline-primary" href="/api/abonnements" target="_blank">Voir l’API</a>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <img class="img-fluid rounded-4 shadow-sm"
-                    src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?q=80&w=1200&auto=format&fit=crop"
-                    alt="mesure" />
             </div>
         </div>
     </section>
 
-    <!-- FAQ -->
+    <!-- FAQ Section -->
+    <section id="faq" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-6 fw-bold mb-3">Questions fréquentes</h2>
+                <p class="lead text-muted">Trouvez rapidement des réponses à vos questions</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    Comment commencer à utiliser l'application ?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Cliquez simplement sur "Ouvrir l'app" pour accéder à l'interface principale. Vous pouvez ensuite ajouter vos premiers abonnements via le panneau de droite.
+                                </div>
+                            </div>
+                        </div>
 
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    L'application est-elle gratuite ?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Oui, l'application de gestion d'abonnements est entièrement gratuite et open source. Vous pouvez l'utiliser sans limitation.
+                                </div>
+                            </div>
+                        </div>
 
-    <!-- Footer -->
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    Mes données sont-elles sécurisées ?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Toutes vos données sont stockées localement sur votre machine. Aucune information personnelle n'est transmise à des serveurs externes.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Puis-je exporter mes données ?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Oui, vous pouvez exporter toutes vos données au format JSON à tout moment depuis l'interface principale de l'application.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="/help.html" class="btn btn-primary">
+                            <i class="bi bi-question-circle me-2"></i>Centre d'aide complet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <footer class="py-4 border-top bg-white">
         <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div class="d-flex align-items-center">
