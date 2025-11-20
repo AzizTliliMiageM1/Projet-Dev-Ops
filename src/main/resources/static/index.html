@@ -38,6 +38,45 @@
   </header>
 
   <main class="container py-4">
+    <!-- Barre de recherche et filtres -->
+    <section class="search-toolbar mb-4">
+      <div class="card border-0 shadow-soft">
+        <div class="card-body p-3">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label fw-semibold">🔍 Recherche</label>
+              <input type="text" id="searchInput" class="form-control" placeholder="Rechercher par client ou service...">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">📊 Statut</label>
+              <select id="statusFilter" class="form-select">
+                <option value="">Tous</option>
+                <option value="actif">Actif</option>
+                <option value="expire">Expiré</option>
+                <option value="bientot-expire">Bientôt expiré</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">🔄 Trier par</label>
+              <select id="sortSelect" class="form-select">
+                <option value="date-desc">Plus récent</option>
+                <option value="date-asc">Plus ancien</option>
+                <option value="client-asc">Client A-Z</option>
+                <option value="client-desc">Client Z-A</option>
+                <option value="prix-desc">Prix ↓</option>
+                <option value="prix-asc">Prix ↑</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <button id="alertesBtn" class="btn btn-outline-warning">
+                <i class="fa-solid fa-bell me-1"></i>Alertes d'expiration
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Dashboard -->
     <section id="dashboard" class="row g-3 mb-4">
       <!-- Remplis par app.js ; style dans CSS -->
