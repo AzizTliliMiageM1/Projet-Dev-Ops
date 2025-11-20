@@ -1,1 +1,2 @@
-8bb49319-766d-4d6d-b5c0-852533dabad2;Streaming;2025-11-06;2025-11-06;10.00;Netflix;;Divertissement
+5e0d6849-4b8a-438e-8364-80e75c69d7d5;BasicFit;2003-02-11;0004-02-11;100.00;Tlili Aziz;2025-11-20;Sport
+cb447fa7-eb32-429a-9544-ba31970db0cf;BasicFit;2025-11-20;2025-11-25;100.00;Alex;;Sport

@@ -26,7 +26,6 @@ public class DatabaseAbonnementRepository implements AbonnementRepository {
     private final String jdbcUrl;
     private final String username;
     private final String password;
-
     public DatabaseAbonnementRepository() {
         this(System.getenv("JDBC_URL") != null ? System.getenv("JDBC_URL") : "jdbc:h2:./data/abonnements-db",
              System.getenv("JDBC_USER"), System.getenv("JDBC_PASS"));

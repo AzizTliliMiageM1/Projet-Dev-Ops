@@ -163,7 +163,6 @@ public class Abonnement {
         }
         return new Abonnement(id, nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, categorie);
     }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -191,5 +190,5 @@ public class Abonnement {
         result = 31 * result + (derniereUtilisation != null ? derniereUtilisation.hashCode() : 0);
         result = 31 * result + (categorie != null ? categorie.hashCode() : 0);
         return result;
-    }
+    } 
 }

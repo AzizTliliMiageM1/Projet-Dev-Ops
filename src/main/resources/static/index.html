@@ -16,7 +16,8 @@
 
 </head>
 
-<body>
+<body class="bg-light">
+
   <!-- Header -->
   <header class="app-hero shadow-sm">
     <div class="container d-flex align-items-center justify-content-between py-3">
@@ -29,44 +30,15 @@
       </div>
       <div class="d-flex gap-2">
         <button id="refreshBtn" class="btn btn-glass btn-sm"><i class="fa-solid fa-rotate me-1"></i> Rafraîchir</button>
-        <a class="btn btn-white btn-sm" href="/"><i class="fa-regular fa-window-restore me-1"></i> UI</a>
+        <a class="btn btn-outline-secondary btn-sm" href="/help.html"><i class="fa-regular fa-circle-question me-1"></i> Aide</a>
+        <a class="btn btn-white btn-sm" href="/home.html"><i class="fa-regular fa-window-restore me-1"></i> Accueil</a>
       </div>
     </div>
   </header>
 
   <main class="container py-4">
-    <!-- Toolbar -->
-    <section class="toolbar row g-2 align-items-center mb-3">
-      <div class="col-12 col-lg-5">
-        <div class="input-group input-group-sm">
-          <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
-          <input id="searchInput" class="form-control" placeholder="Rechercher client / service" />
-        </div>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-2">
-        <select id="statusFilter" class="form-select form-select-sm">
-          <option value="all">Tous</option>
-          <option value="actifs">Actifs</option>
-          <option value="expires">Expirés</option>
-        </select>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-2">
-        <select id="sortSelect" class="form-select form-select-sm">
-          <option value="none">Tri: par défaut</option>
-          <option value="nom">Tri: nom client</option>
-          <option value="dateDebut">Tri: date début</option>
-          <option value="dateFin">Tri: date fin</option>
-        </select>
-      </div>
-      <div class="col-12 col-sm-4 col-lg-3 d-flex gap-2 justify-content-sm-end">
-        <button id="alertsBtn" class="btn btn-outline-danger btn-sm"><i class="fa-regular fa-bell me-1"></i> Voir
-          alertes</button>
-        <!-- (facultatif) bouton actions groupées déjà géré par la colonne Actions -->
-      </div>
-    </section>
-
-    <!-- Dashboard KPIs -->
-    <section class="row g-3 mb-4" id="dashboard">
+    <!-- Dashboard -->
+    <section id="dashboard" class="row g-3 mb-4">
       <!-- Remplis par app.js ; style dans CSS -->
     </section>
 
@@ -95,42 +67,43 @@
               <span class="circle"><i class="fa-solid fa-plus"></i></span>
               <span class="fw-semibold">Ajouter un abonnement</span>
             </div>
-            <button class="btn btn-icon" type="button" data-bs-toggle="collapse" data-bs-target="#addCollapse">
-              <i class="fa-solid fa-angle-down"></i>
-            </button>
           </div>
-
-          <div id="addCollapse" class="collapse show">
-            <div class="panel-body">
-              <form id="addForm" class="row g-2">
-                <div class="col-12">
-                  <input id="clientName" class="form-control" placeholder="Nom du client" required />
+          <div class="panel-body">
+            <form id="addForm" class="vstack gap-2">
+              <div>
+                <label class="form-label">Client</label>
+                <input id="clientName" class="form-control form-control-sm" placeholder="Nom du client" required />
+              </div>
+              <div>
+                <label class="form-label">Service</label>
+                <input id="nomService" class="form-control form-control-sm" placeholder="Ex: Netflix, Orange…" required />
+              </div>
+              <div class="row g-2">
+                <div class="col">
+                  <label class="form-label">Début</label>
+                  <input id="dateDebut" type="date" class="form-control form-control-sm" required />
                 </div>
-                <div class="col-12">
-                  <input id="nomService" class="form-control" placeholder="Service" required />
+                <div class="col">
+                  <label class="form-label">Fin</label>
+                  <input id="dateFin" type="date" class="form-control form-control-sm" required />
                 </div>
-                <div class="col-6">
-                  <input id="dateDebut" type="date" class="form-control" required />
+              </div>
+              <div class="row g-2">
+                <div class="col">
+                  <label class="form-label">Catégorie</label>
+                  <input id="categorie" class="form-control form-control-sm" placeholder="Streaming, Télécom…" />
                 </div>
-                <div class="col-6">
-                  <input id="dateFin" type="date" class="form-control" required />
+                <div class="col">
+                  <label class="form-label">Prix mensuel (€)</label>
+                  <input id="prixMensuel" type="number" min="0" step="0.01" class="form-control form-control-sm" />
                 </div>
-                <div class="col-6">
-                  <input id="prixMensuel" type="number" step="0.01" class="form-control" placeholder="Prix mensuel"
-                    required />
-                </div>
-                <div class="col-6">
-                  <input id="categorie" class="form-control" placeholder="Catégorie (ex: IT, Streaming…)" />
-                </div>
-
-                <div class="col-12 d-grid d-sm-flex gap-2 mt-1">
-                  <button type="submit" class="btn btn-primary flex-fill"><i class="fa-solid fa-check me-1"></i>
-                    Ajouter</button>
-                  <button type="reset" class="btn btn-outline-secondary flex-fill"><i
-                      class="fa-regular fa-circle-xmark me-1"></i> Réinitialiser</button>
-                </div>
-              </form>
-            </div>
+              </div>
+              <div class="d-grid mt-2">
+                <button type="submit" class="btn btn-primary btn-sm">
+                  <i class="fa-solid fa-plus me-1"></i> Ajouter
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 
@@ -159,40 +132,90 @@
       </div>
     </div>
 
+    <!-- Toolbar -->
+    <section class="toolbar row g-2 align-items-center mb-3 mt-4">
+      <div class="col-12 col-lg-5">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input id="searchInput" class="form-control" placeholder="Rechercher client / service" />
+        </div>
+      </div>
+      <div class="col-12 col-sm-4 col-lg-2">
+        <select id="statusFilter" class="form-select form-select-sm">
+          <option value="all">Tous</option>
+          <option value="actifs">Actifs</option>
+          <option value="expires">Expirés</option>
+        </select>
+      </div>
+      <div class="col-12 col-sm-4 col-lg-3">
+        <select id="sortSelect" class="form-select form-select-sm">
+          <option value="dateDebut">Trier par date de début</option>
+          <option value="dateFin">Trier par date de fin</option>
+          <option value="prix">Trier par prix</option>
+          <option value="client">Trier par client</option>
+        </select>
+      </div>
+      <div class="col-12 col-sm-4 col-lg-2 text-sm-end">
+        <button id="alertsBtn" class="btn btn-outline-danger btn-sm w-100 w-sm-auto">
+          <i class="fa-solid fa-bell me-1"></i> Alertes inactivité
+        </button>
+      </div>
+    </section>
+
     <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1">
       <div class="modal-dialog">
-        <div class="modal-content shadow-soft">
+        <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title"><i class="fa-regular fa-pen-to-square me-2"></i>Modifier l’abonnement</h5>
+            <h5 class="modal-title">Modifier un abonnement</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-            <form id="editForm" class="row g-2">
+            <form id="editForm" class="vstack gap-2">
               <input type="hidden" id="editIndex" />
-              <div class="col-12"><input id="editClient" class="form-control" placeholder="Nom du client" /></div>
-              <div class="col-12"><input id="editService" class="form-control" placeholder="Service" /></div>
-              <div class="col-6"><input id="editDebut" type="date" class="form-control" /></div>
-              <div class="col-6"><input id="editFin" type="date" class="form-control" /></div>
-              <div class="col-6"><input id="editPrix" type="number" step="0.01" class="form-control"
-                  placeholder="Prix" /></div>
-              <div class="col-6"><input id="editCategorie" class="form-control" placeholder="Catégorie" /></div>
+              <div>
+                <label class="form-label">Client</label>
+                <input id="editClient" class="form-control form-control-sm" required />
+              </div>
+              <div>
+                <label class="form-label">Service</label>
+                <input id="editService" class="form-control form-control-sm" required />
+              </div>
+              <div class="row g-2">
+                <div class="col">
+                  <label class="form-label">Début</label>
+                  <input id="editDebut" type="date" class="form-control form-control-sm" required />
+                </div>
+                <div class="col">
+                  <label class="form-label">Fin</label>
+                  <input id="editFin" type="date" class="form-control form-control-sm" required />
+                </div>
+              </div>
+              <div class="row g-2">
+                <div class="col">
+                  <label class="form-label">Catégorie</label>
+                  <input id="editCategorie" class="form-control form-control-sm" />
+                </div>
+                <div class="col">
+                  <label class="form-label">Prix mensuel (€)</label>
+                  <input id="editPrix" type="number" min="0" step="0.01" class="form-control form-control-sm" />
+                </div>
+              </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button id="saveEditBtn" type="button" class="btn btn-primary">
-              <i class="fa-solid fa-floppy-disk me-1"></i> Enregistrer
-            </button>
+            <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+            <button id="saveEditBtn" class="btn btn-primary btn-sm">Enregistrer</button>
           </div>
         </div>
       </div>
     </div>
+
   </main>
 
   <!-- Bootstrap bundle -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- App JS (inchangé) -->
-  <!-- ✅ bon chemin -->
+  <!-- App JS -->
   <script src="/app.js"></script>
 
 </body>
