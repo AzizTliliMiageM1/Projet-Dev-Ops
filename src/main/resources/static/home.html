@@ -4,181 +4,436 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Gestion des abonnements</title>
+    <title>Gestion d'abonnements - Interface Révolutionnaire</title>
 
     <!-- Bootstrap + Inter + Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/home.css">
+    <style>
+        /* Variables CSS modernes */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --secondary-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            --accent-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-text-bg: rgba(0, 0, 0, 0.2);
+            --text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+            --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.2);
+            --shadow-hover: 0 20px 50px rgba(31, 38, 135, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            background: var(--primary-gradient);
+            background-attachment: fixed;
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes shimmer {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Effets hover */
+        .cta-primary:hover {
+            transform: translateY(-4px) scale(1.08) !important;
+            box-shadow: 0 15px 50px rgba(255, 215, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.4) !important;
+        }
+
+        .cta-primary:hover span:first-child {
+            left: 100% !important;
+        }
+
+        .cta-secondary:hover {
+            transform: translateY(-4px) scale(1.05) !important;
+            background: rgba(255,255,255,0.35) !important;
+            border-color: rgba(255,255,255,0.6) !important;
+        }
+
+        .cta-secondary:hover span:first-child {
+            left: 100% !important;
+        }
+
+        .trust-indicators > div:hover {
+            transform: translateY(-3px) scale(1.05) !important;
+            box-shadow: var(--shadow-hover) !important;
+        }
+
+        .main-dashboard:hover {
+            transform: rotate(-1deg) scale(1.02) !important;
+            box-shadow: var(--shadow-hover), 0 35px 70px rgba(0,0,0,0.25) !important;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.05) !important;
+        }
+
+        .metric-card:hover > div:first-child {
+            left: 100% !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem !important;
+                padding: 15px 20px !important;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem !important;
+                padding: 15px 18px !important;
+            }
+            
+            .trust-indicators {
+                flex-direction: column !important;
+                gap: 20px !important;
+            }
+            
+            .main-dashboard {
+                margin: 10px !important;
+                padding: 20px !important;
+                transform: rotate(0deg) !important;
+            }
+        }
+
+        /* Header Glassmorphisme */
+        .modern-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid var(--glass-border);
+            box-shadow: var(--shadow-soft);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            background: var(--primary-gradient) !important;
+            background-size: 200% 200% !important;
+            animation: gradientShift 3s ease-in-out infinite !important;
+            border-radius: 15px !important;
+            box-shadow: 
+                0 10px 25px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .brand-logo:hover {
+            transform: scale(1.1) rotate(5deg) !important;
+            box-shadow: 
+                0 15px 35px rgba(102, 126, 234, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .navbar-brand div:first-of-type {
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            text-shadow: var(--text-shadow) !important;
+            background: var(--glass-text-bg) !important;
+            padding: 8px 16px !important;
+            border-radius: 12px !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            margin: 0 !important;
+        }
+
+        .navbar-brand div:last-of-type {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 600 !important;
+            text-shadow: var(--text-shadow) !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            padding: 4px 12px !important;
+            border-radius: 8px !important;
+            backdrop-filter: blur(5px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            margin-top: 5px !important;
+        }
+
+        .modern-nav-link {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            text-shadow: var(--text-shadow) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            padding: 8px 16px !important;
+            border-radius: 25px !important;
+            backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.3s ease !important;
+            text-decoration: none !important;
+        }
+
+        .modern-nav-link:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            transform: translateY(-2px) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .modern-btn-outline {
+            border: 2px solid rgba(255, 255, 255, 0.6) !important;
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px) !important;
+            font-weight: 700 !important;
+            text-shadow: var(--text-shadow) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .modern-btn-outline:hover {
+            background: rgba(255, 255, 255, 0.25) !important;
+            transform: translateY(-3px) scale(1.05) !important;
+            color: #ffffff !important;
+            border-color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .modern-btn-primary {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%) !important;
+            color: #1a1a1a !important;
+            border: none !important;
+            font-weight: 800 !important;
+            box-shadow: 
+                0 10px 30px rgba(255, 215, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .modern-btn-primary:hover {
+            transform: translateY(-4px) scale(1.08) !important;
+            box-shadow: 
+                0 15px 40px rgba(255, 215, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+            color: #1a1a1a !important;
+        }
+    </style>
 </head>
 
 <body>
-
-    <!-- Topbar -->
-    <header class="modern-header" style="background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95)); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(148,163,184,0.2); box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <!-- Topbar Glassmorphisme -->
+    <header class="modern-header">
         <nav class="container navbar navbar-expand-lg py-4">
             <a class="navbar-brand fw-bold d-flex align-items-center" href="/home.html" style="text-decoration: none;">
-                <div class="brand-logo me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s ease;">
-                    <span style="color: white; font-weight: 800; font-size: 1.2rem;">GA</span>
+                <div class="brand-logo me-3" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: white; font-weight: 800; font-size: 1.3rem;">GA</span>
                 </div>
                 <div>
-                    <div style="background: linear-gradient(45deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.3rem; font-weight: 800; line-height: 1;">Gestion d'abonnements</div>
-                    <div style="color: #64748b; font-size: 0.75rem; font-weight: 500; margin-top: 2px;">✨ Simplicité et élégance</div>
+                    <div style="font-size: 1.4rem; line-height: 1;">Gestion d'abonnements</div>
+                    <div style="font-size: 0.8rem; margin-top: 2px;">✨ Interface Révolutionnaire</div>
                 </div>
             </a>
-            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav">
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nav" style="border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1);">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div id="nav" class="collapse navbar-collapse">
-                <ul class="navbar-nav ms-auto gap-lg-4">
-                    <li class="nav-item"><a href="#features" class="nav-link fw-semibold position-relative modern-nav-link" style="color: #475569; transition: all 0.3s ease;">✨ Fonctionnalités</a></li>
-                    <li class="nav-item"><a href="#identify" class="nav-link fw-semibold position-relative modern-nav-link" style="color: #475569; transition: all 0.3s ease;">🔍 Identifier</a></li>
-                    <li class="nav-item"><a href="#measure" class="nav-link fw-semibold position-relative modern-nav-link" style="color: #475569; transition: all 0.3s ease;">📊 Mesurer</a></li>
-                    <li class="nav-item"><a href="/help.html" class="nav-link fw-semibold position-relative modern-nav-link" style="color: #475569; transition: all 0.3s ease;">❓ Aide</a></li>
-                    <li class="nav-item"><a href="#faq" class="nav-link fw-semibold position-relative modern-nav-link" style="color: #475569; transition: all 0.3s ease;">💬 FAQ</a></li>
+                <ul class="navbar-nav ms-auto gap-lg-3">
+                    <li class="nav-item"><a href="#features" class="nav-link modern-nav-link">✨ Fonctionnalités</a></li>
+                    <li class="nav-item"><a href="#identify" class="nav-link modern-nav-link">🔍 Identifier</a></li>
+                    <li class="nav-item"><a href="#measure" class="nav-link modern-nav-link">📊 Mesurer</a></li>
+                    <li class="nav-item"><a href="/help.html" class="nav-link modern-nav-link">❓ Aide</a></li>
+                    <li class="nav-item"><a href="#faq" class="nav-link modern-nav-link">💬 FAQ</a></li>
                 </ul>
                 <div class="ms-lg-4 d-flex gap-3">
-                    <a class="btn modern-btn-outline" href="/api.html" style="border: 2px solid #667eea; color: #667eea; padding: 10px 20px; border-radius: 50px; font-weight: 600; transition: all 0.3s ease; text-decoration: none;">📚 API</a>
-                    <a class="btn modern-btn-primary" href="/index.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 10px 24px; border-radius: 50px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; text-decoration: none;">🚀 Ouvrir l'app</a>
+                    <a class="btn modern-btn-outline" href="/api.html" style="padding: 12px 24px; border-radius: 30px;">📚 API</a>
+                    <a class="btn modern-btn-primary" href="/index.html" style="padding: 12px 28px; border-radius: 30px;">🚀 Ouvrir l'app</a>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- Hero banner moderne -->
-    <section class="hero-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); position: relative; overflow: hidden; padding: 100px 0 120px;">
-        <!-- Effets de fond animés -->
-        <div class="hero-bg-effects">
-            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 70%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.08) 0%, transparent 70%); animation: pulse 4s ease-in-out infinite;"></div>
-            <div style="position: absolute; top: 20%; right: 10%; width: 300px; height: 300px; background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border-radius: 50%; filter: blur(40px); animation: float 6s ease-in-out infinite;"></div>
-            <div style="position: absolute; bottom: 20%; left: 10%; width: 200px; height: 200px; background: linear-gradient(45deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border-radius: 50%; filter: blur(30px); animation: float 4s ease-in-out infinite reverse;"></div>
+    </header>
+
+    <!-- Hero Section Glassmorphisme Ultra-Moderne -->
+    <section class="hero-modern" style="position: relative; overflow: hidden; padding: 120px 0 140px; background: transparent;">
+        <!-- Effets de fond animés améliorés -->
+        <div class="hero-bg-effects" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(circle at 25% 25%, rgba(255,255,255,0.15) 0%, transparent 70%), radial-gradient(circle at 75% 75%, rgba(255,255,255,0.12) 0%, transparent 70%); animation: pulse 6s ease-in-out infinite;"></div>
+            <div style="position: absolute; top: 15%; right: 8%; width: 350px; height: 350px; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%); border-radius: 50%; filter: blur(60px); animation: float 8s ease-in-out infinite;"></div>
+            <div style="position: absolute; bottom: 15%; left: 8%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(102,126,234,0.12) 0%, transparent 70%); border-radius: 50%; filter: blur(50px); animation: float 6s ease-in-out infinite reverse;"></div>
         </div>
         
-        <div class="container position-relative">
+        <div class="container position-relative" style="z-index: 3;">
             <div class="row align-items-center">
                 <div class="col-lg-6">
-                    <!-- Badge premium -->
-                    <div class="hero-badge" style="display: inline-flex; align-items: center; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 50px; padding: 8px 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.3);">
-                        <span style="background: linear-gradient(45deg, #ffd700, #ffed4e); width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; animation: pulse 2s infinite;"></span>
-                        <span style="color: rgba(255,255,255,0.9); font-weight: 600; font-size: 0.9rem;">🏆 #1 Application de gestion d'abonnements</span>
+                    <!-- Badge premium glassmorphisme -->
+                    <div class="hero-badge" style="display: inline-flex; align-items: center; background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: 30px; padding: 12px 24px; margin-bottom: 35px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft);">
+                        <span style="background: linear-gradient(45deg, #ffd700, #ffed4e); width: 14px; height: 14px; border-radius: 50%; margin-right: 12px; animation: pulse 2s infinite; box-shadow: 0 0 10px rgba(255,215,0,0.5);"></span>
+                        <span style="color: #ffffff; font-weight: 700; font-size: 1rem; text-shadow: var(--text-shadow);">🏆 #1 Application de gestion d'abonnements</span>
                     </div>
                     
-                    <h1 class="hero-title" style="font-size: 3.5rem; font-weight: 800; color: white; line-height: 1.1; margin-bottom: 25px; text-shadow: 0 2px 30px rgba(0,0,0,0.2);">
+                    <h1 class="hero-title" style="font-size: 4rem; font-weight: 900; color: #ffffff; line-height: 1.1; margin-bottom: 30px; text-shadow: var(--text-shadow); background: var(--glass-text-bg); padding: 20px 30px; border-radius: 20px; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.3); position: relative; overflow: hidden;">
+                        <span style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); animation: shimmer 3s infinite;"></span>
                         Gestion d'abonnements
-                        <span style="background: linear-gradient(45deg, #ffd700, #ffed4e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">révolutionnaire</span>
+                        <br><span style="background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700); background-size: 200% 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 2s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));">révolutionnaire</span>
                     </h1>
                     
-                    <p class="hero-subtitle" style="font-size: 1.3rem; color: rgba(255,255,255,0.85); margin-bottom: 35px; line-height: 1.6; font-weight: 400;">Transformez votre gestion d'abonnements avec notre interface ultra-moderne. Surveillez, analysez et optimisez tous vos services en un seul endroit.</p>
-                    <!-- Boutons CTA modernes -->
-                    <div class="hero-cta" style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 50px;">
-                        <a href="/index.html" class="cta-primary" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; padding: 16px 32px; border-radius: 50px; font-weight: 700; font-size: 1.1rem; text-decoration: none; box-shadow: 0 8px 30px rgba(255, 215, 0, 0.4); transition: all 0.3s ease; border: none;">
-                            <span style="margin-right: 10px; font-size: 1.2rem;">🚀</span>
+                    <p class="hero-subtitle" style="font-size: 1.4rem; color: #ffffff; margin-bottom: 40px; line-height: 1.7; font-weight: 500; text-shadow: var(--text-shadow); background: rgba(255,255,255,0.15); padding: 20px 25px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2);">Transformez votre gestion d'abonnements avec notre interface ultra-moderne. Surveillez, analysez et optimisez tous vos services en un seul endroit avec une expérience utilisateur révolutionnaire.</p>
+                    
+                    <!-- Boutons CTA glassmorphisme -->
+                    <div class="hero-cta" style="display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 60px;">
+                        <a href="/index.html" class="cta-primary" style="display: inline-flex; align-items: center; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; padding: 18px 36px; border-radius: 30px; font-weight: 800; font-size: 1.2rem; text-decoration: none; box-shadow: 0 10px 35px rgba(255, 215, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.3); transition: all 0.4s ease; border: none; position: relative; overflow: hidden;">
+                            <span style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.6s ease;"></span>
+                            <span style="margin-right: 12px; font-size: 1.3rem;">🚀</span>
                             Commencer gratuitement
                         </a>
-                        <a href="#features" class="cta-secondary" style="display: inline-flex; align-items: center; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); color: white; padding: 16px 32px; border-radius: 50px; font-weight: 600; font-size: 1.1rem; text-decoration: none; border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease;">
-                            <span style="margin-right: 10px; font-size: 1.2rem;">▶️</span>
+                        <a href="#features" class="cta-secondary" style="display: inline-flex; align-items: center; background: var(--glass-bg); backdrop-filter: blur(15px); color: #ffffff; padding: 18px 36px; border-radius: 30px; font-weight: 700; font-size: 1.2rem; text-decoration: none; border: 2px solid rgba(255,255,255,0.4); transition: all 0.4s ease; text-shadow: var(--text-shadow); position: relative; overflow: hidden;">
+                            <span style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.6s ease;"></span>
+                            <span style="margin-right: 12px; font-size: 1.3rem;">▶️</span>
                             Voir la démo
                         </a>
                     </div>
                     
                     <!-- Indicateurs de confiance modernisés -->
                     <div class="trust-indicators" style="display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
-                        <div style="display: flex; align-items: center; color: rgba(255,255,255,0.8);">
-                            <div style="background: rgba(16, 185, 129, 0.2); border-radius: 50%; padding: 8px; margin-right: 12px; border: 1px solid rgba(16, 185, 129, 0.4);">
-                                <span style="font-size: 1.1rem;">🛡️</span>
+                        <div style="display: flex; align-items: center; background: rgba(16, 185, 129, 0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 20px; border: 1px solid rgba(16, 185, 129, 0.3); transition: all 0.3s ease;">
+                            <div style="background: rgba(16, 185, 129, 0.3); border-radius: 50%; padding: 12px; margin-right: 15px; border: 1px solid rgba(16, 185, 129, 0.5);">
+                                <span style="font-size: 1.2rem;">🛡️</span>
                             </div>
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem;">100% Sécurisé</div>
-                                <div style="font-size: 0.75rem; opacity: 0.7;">Données protégées</div>
+                                <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-shadow: var(--text-shadow);">100% Sécurisé</div>
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); text-shadow: var(--text-shadow);">Données protégées</div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; color: rgba(255,255,255,0.8);">
-                            <div style="background: rgba(59, 130, 246, 0.2); border-radius: 50%; padding: 8px; margin-right: 12px; border: 1px solid rgba(59, 130, 246, 0.4);">
-                                <span style="font-size: 1.1rem;">⚡</span>
+                        <div style="display: flex; align-items: center; background: rgba(59, 130, 246, 0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 20px; border: 1px solid rgba(59, 130, 246, 0.3); transition: all 0.3s ease;">
+                            <div style="background: rgba(59, 130, 246, 0.3); border-radius: 50%; padding: 12px; margin-right: 15px; border: 1px solid rgba(59, 130, 246, 0.5);">
+                                <span style="font-size: 1.2rem;">⚡</span>
                             </div>
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem;">Ultra Rapide</div>
-                                <div style="font-size: 0.75rem; opacity: 0.7;">Interface réactive</div>
+                                <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-shadow: var(--text-shadow);">Ultra Rapide</div>
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); text-shadow: var(--text-shadow);">Interface réactive</div>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; color: rgba(255,255,255,0.8);">
-                            <div style="background: rgba(168, 85, 247, 0.2); border-radius: 50%; padding: 8px; margin-right: 12px; border: 1px solid rgba(168, 85, 247, 0.4);">
-                                <span style="font-size: 1.1rem;">📈</span>
+                        <div style="display: flex; align-items: center; background: rgba(168, 85, 247, 0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px 20px; border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s ease;">
+                            <div style="background: rgba(168, 85, 247, 0.3); border-radius: 50%; padding: 12px; margin-right: 15px; border: 1px solid rgba(168, 85, 247, 0.5);">
+                                <span style="font-size: 1.2rem;">📈</span>
                             </div>
                             <div>
-                                <div style="font-weight: 600; font-size: 0.9rem;">Analytics Pro</div>
-                                <div style="font-size: 0.75rem; opacity: 0.7;">Insights avancés</div>
+                                <div style="font-weight: 700; font-size: 1rem; color: #ffffff; text-shadow: var(--text-shadow);">Analytics Pro</div>
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); text-shadow: var(--text-shadow);">Insights avancés</div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Dashboard Mockup Ultra-Moderne -->
                 <div class="col-lg-6">
-                    <div class="dashboard-mockup" style="position: relative; animation: slideInRight 1s ease-out 0.3s both;">
-                        <!-- Effet de glow lumineux -->
-                        <div style="position: absolute; top: 50%; left: 50%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%); border-radius: 50%; transform: translate(-50%, -50%); filter: blur(40px); animation: pulse 3s infinite;"></div>
+                    <div class="dashboard-mockup" style="position: relative; animation: slideInRight 1.2s ease-out 0.5s both; z-index: 4;">
+                        <!-- Effet de glow lumineux amélioré -->
+                        <div style="position: absolute; top: 50%; left: 50%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(255,215,0,0.25) 0%, rgba(102,126,234,0.15) 50%, transparent 80%); border-radius: 50%; transform: translate(-50%, -50%); filter: blur(60px); animation: pulse 4s infinite;"></div>
                         
-                        <!-- Dashboard principal -->
-                        <div class="main-dashboard" style="position: relative; background: rgba(255,255,255,0.15); backdrop-filter: blur(20px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.3); transform: rotate(-3deg); box-shadow: 0 25px 50px rgba(0,0,0,0.2); margin: 20px;">
+                        <!-- Dashboard principal glassmorphisme -->
+                        <div class="main-dashboard" style="position: relative; background: var(--glass-bg); backdrop-filter: blur(25px); border-radius: 25px; padding: 30px; border: 1px solid var(--glass-border); transform: rotate(-2deg); box-shadow: var(--shadow-soft), 0 30px 60px rgba(0,0,0,0.2); margin: 25px; transition: all 0.3s ease;">
                             <!-- Header du dashboard -->
-                            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
-                                <div>
-                                    <h6 style="color: white; font-weight: 700; font-size: 1.1rem; margin: 0; display: flex; align-items: center;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                                <div style="background: var(--glass-text-bg); padding: 12px 18px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">
+                                    <h6 style="color: #ffffff; font-weight: 800; font-size: 1.2rem; margin: 0; display: flex; align-items: center; text-shadow: var(--text-shadow);">
                                         📊 Dashboard Analytics
                                     </h6>
-                                    <div style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 2px;">Temps réel • Mis à jour il y a 2min</div>
+                                    <div style="color: rgba(255,255,255,0.8); font-size: 0.85rem; margin-top: 3px; text-shadow: var(--text-shadow);">Temps réel • Mis à jour il y a 2min</div>
                                 </div>
-                                <div style="background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4); border-radius: 50px; padding: 4px 12px; color: #10b981; font-size: 0.75rem; font-weight: 600;">
+                                <div style="background: rgba(16,185,129,0.25); border: 1px solid rgba(16,185,129,0.5); border-radius: 25px; padding: 6px 15px; color: #ffffff; font-size: 0.8rem; font-weight: 700; backdrop-filter: blur(10px); text-shadow: var(--text-shadow); box-shadow: 0 0 15px rgba(16,185,129,0.3);">
                                     🟢 Live
                                 </div>
                             </div>
                             
-                            <!-- Métriques principales -->
-                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
-                                <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 12px; padding: 15px; text-align: center; color: white; transform: translateY(0); transition: all 0.3s ease;" class="metric-card">
-                                    <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">24</div>
-                                    <div style="font-size: 0.7rem; opacity: 0.9;">Actifs</div>
+                            <!-- Métriques principales glassmorphisme -->
+                            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                                <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 15px; padding: 18px; text-align: center; color: #ffffff; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(59,130,246,0.3); position: relative; overflow: hidden;" class="metric-card">
+                                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 1s ease;"></div>
+                                    <div style="font-size: 2rem; font-weight: 900; margin-bottom: 6px; text-shadow: var(--text-shadow);">24</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.95; text-shadow: var(--text-shadow);">Actifs</div>
                                 </div>
-                                <div style="background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; padding: 15px; text-align: center; color: white; transform: translateY(0); transition: all 0.3s ease;" class="metric-card">
-                                    <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">+3</div>
-                                    <div style="font-size: 0.7rem; opacity: 0.9;">Nouveaux</div>
+                                <div style="background: linear-gradient(135deg, #10b981, #059669); border-radius: 15px; padding: 18px; text-align: center; color: #ffffff; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(16,185,129,0.3); position: relative; overflow: hidden;" class="metric-card">
+                                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 1s ease;"></div>
+                                    <div style="font-size: 2rem; font-weight: 900; margin-bottom: 6px; text-shadow: var(--text-shadow);">+3</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.95; text-shadow: var(--text-shadow);">Nouveaux</div>
                                 </div>
-                                <div style="background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 12px; padding: 15px; text-align: center; color: white; transform: translateY(0); transition: all 0.3s ease;" class="metric-card">
-                                    <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">⚠️ 2</div>
-                                    <div style="font-size: 0.7rem; opacity: 0.9;">Alertes</div>
+                                <div style="background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 15px; padding: 18px; text-align: center; color: #ffffff; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(245,158,11,0.3); position: relative; overflow: hidden;" class="metric-card">
+                                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 1s ease;"></div>
+                                    <div style="font-size: 2rem; font-weight: 900; margin-bottom: 6px; text-shadow: var(--text-shadow);">⚠️ 2</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.95; text-shadow: var(--text-shadow);">Alertes</div>
                                 </div>
-                                <div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; padding: 15px; text-align: center; color: white; transform: translateY(0); transition: all 0.3s ease;" class="metric-card">
-                                    <div style="font-size: 1.8rem; font-weight: 800; margin-bottom: 4px;">€89</div>
-                                    <div style="font-size: 0.7rem; opacity: 0.9;">Mensuel</div>
+                                <div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 15px; padding: 18px; text-align: center; color: #ffffff; transform: translateY(0); transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(139,92,246,0.3); position: relative; overflow: hidden;" class="metric-card">
+                                    <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 1s ease;"></div>
+                                    <div style="font-size: 2rem; font-weight: 900; margin-bottom: 6px; text-shadow: var(--text-shadow);">€89</div>
+                                    <div style="font-size: 0.8rem; opacity: 0.95; text-shadow: var(--text-shadow);">Mensuel</div>
                                 </div>
                             </div>
                             
-                            <!-- Graphique simulé -->
-                            <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 15px; height: 80px; position: relative; overflow: hidden;">
-                                <div style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin-bottom: 10px; font-weight: 600;">📈 Évolution des économies</div>
-                                <div style="display: flex; align-items-end; justify-content: space-between; height: 45px;">
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 20px; border-radius: 4px; animation: slideInUp 1s ease-out 0.5s both;"></div>
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 35px; border-radius: 4px; animation: slideInUp 1s ease-out 0.6s both;"></div>
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 15px; border-radius: 4px; animation: slideInUp 1s ease-out 0.7s both;"></div>
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 45px; border-radius: 4px; animation: slideInUp 1s ease-out 0.8s both;"></div>
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 25px; border-radius: 4px; animation: slideInUp 1s ease-out 0.9s both;"></div>
-                                    <div style="background: rgba(255,215,0,0.8); width: 8px; height: 40px; border-radius: 4px; animation: slideInUp 1s ease-out 1s both;"></div>
+                            <!-- Graphique simulé glassmorphisme -->
+                            <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 15px; padding: 20px; height: 90px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); margin-top: 15px;">
+                                <div style="color: #ffffff; font-size: 0.9rem; margin-bottom: 15px; font-weight: 700; text-shadow: var(--text-shadow); background: var(--glass-text-bg); padding: 6px 12px; border-radius: 8px; display: inline-block;">📈 Évolution des économies</div>
+                                <div style="display: flex; align-items: end; justify-content: space-between; height: 45px;">
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 20px; border-radius: 5px; animation: slideInUp 1s ease-out 0.5s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 35px; border-radius: 5px; animation: slideInUp 1s ease-out 0.6s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 15px; border-radius: 5px; animation: slideInUp 1s ease-out 0.7s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 45px; border-radius: 5px; animation: slideInUp 1s ease-out 0.8s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 25px; border-radius: 5px; animation: slideInUp 1s ease-out 0.9s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
+                                    <div style="background: linear-gradient(135deg, #ffd700, #ffed4e); width: 10px; height: 40px; border-radius: 5px; animation: slideInUp 1s ease-out 1s both; box-shadow: 0 4px 15px rgba(255,215,0,0.3);"></div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Cartes flottantes -->
-                        <div style="position: absolute; top: -10px; right: -30px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: float 6s ease-in-out infinite; border: 1px solid rgba(255,255,255,0.3);">
-                            <div style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">💰 Économies</div>
-                            <div style="font-size: 1.3rem; font-weight: 800; color: #10b981;">+127€</div>
-                            <div style="font-size: 0.7rem; color: #64748b;">ce mois</div>
+                        <!-- Cartes flottantes glassmorphisme -->
+                        <div style="position: absolute; top: -15px; right: -35px; background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-soft); animation: float 6s ease-in-out infinite; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.9rem; color: #ffffff; font-weight: 700; margin-bottom: 8px; text-shadow: var(--text-shadow);">💰 Économies</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: #ffffff; text-shadow: var(--text-shadow); background: linear-gradient(45deg, #10b981, #38ef7d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">+127€</div>
+                            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); text-shadow: var(--text-shadow);">ce mois</div>
                         </div>
                         
-                        <div style="position: absolute; bottom: 20px; left: -40px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); animation: float 4s ease-in-out infinite reverse; border: 1px solid rgba(255,255,255,0.3);">
-                            <div style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">🎯 Efficacité</div>
-                            <div style="font-size: 1.3rem; font-weight: 800; color: #3b82f6;">94%</div>
-                            <div style="font-size: 0.7rem; color: #64748b;">utilisation</div>
+                        <div style="position: absolute; bottom: 25px; left: -45px; background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-soft); animation: float 4s ease-in-out infinite reverse; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.9rem; color: #ffffff; font-weight: 700; margin-bottom: 8px; text-shadow: var(--text-shadow);">🎯 Efficacité</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: #ffffff; text-shadow: var(--text-shadow); background: linear-gradient(45deg, #3b82f6, #1e40af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">94%</div>
+                            <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); text-shadow: var(--text-shadow);">utilisation</div>
                         </div>
                     </div>
                 </div>
@@ -202,47 +457,113 @@
                 </h2>
                 <p style="font-size: 1.2rem; color: #64748b; max-width: 600px; margin: 0 auto;">Découvrez tous les outils dont vous avez besoin pour gérer vos abonnements comme un professionnel</p>
             </div>
+    <!-- Features Section Glassmorphisme -->
+    <section id="features" class="py-5" style="position: relative; padding: 100px 0; overflow: hidden;">
+        <!-- Fond décoratif glassmorphisme -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(180deg, transparent, rgba(255,255,255,0.1)); z-index: 2;"></div>
+        
+        <div class="container position-relative" style="z-index: 3;">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center mb-5">
+                    <div style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 20px; padding: 30px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft);">
+                        <h2 style="font-size: 3rem; font-weight: 900; color: #ffffff; margin-bottom: 20px; text-shadow: var(--text-shadow);">
+                            ✨ Fonctionnalités Révolutionnaires
+                        </h2>
+                        <p style="font-size: 1.3rem; color: rgba(255,255,255,0.9); margin: 0; text-shadow: var(--text-shadow);">
+                            Des outils modernes pour une gestion d'abonnements sans effort
+                        </p>
+                    </div>
+                </div>
+            </div>
             
             <div class="row g-4">
                 <div class="col-md-4">
-                    <div class="modern-card h-100" style="background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 237, 78, 0.05) 100%); border: 1px solid rgba(255, 215, 0, 0.2);">
-                        <!-- Icon moderne -->
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffd700, #ffed4e); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);">
-                            <span style="font-size: 2rem;">⚡</span>
+                    <div class="modern-card h-100" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 25px; padding: 30px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.8s ease;"></div>
+                        <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #ffd700, #ffed4e); border-radius: 25px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(255, 215, 0, 0.4); position: relative; z-index: 1;">
+                            <span style="font-size: 2.2rem;">⚡</span>
                         </div>
-                        <h5 style="font-weight: 700; color: #1e293b; margin-bottom: 15px; font-size: 1.3rem;">Gestion CRUD Ultra-Rapide</h5>
-                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">Interface lightning-fast pour créer, modifier et supprimer vos abonnements en temps record.</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <span style="background: rgba(255, 215, 0, 0.2); color: #b45309; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Instant</span>
-                            <span style="background: rgba(255, 215, 0, 0.2); color: #b45309; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Intuitif</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="modern-card h-100" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(52, 211, 153, 0.05) 100%); border: 1px solid rgba(16, 185, 129, 0.2);">
-                        <!-- Icon moderne -->
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);">
-                            <span style="font-size: 2rem;">📊</span>
-                        </div>
-                        <h5 style="font-weight: 700; color: #1e293b; margin-bottom: 15px; font-size: 1.3rem;">Analytics Avancés</h5>
-                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">Tableaux de bord interactifs avec métriques en temps réel et insights intelligents.</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <span style="background: rgba(16, 185, 129, 0.2); color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Temps réel</span>
-                            <span style="background: rgba(16, 185, 129, 0.2); color: #065f46; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Smart</span>
+                        <h5 style="font-weight: 800; color: #ffffff; margin-bottom: 15px; font-size: 1.4rem; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Gestion CRUD Ultra-Rapide</h5>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px; line-height: 1.7; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Interface lightning-fast pour créer, modifier et supprimer vos abonnements en temps record.</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1;">
+                            <span style="background: rgba(255, 215, 0, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.4);">⚡ Instant</span>
+                            <span style="background: rgba(255, 215, 0, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(255,215,0,0.4);">🎯 Intuitif</span>
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-4">
-                    <div class="modern-card h-100" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(196, 181, 253, 0.05) 100%); border: 1px solid rgba(168, 85, 247, 0.2);">
-                        <!-- Icon moderne -->
-                        <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #a855f7, #c4b5fd); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);">
-                            <span style="font-size: 2rem;">🔔</span>
+                    <div class="modern-card h-100" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 25px; padding: 30px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.8s ease;"></div>
+                        <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 25px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4); position: relative; z-index: 1;">
+                            <span style="font-size: 2.2rem;">📊</span>
                         </div>
-                        <h5 style="font-weight: 700; color: #1e293b; margin-bottom: 15px; font-size: 1.3rem;">Alertes Intelligentes</h5>
-                        <p style="color: #64748b; margin-bottom: 20px; line-height: 1.6;">Notifications automatiques pour optimiser vos coûts et détecter les services inutilisés.</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <h5 style="font-weight: 800; color: #ffffff; margin-bottom: 15px; font-size: 1.4rem; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Analytics Avancés</h5>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px; line-height: 1.7; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Tableaux de bord interactifs avec métriques en temps réel et insights intelligents.</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1;">
+                            <span style="background: rgba(16, 185, 129, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(16,185,129,0.4);">📈 Temps réel</span>
+                            <span style="background: rgba(16, 185, 129, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(16,185,129,0.4);">🧠 Smart</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="modern-card h-100" style="background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 25px; padding: 30px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-soft); transition: all 0.3s ease; position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.8s ease;"></div>
+                        <div style="width: 90px; height: 90px; background: linear-gradient(135deg, #a855f7, #c4b5fd); border-radius: 25px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(168, 85, 247, 0.4); position: relative; z-index: 1;">
+                            <span style="font-size: 2.2rem;">🔔</span>
+                        </div>
+                        <h5 style="font-weight: 800; color: #ffffff; margin-bottom: 15px; font-size: 1.4rem; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Alertes Intelligentes</h5>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 25px; line-height: 1.7; text-shadow: var(--text-shadow); position: relative; z-index: 1;">Notifications automatiques pour optimiser vos coûts et détecter les services inutilisés.</p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; position: relative; z-index: 1;">
+                            <span style="background: rgba(168, 85, 247, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(168,85,247,0.4);">🚨 Auto</span>
+                            <span style="background: rgba(168, 85, 247, 0.3); color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; backdrop-filter: blur(10px); border: 1px solid rgba(168,85,247,0.4);">💡 Smart</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer simplifié -->
+    <footer style="background: var(--glass-bg); backdrop-filter: blur(25px); border-top: 1px solid var(--glass-border); padding: 60px 0; text-align: center;">
+        <div class="container">
+            <div style="background: rgba(0,0,0,0.2); backdrop-filter: blur(15px); border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.3);">
+                <h3 style="color: #ffffff; font-weight: 900; font-size: 2rem; margin-bottom: 20px; text-shadow: var(--text-shadow);">
+                    🚀 Prêt à révolutionner votre gestion ?
+                </h3>
+                <p style="color: rgba(255,255,255,0.9); font-size: 1.2rem; margin-bottom: 30px; text-shadow: var(--text-shadow);">
+                    Rejoignez les milliers d'utilisateurs qui économisent temps et argent
+                </p>
+                <a href="/index.html" class="btn" style="background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #1a1a1a; padding: 18px 36px; border-radius: 30px; font-weight: 800; font-size: 1.2rem; text-decoration: none; box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4); transition: all 0.3s ease; border: none; display: inline-block;">
+                    ✨ Commencer maintenant
+                </a>
+                
+                <div style="margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.2);">
+                    <p style="color: rgba(255,255,255,0.7); margin: 0; text-shadow: var(--text-shadow);">
+                        © 2024 Gestion d'abonnements - Interface révolutionnaire créée avec ❤️
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Effets hover CSS -->
+    <style>
+        .modern-card:hover {
+            transform: translateY(-8px) scale(1.02) !important;
+            box-shadow: var(--shadow-hover) !important;
+        }
+        
+        .modern-card:hover > div:first-child {
+            left: 100% !important;
+        }
+    </style>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
                             <span style="background: rgba(168, 85, 247, 0.2); color: #581c87; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Auto</span>
                             <span style="background: rgba(168, 85, 247, 0.2); color: #581c87; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Économies</span>
                         </div>
