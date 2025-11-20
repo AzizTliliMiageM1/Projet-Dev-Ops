@@ -136,8 +136,26 @@ Notre application arbore maintenant un design révolutionnaire qui redéfinit l'
 
 - CSS optimisé avec variables pour cohérence
 - Animations GPU-accelerated uniquement
-- Contraste élevé maintenu malgré la transparence
+- **Contraste élevé optimisé** : Fonds semi-transparents pour tous les textes
+- **Lisibilité étudiante renforcée** : Ombres portées et backdrop-filters
+- **Variables --text-shadow** : Cohérence des effets de profondeur
+- **Glass-text-bg containers** : Fonds contrastés pour éléments importants
 - Support complet des lecteurs d'écran
+
+#### 🎓 **Optimisations Étudiantes**
+
+📖 **Lisibilité Premium**
+- Fonds semi-transparents rgba(0,0,0,0.25) sur textes cruciaux
+- Contraste élevé maintenu malgré l'esthétique glassmorphisme
+- Tailles de police agrandies pour confort de lecture
+- Drop-shadows sur gradients pour distinction visuelle
+- Bordures subtiles pour délimitation des zones de contenu
+
+✅ **Balance Design/Fonctionnel**
+- Esthétique futuriste préservée intégralement
+- Accessibilité web standards respectés
+- UX optimisée pour usage académique et professionnel
+- Interface adaptée aux longues sessions d'étude
 
 Pour l'ouvrir :
 1. Démarre le serveur API :
