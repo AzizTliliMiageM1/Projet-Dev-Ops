@@ -12,26 +12,28 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
   <style>
-    /* Variables et design révolutionnaire */
+    /* Variables Futuristes Cyberpunk */
     :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 30%, #f093fb 60%, #ff9a8b 100%);
-      --secondary-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #ffecd2 100%);
-      --accent-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff9a8b 100%);
-      --neon-gradient: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
-      --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 50%, #06ffa5 100%);
-      --warning-gradient: linear-gradient(135deg, #fcb045 0%, #fd1d1d 50%, #833ab4 100%);
-      --glass-bg: rgba(255, 255, 255, 0.15);
-      --glass-border: rgba(255, 255, 255, 0.35);
-      --glass-text-bg: rgba(0, 0, 0, 0.25);
-      --glass-premium: rgba(255, 255, 255, 0.2);
-      --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.2);
-      --shadow-hover: 0 25px 60px rgba(31, 38, 135, 0.4);
-      --shadow-glow: 0 0 30px rgba(102, 126, 234, 0.3);
-      --border-radius: 30px;
-      --animation-speed: 0.4s;
-      --text-gradient: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #ff9a8b);
-      --text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-      --neon-glow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+      --cyber-primary: linear-gradient(135deg, #00d4ff 0%, #090979 25%, #020024 50%, #7b2cbf 75%, #c77dff 100%);
+      --quantum-gradient: linear-gradient(135deg, #ff006e 0%, #fb5607 20%, #ffbe0b 40%, #8338ec 60%, #3a86ff 80%, #06ffa5 100%);
+      --neon-cyan: linear-gradient(135deg, #00f5ff 0%, #00d4ff 50%, #0099ff 100%);
+      --plasma-purple: linear-gradient(135deg, #8e2de2 0%, #4a00e0 50%, #2d1b69 100%);
+      --holographic: linear-gradient(135deg, #ff006e 0%, #8338ec 25%, #3a86ff 50%, #06ffa5 75%, #ffbe0b 100%);
+      --matrix-green: linear-gradient(135deg, #39ff14 0%, #00ff41 50%, #00cc33 100%);
+      --cosmic-void: linear-gradient(135deg, #0c0c0c 0%, #1a0033 30%, #000000 70%, #0d1421 100%);
+      --glass-cyber: rgba(0, 212, 255, 0.15);
+      --glass-quantum: rgba(255, 255, 255, 0.08);
+      --glass-neon: rgba(57, 255, 20, 0.12);
+      --cyber-border: rgba(0, 212, 255, 0.6);
+      --quantum-border: rgba(255, 0, 110, 0.5);
+      --shadow-cyber: 0 0 50px rgba(0, 212, 255, 0.4), 0 20px 40px rgba(131, 56, 236, 0.3);
+      --shadow-quantum: 0 0 60px rgba(255, 0, 110, 0.5), 0 25px 50px rgba(58, 134, 255, 0.4);
+      --shadow-hologram: 0 0 80px rgba(57, 255, 20, 0.6), 0 30px 60px rgba(255, 190, 11, 0.4);
+      --glow-cyber: 0 0 30px currentColor, 0 0 60px currentColor, 0 0 90px currentColor;
+      --glow-quantum: 0 0 40px #ff006e, 0 0 80px #8338ec, 0 0 120px #3a86ff;
+      --border-cyber: 35px;
+      --text-cyber: linear-gradient(135deg, #00d4ff, #ff006e, #8338ec, #06ffa5, #ffbe0b);
+      --text-quantum: 0 0 20px rgba(0, 212, 255, 0.8), 0 4px 15px rgba(0, 0, 0, 0.6);
     }
 
     * {
@@ -39,15 +41,16 @@
     }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--primary-gradient);
+      font-family: 'Orbitron', 'Courier New', monospace;
+      background: var(--cosmic-void);
       background-attachment: fixed;
       background-size: 400% 400%;
-      animation: gradientShift 20s ease infinite;
+      animation: cyberMatrix 25s ease infinite;
       min-height: 100vh;
       margin: 0;
       overflow-x: hidden;
       position: relative;
+      perspective: 2000px;
     }
 
     body::before {
@@ -58,13 +61,14 @@
       width: 100%;
       height: 100%;
       background: 
-        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 60% 90%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 10% 20%, rgba(0, 212, 255, 0.3) 0%, transparent 30%),
+        radial-gradient(circle at 80% 80%, rgba(255, 0, 110, 0.25) 0%, transparent 35%),
+        radial-gradient(circle at 40% 40%, rgba(131, 56, 236, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(57, 255, 20, 0.15) 0%, transparent 30%),
+        radial-gradient(circle at 20% 90%, rgba(255, 190, 11, 0.2) 0%, transparent 35%);
       pointer-events: none;
       z-index: 1;
-      animation: particleFloat 25s ease-in-out infinite;
+      animation: quantumField 30s ease-in-out infinite;
     }
 
     body::after {
@@ -75,67 +79,88 @@
       width: 100%;
       height: 100%;
       background-image: 
-        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
-        radial-gradient(2px 2px at 40px 70px, rgba(255,215,0,0.4), transparent),
-        radial-gradient(1px 1px at 90px 40px, rgba(102,126,234,0.5), transparent),
-        radial-gradient(1px 1px at 130px 80px, rgba(240,147,251,0.4), transparent);
+        linear-gradient(0deg, transparent 24%, rgba(57, 255, 20, 0.05) 25%, rgba(57, 255, 20, 0.05) 26%, transparent 27%, transparent 74%, rgba(0, 212, 255, 0.05) 75%, rgba(0, 212, 255, 0.05) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255, 0, 110, 0.03) 25%, rgba(255, 0, 110, 0.03) 26%, transparent 27%, transparent 74%, rgba(131, 56, 236, 0.03) 75%, rgba(131, 56, 236, 0.03) 76%, transparent 77%, transparent),
+        radial-gradient(1px 1px at 20px 30px, rgba(57, 255, 20, 0.6), transparent),
+        radial-gradient(1px 1px at 40px 70px, rgba(0, 212, 255, 0.8), transparent),
+        radial-gradient(2px 2px at 90px 40px, rgba(255, 0, 110, 0.5), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 190, 11, 0.7), transparent);
       background-repeat: repeat;
-      background-size: 150px 100px;
+      background-size: 120px 120px, 80px 80px, 180px 120px, 200px 150px, 160px 100px, 220px 180px;
       pointer-events: none;
       z-index: 1;
-      opacity: 0.6;
-      animation: sparkle 15s linear infinite;
+      opacity: 0.4;
+      animation: digitalRain 20s linear infinite;
     }
 
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      25% { background-position: 100% 50%; }
-      50% { background-position: 50% 100%; }
-      75% { background-position: 100% 0%; }
+    @keyframes cyberMatrix {
+      0%, 100% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+      20% { background-position: 100% 20%; filter: hue-rotate(60deg); }
+      40% { background-position: 50% 100%; filter: hue-rotate(120deg); }
+      60% { background-position: 80% 10%; filter: hue-rotate(180deg); }
+      80% { background-position: 20% 80%; filter: hue-rotate(240deg); }
     }
 
-    @keyframes particleFloat {
+    @keyframes quantumField {
       0%, 100% { 
-        transform: translateX(0) translateY(0) rotate(0deg);
+        transform: translateX(0) translateY(0) rotateZ(0deg) scale(1);
         opacity: 0.6;
+        filter: blur(0px) brightness(1);
       }
       25% {
-        transform: translateX(10px) translateY(-5px) rotate(90deg);
-        opacity: 0.8;
+        transform: translateX(15px) translateY(-10px) rotateZ(2deg) scale(1.05);
+        opacity: 0.9;
+        filter: blur(1px) brightness(1.2);
       }
       50% {
-        transform: translateX(-5px) translateY(-10px) rotate(180deg);
+        transform: translateX(-10px) translateY(-20px) rotateZ(-1deg) scale(0.95);
         opacity: 1;
+        filter: blur(2px) brightness(1.4);
       }
       75% {
-        transform: translateX(-10px) translateY(5px) rotate(270deg);
-        opacity: 0.7;
+        transform: translateX(-20px) translateY(10px) rotateZ(3deg) scale(1.1);
+        opacity: 0.8;
+        filter: blur(1px) brightness(1.1);
       }
     }
 
-    @keyframes sparkle {
-      0%, 100% { transform: translateY(0px) translateX(0px); }
-      25% { transform: translateY(-10px) translateX(5px); }
-      50% { transform: translateY(-5px) translateX(-8px); }
-      75% { transform: translateY(8px) translateX(3px); }
+    @keyframes digitalRain {
+      0%, 100% { transform: translateY(0px) translateX(0px) rotateZ(0deg); }
+      25% { transform: translateY(-15px) translateX(8px) rotateZ(1deg); }
+      50% { transform: translateY(-8px) translateX(-12px) rotateZ(-2deg); }
+      75% { transform: translateY(12px) translateX(5px) rotateZ(1deg); }
     }
 
-    @keyframes neonPulse {
+    @keyframes cyberPulse {
       0%, 100% { 
-        box-shadow: var(--shadow-glow), inset 0 0 20px rgba(255,255,255,0.1);
-        transform: scale(1);
+        box-shadow: var(--shadow-cyber), inset 0 0 30px rgba(0, 212, 255, 0.1);
+        transform: scale(1) rotateY(0deg);
+        filter: brightness(1);
       }
-      50% { 
-        box-shadow: var(--neon-glow), inset 0 0 30px rgba(255,255,255,0.2);
-        transform: scale(1.02);
+      33% { 
+        box-shadow: var(--glow-quantum), inset 0 0 50px rgba(255, 0, 110, 0.2);
+        transform: scale(1.03) rotateY(5deg);
+        filter: brightness(1.3);
+      }
+      66% { 
+        box-shadow: var(--shadow-hologram), inset 0 0 40px rgba(57, 255, 20, 0.15);
+        transform: scale(1.01) rotateY(-3deg);
+        filter: brightness(1.1);
       }
     }
 
-    @keyframes morphing {
-      0%, 100% { border-radius: 30px 25px 35px 20px; }
-      25% { border-radius: 20px 35px 25px 30px; }
-      50% { border-radius: 35px 20px 30px 25px; }
-      75% { border-radius: 25px 30px 20px 35px; }
+    @keyframes quantumMorphing {
+      0%, 100% { border-radius: 35px 20px 40px 15px; transform: skew(0deg, 0deg); }
+      25% { border-radius: 15px 40px 20px 35px; transform: skew(1deg, -0.5deg); }
+      50% { border-radius: 40px 15px 35px 20px; transform: skew(-0.5deg, 1deg); }
+      75% { border-radius: 20px 35px 15px 40px; transform: skew(0.5deg, -1deg); }
+    }
+
+    @keyframes dataStream {
+      0% { transform: translateX(-100%) rotateY(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateX(100%) rotateY(360deg); opacity: 0; }
     }
 
     .container-fluid {
@@ -143,21 +168,23 @@
       z-index: 2;
     }
 
-    /* Glassmorphisme Ultra-Premium */
+    /* Glassmorphisme Cyberpunk Futuriste */
     .glass-card {
-      background: var(--glass-premium);
-      backdrop-filter: blur(30px) saturate(120%) brightness(1.1);
-      -webkit-backdrop-filter: blur(30px) saturate(120%) brightness(1.1);
-      border-radius: var(--border-radius);
-      border: 2px solid var(--glass-border);
+      background: var(--glass-cyber);
+      backdrop-filter: blur(40px) saturate(150%) brightness(1.2) contrast(1.1);
+      -webkit-backdrop-filter: blur(40px) saturate(150%) brightness(1.2) contrast(1.1);
+      border-radius: var(--border-cyber);
+      border: 2px solid var(--cyber-border);
       box-shadow: 
-        var(--shadow-soft),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
-      transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        var(--shadow-cyber),
+        inset 0 2px 0 rgba(0, 212, 255, 0.3),
+        inset 0 0 20px rgba(57, 255, 20, 0.1),
+        0 0 0 1px rgba(255, 0, 110, 0.2);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
-      animation: morphing 8s ease-in-out infinite;
+      animation: quantumMorphing 12s ease-in-out infinite;
+      transform-style: preserve-3d;
     }
 
     .glass-card::before {
@@ -169,43 +196,50 @@
       height: 100%;
       background: linear-gradient(90deg, 
         transparent, 
-        rgba(255, 255, 255, 0.3), 
-        rgba(255, 215, 0, 0.2),
-        rgba(255, 255, 255, 0.3),
+        rgba(0, 212, 255, 0.4), 
+        rgba(57, 255, 20, 0.3),
+        rgba(255, 0, 110, 0.4),
+        rgba(255, 190, 11, 0.3),
         transparent);
-      transition: left 1s ease;
+      transition: left 1.5s ease;
       z-index: 1;
+      animation: dataStream 3s ease-in-out infinite;
     }
 
     .glass-card::after {
       content: '';
       position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, 
-        rgba(255, 255, 255, 0.1) 0%, 
-        rgba(102, 126, 234, 0.05) 30%,
-        transparent 70%);
-      animation: rotate 20s linear infinite;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background: conic-gradient(from 0deg, 
+        rgba(0, 212, 255, 0.1) 0%, 
+        rgba(255, 0, 110, 0.08) 25%,
+        rgba(57, 255, 20, 0.06) 50%,
+        rgba(131, 56, 236, 0.09) 75%,
+        rgba(0, 212, 255, 0.1) 100%);
+      animation: rotate 25s linear infinite;
       pointer-events: none;
       z-index: 0;
     }
 
     .glass-card:hover::before {
       left: 100%;
+      animation: dataStream 1.5s ease-in-out infinite;
     }
 
     .glass-card:hover {
-      transform: translateY(-10px) scale(1.03) rotateX(5deg);
+      transform: translateY(-15px) scale(1.05) rotateX(8deg) rotateY(5deg) translateZ(20px);
       box-shadow: 
-        var(--shadow-hover),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4),
-        0 0 40px rgba(102, 126, 234, 0.3),
-        0 0 0 2px rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.5);
-      animation: neonPulse 2s ease-in-out infinite;
+        var(--shadow-quantum),
+        inset 0 2px 0 rgba(255, 0, 110, 0.4),
+        inset 0 0 30px rgba(0, 212, 255, 0.2),
+        0 0 60px rgba(57, 255, 20, 0.4),
+        0 0 0 3px rgba(255, 190, 11, 0.3);
+      border-color: rgba(255, 0, 110, 0.8);
+      animation: cyberPulse 2s ease-in-out infinite;
+      backdrop-filter: blur(50px) saturate(180%) brightness(1.4) contrast(1.2);
     }
 
     /* Header futuriste */
@@ -404,70 +438,143 @@
     }
 
     .metric-icon {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 30px;
-      background: var(--primary-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 5s ease-in-out infinite;
-      border-radius: 30px;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 40px;
+      background: var(--quantum-gradient);
+      background-size: 300% 300%;
+      animation: cyberMatrix 6s ease-in-out infinite;
+      border-radius: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.5rem;
-      color: white;
+      font-size: 3rem;
+      color: #00f5ff;
       box-shadow: 
-        0 20px 40px rgba(102, 126, 234, 0.4),
-        inset 0 2px 0 rgba(255, 255, 255, 0.3),
-        0 0 0 3px rgba(255, 255, 255, 0.1);
-      transition: all 0.4s ease;
+        var(--shadow-cyber),
+        inset 0 3px 0 rgba(0, 212, 255, 0.4),
+        inset 0 0 25px rgba(57, 255, 20, 0.2),
+        0 0 0 4px rgba(255, 0, 110, 0.3);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       z-index: 2;
       overflow: hidden;
+      transform-style: preserve-3d;
+      text-shadow: var(--text-quantum);
     }
 
     .metric-icon::before {
       content: '';
       position: absolute;
-      top: -100%;
-      left: -100%;
-      width: 300%;
-      height: 300%;
-      background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.3), transparent, rgba(255,215,0,0.2), transparent);
-      animation: rotate 3s linear infinite;
+      top: -150%;
+      left: -150%;
+      width: 400%;
+      height: 400%;
+      background: conic-gradient(from 0deg, 
+        transparent, 
+        rgba(0, 212, 255, 0.4), 
+        transparent, 
+        rgba(255, 0, 110, 0.3), 
+        transparent,
+        rgba(57, 255, 20, 0.35),
+        transparent);
+      animation: rotate 4s linear infinite;
+      z-index: -1;
+    }
+
+    .metric-icon::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, 
+        rgba(0, 212, 255, 0.1) 0%,
+        rgba(255, 0, 110, 0.08) 25%,
+        rgba(57, 255, 20, 0.1) 50%,
+        rgba(131, 56, 236, 0.08) 75%,
+        rgba(255, 190, 11, 0.1) 100%);
+      border-radius: 40px;
+      animation: quantumField 8s ease-in-out infinite;
       z-index: -1;
     }
 
     .metric-card:hover .metric-icon {
-      transform: scale(1.15) rotate(10deg) rotateY(15deg);
+      transform: scale(1.2) rotate(15deg) rotateY(20deg) translateZ(30px);
       box-shadow: 
-        0 25px 60px rgba(102, 126, 234, 0.6),
-        inset 0 2px 0 rgba(255, 255, 255, 0.4),
-        0 0 50px rgba(255, 215, 0, 0.3),
-        0 0 0 4px rgba(255, 255, 255, 0.2);
-      animation: neonPulse 1.5s ease-in-out infinite;
+        var(--shadow-quantum),
+        inset 0 4px 0 rgba(255, 0, 110, 0.5),
+        inset 0 0 40px rgba(0, 212, 255, 0.3),
+        0 0 80px rgba(57, 255, 20, 0.6),
+        0 0 120px rgba(255, 190, 11, 0.4),
+        0 0 0 6px rgba(131, 56, 236, 0.4);
+      animation: cyberPulse 1.2s ease-in-out infinite;
+      color: #39ff14;
+      text-shadow: 0 0 30px currentColor;
     }
 
     .metric-value {
-      font-size: 4.2rem;
+      font-size: 5rem;
       font-weight: 900;
-      background: var(--text-gradient);
-      background-size: 300% 300%;
+      font-family: 'Orbitron', monospace;
+      background: var(--text-cyber);
+      background-size: 400% 400%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: gradientShift 6s ease-in-out infinite;
-      margin-bottom: 20px;
-      text-shadow: var(--text-shadow);
+      animation: cyberMatrix 8s ease-in-out infinite;
+      margin-bottom: 25px;
+      text-shadow: var(--text-quantum);
       position: relative;
       z-index: 2;
-      filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.6));
-      transition: all 0.3s ease;
+      filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.8)) 
+              drop-shadow(0 0 50px rgba(255, 0, 110, 0.6))
+              drop-shadow(0 0 75px rgba(57, 255, 20, 0.4));
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 2px;
+    }
+
+    .metric-value::before {
+      content: attr(data-value);
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--holographic);
+      background-size: 500% 500%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: hologram 6s ease-in-out infinite;
+      opacity: 0.7;
+      z-index: -1;
+    }
+
+    .metric-value::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      background: linear-gradient(45deg, 
+        rgba(0, 212, 255, 0.1),
+        rgba(255, 0, 110, 0.08),
+        rgba(57, 255, 20, 0.1),
+        rgba(131, 56, 236, 0.08));
+      border-radius: 20px;
+      filter: blur(20px);
+      animation: quantumField 10s ease-in-out infinite;
+      z-index: -2;
     }
 
     .metric-card:hover .metric-value {
-      transform: scale(1.05);
-      filter: drop-shadow(0 0 25px rgba(102, 126, 234, 0.8)) drop-shadow(0 0 40px rgba(255, 215, 0, 0.4));
+      transform: scale(1.08) rotateX(10deg);
+      filter: drop-shadow(0 0 40px rgba(0, 212, 255, 1)) 
+              drop-shadow(0 0 80px rgba(255, 0, 110, 0.8))
+              drop-shadow(0 0 120px rgba(57, 255, 20, 0.6))
+              drop-shadow(0 0 160px rgba(255, 190, 11, 0.4));
+      animation: cyberPulse 2s ease-in-out infinite, cyberMatrix 4s ease-in-out infinite;
     }
 
     .metric-label {
@@ -978,6 +1085,33 @@
       background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent);
       animation: rotate 6s linear infinite;
       pointer-events: none;
+    }
+
+    /* Effets Cyberpunk Additionnels */
+    .cyber-interface {
+      position: relative;
+      perspective: 1200px;
+      transform-style: preserve-3d;
+    }
+
+    .quantum-display {
+      animation: hologram 10s ease-in-out infinite, cyberPulse 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.6)) 
+              drop-shadow(0 0 40px rgba(255, 0, 110, 0.4))
+              drop-shadow(0 0 60px rgba(57, 255, 20, 0.3));
+    }
+
+    .neural-network {
+      background: var(--cyber-primary);
+      background-size: 500% 500%;
+      animation: cyberMatrix 12s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .digital-glow {
+      box-shadow: var(--glow-cyber), var(--shadow-quantum);
+      animation: cyberPulse 3s ease-in-out infinite;
     }
 
     /* Responsive amélioré */

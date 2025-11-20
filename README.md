@@ -48,7 +48,6 @@ Exemples curl :
 curl -s http://localhost:4567/api/abonnements
 curl -X POST http://localhost:4567/api/abonnements -H "Content-Type: application/json" -d '@exemple.json'
 ```
-
 Note sur l'ID : l'API utilise pour l'instant l'index dans la liste (0-based). Pour production, il faut ajouter un champ `id` persistant.
 
 ### 🎯 **Interface Révolutionnaire 2024**
