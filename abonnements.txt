@@ -1,1 +1,1 @@
-8bb49319-766d-4d6d-b5c0-852533dabad2;Streaming;2025-11-06;2025-11-06;10,00;Netflix;;Divertissement
+8bb49319-766d-4d6d-b5c0-852533dabad2;Streaming;2025-11-06;2025-11-06;10.00;Netflix;;Divertissement
