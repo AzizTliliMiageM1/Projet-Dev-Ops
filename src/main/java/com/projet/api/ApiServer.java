@@ -226,6 +226,27 @@ public class ApiServer {
 
                 return "Votre compte est maintenant confirmé !";
             });
+            get("/test-mail", (req, res) -> {
+    res.type("text/plain");
+    com.projet.email.EmailService email = new com.projet.email.EmailServiceImpl();
+    email.sendEmail("f.mayssara@gmail.com", "Test DevOps", "Ceci est un email de test.");
+    return "Test d'envoi d'email déclenché.";
+            });
+            post("/register", (req, res) -> {
+    String email = req.queryParams("email");
+    String password = req.queryParams("password");
+
+    UserService service = new UserServiceImpl();
+    String token = service.register(email, password);
+
+    if (token == null) {
+        res.status(400);
+        return "Email déjà utilisé.";
+    }
+
+    return "Inscription réussie ! Vérifiez votre email pour confirmer votre compte.";
+});
+
 
         }); // end /api
 

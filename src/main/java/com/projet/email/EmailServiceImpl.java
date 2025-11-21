@@ -1,5 +1,6 @@
 package com.projet.email;
 
+import org.eclipse.angus.mail.smtp.SMTPTransport;
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -10,22 +11,22 @@ public class EmailServiceImpl implements EmailService {
 
     private final Session session;
     private final String from;
+    private final String password;
 
     public EmailServiceImpl() {
 
-        // Lire l’email et mdp depuis les variables d'environnement
-        this.from = System.getenv().getOrDefault("SMTP_USER", "example@gmail.com");
-        String password = System.getenv().getOrDefault("SMTP_PASS", "password");
+        // 🔵 CONFIG SMTP DIRECTE (pas via variables Windows)
+        this.from = "f.mayssara@gmail.com";  
+        this.password = "cxkvwfquhrjykteo";   // mot de passe application Gmail
 
-        // Configuration SMTP (Gmail par défaut)
         Properties props = new Properties();
-        props.put("mail.smtp.host", System.getenv().getOrDefault("SMTP_HOST", "smtp.gmail.com"));
-        props.put("mail.smtp.port", System.getenv().getOrDefault("SMTP_PORT", "587"));
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
 
-        // Authentification
         this.session = Session.getInstance(props, new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(from, password);
             }
@@ -41,13 +42,16 @@ public class EmailServiceImpl implements EmailService {
             msg.setSubject(subject);
             msg.setText(message);
 
-            Transport.send(msg);
+            SMTPTransport t = (SMTPTransport) session.getTransport("smtp");
+            t.connect();
+            t.sendMessage(msg, msg.getAllRecipients());
+            t.close();
 
-            System.out.println("Email envoyé à : " + to);
+            System.out.println("Email envoyé → " + to);
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Erreur lors de l'envoi de l'email : " + e.getMessage());
+            System.err.println("Erreur email : " + e.getMessage());
         }
     }
 }
