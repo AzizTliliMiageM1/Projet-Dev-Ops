@@ -1,28 +1,138 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <title>Connexion</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(to right, #4b79a1, #283e51);
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 80px auto;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.35);
+            backdrop-filter: blur(8px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #00c6ff;
+            background: linear-gradient(to right, #0072ff, #00c6ff);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 10px rgba(255,255,255,0.4);
+        }
+
+        .error {
+            color: #ff8080;
+            margin-top: 10px;
+            font-size: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .link a {
+            color: #00c6ff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Connexion</h1>
 
-        <form method="POST" action="/api/login">
-            <label>Email :</label>
-            <input type="email" name="email" required>
+<div class="container">
 
-            <label>Mot de passe :</label>
-            <input type="password" name="password" required>
+    <h1>Connexion</h1>
 
-            <button type="submit">Se connecter</button>
-        </form>
+    <form id="login-form">
 
-        <p>Pas encore de compte ? <a href="register.html">Inscription</a></p>
+        <input type="email" name="email" placeholder="Adresse e-mail" required>
+
+        <input type="password" name="password" placeholder="Mot de passe" required>
+
+        <button type="submit">Se connecter</button>
+
+        <div class="error" id="error-box">Erreur…</div>
+
+    </form>
+
+    <div class="link">
+        <a href="register.html">Créer un compte</a>
     </div>
-</body>
 
+</div>
+
+<script>
+document.getElementById("login-form").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const form = new FormData(e.target);
+    const email = form.get("email");
+    const password = form.get("password");
+
+    const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    });
+
+    if (response.status === 200) {
+        window.location.href = "index.html";  // 🔥 Redirection après connexion
+        return;
+    }
+
+    const errorBox = document.getElementById("error-box");
+    const text = await response.text();
+    errorBox.innerHTML = text;
+    errorBox.style.display = "block";
+};
+</script>
+
+</body>
 </html>
