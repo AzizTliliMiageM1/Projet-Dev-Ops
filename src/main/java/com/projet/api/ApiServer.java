@@ -59,8 +59,9 @@ public class ApiServer {
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
+
         // =================================================
-        //     🔵   API /api/...
+        //     🔵  API /api/...
         // =================================================
         path("/api", () -> {
 
@@ -104,9 +105,6 @@ public class ApiServer {
                 return mapper.writeValueAsString(a);
             });
 
-            // ----------------------------
-            //  IMPORT D'ABONNEMENTS
-            // ----------------------------
             post("/abonnements/import", (req, res) -> {
                 res.type("application/json");
                 List<Abonnement> arr = mapper.readValue(
@@ -187,7 +185,6 @@ public class ApiServer {
             // =================================================
             //     🔵  INSCRIPTION UTILISATEUR
             // =================================================
-
             post("/register", (req, res) -> {
                 res.type("text/plain");
 
@@ -202,13 +199,12 @@ public class ApiServer {
                     return "Email déjà utilisé.";
                 }
 
-                // plus tard → envoi d'email
-                return "Inscription réussie ! Token = " + token;
+                return "Inscription réussie ! Vérifiez votre email pour confirmer votre compte.";
             });
 
 
             // =================================================
-            //     🔵  CONFIRMATION PAR TOKEN
+            //     🔵  CONFIRMATION PAR EMAIL
             // =================================================
             get("/confirm", (req, res) -> {
 
@@ -224,29 +220,51 @@ public class ApiServer {
                 user.setConfirmed(true);
                 repoUser.update(user);
 
-                return "Votre compte est maintenant confirmé !";
+                res.redirect("/confirm.html");
+                return null;
             });
+
+
+            // =================================================
+            //     🔵  CONNEXION UTILISATEUR
+            // =================================================
+            post("/login", (req, res) -> {
+                res.type("text/plain");
+
+                String email = req.queryParams("email");
+                String password = req.queryParams("password");
+
+                FileUserRepository repoUser = new FileUserRepository();
+                User user = repoUser.findByEmail(email);
+
+                if (user == null) {
+                    res.status(400);
+                    return "Utilisateur inconnu";
+                }
+
+                if (!user.getPassword().equals(password)) {
+                    res.status(400);
+                    return "Mot de passe incorrect";
+                }
+
+                if (!user.isConfirmed()) {
+                    res.status(400);
+                    return "Veuillez confirmer votre compte avant de vous connecter.";
+                }
+
+                return "Connexion réussie !";
+            });
+
+
+            // =================================================
+            //     🔵  TEST EMAIL
+            // =================================================
             get("/test-mail", (req, res) -> {
-    res.type("text/plain");
-    com.projet.email.EmailService email = new com.projet.email.EmailServiceImpl();
-    email.sendEmail("f.mayssara@gmail.com", "Test DevOps", "Ceci est un email de test.");
-    return "Test d'envoi d'email déclenché.";
+                res.type("text/plain");
+                com.projet.email.EmailService email = new com.projet.email.EmailServiceImpl();
+                email.sendEmail("f.mayssara@gmail.com", "Test DevOps", "Ceci est un email de test.");
+                return "Test d'envoi d'email déclenché.";
             });
-            post("/register", (req, res) -> {
-    String email = req.queryParams("email");
-    String password = req.queryParams("password");
-
-    UserService service = new UserServiceImpl();
-    String token = service.register(email, password);
-
-    if (token == null) {
-        res.status(400);
-        return "Email déjà utilisé.";
-    }
-
-    return "Inscription réussie ! Vérifiez votre email pour confirmer votre compte.";
-});
-
 
         }); // end /api
 
