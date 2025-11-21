@@ -15,9 +15,8 @@ public class EmailServiceImpl implements EmailService {
 
     public EmailServiceImpl() {
 
-        // 🔵 CONFIG SMTP DIRECTE (pas via variables Windows)
         this.from = "f.mayssara@gmail.com";  
-        this.password = "cxkvwfquhrjykteo";   // mot de passe application Gmail
+        this.password = "cxkvwfquhrjykteo"; // mot de passe d'application Gmail
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -34,20 +33,25 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmail(String to, String subject, String message) {
+    public void sendEmail(String to, String subject, String htmlMessage) {
         try {
             MimeMessage msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(from));
             msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            msg.setSubject(subject);
-            msg.setText(message);
 
+            // Sujet avec encodage UTF-8
+            msg.setSubject(subject, "UTF-8");
+
+            // Très important : envoi en HTML
+            msg.setContent(htmlMessage, "text/html; charset=UTF-8");
+
+            // Envoi SMTP
             SMTPTransport t = (SMTPTransport) session.getTransport("smtp");
             t.connect();
             t.sendMessage(msg, msg.getAllRecipients());
             t.close();
 
-            System.out.println("Email envoyé → " + to);
+            System.out.println("Email HTML envoyé → " + to);
 
         } catch (Exception e) {
             e.printStackTrace();

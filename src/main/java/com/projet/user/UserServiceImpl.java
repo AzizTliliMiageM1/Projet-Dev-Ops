@@ -1,7 +1,6 @@
 package com.projet.user;
 
 import java.util.UUID;
-import com.projet.email.EmailService;
 import com.projet.email.EmailServiceImpl;
 
 public class UserServiceImpl implements UserService {
@@ -11,45 +10,59 @@ public class UserServiceImpl implements UserService {
     @Override
     public String register(String email, String password) {
 
-        // Vérifier si l'email existe déjà
+        // Vérifie si l'email existe déjà
         if (repository.findByEmail(email) != null) {
-            return null; // email déjà utilisé
+            return null;
         }
 
-        // Générer un token unique
+        // Génération du token
         String token = UUID.randomUUID().toString();
 
-        // Créer et sauvegarder l'utilisateur
+        // Création utilisateur
         User user = new User(email, password, token);
         repository.save(user);
 
-        // === 🔵 ENVOI EMAIL DE CONFIRMATION ===
-        try {
-            EmailService emailService = new EmailServiceImpl();
+        // -------------------------------
+        // URL du bouton de confirmation
+        // -------------------------------
+        String baseUrl = System.getenv().getOrDefault("APP_BASE_URL", "http://localhost:4567");
+        String link = baseUrl + "/api/confirm?token=" + token;
 
-            String link = "http://localhost:4567/api/confirm?token=" + token;
+        // -------------------------------
+        // Email HTML avec bouton
+        // -------------------------------
+        String htmlMessage = """
+        <html>
+        <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+            <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: #333;">Confirmez votre inscription</h2>
 
-            String message = 
-                "Bonjour,\n\n" +
-                "Merci pour votre inscription !\n" +
-                "Veuillez confirmer votre compte en cliquant sur le lien ci-dessous :\n\n" +
-                link + "\n\n" +
-                "Cordialement,\nService DevOps";
+                <p>Bonjour,</p>
+                <p>Merci pour votre inscription. Pour activer votre compte, cliquez sur le bouton ci-dessous :</p>
 
-            emailService.sendEmail(
-                email,
-                "Confirmez votre compte",
-                message
-            );
+                <div style="text-align: center; margin: 40px 0;">
+                    <a href="%s"
+                       style="background: #4CAF50; color: white; padding: 14px 28px;
+                              text-decoration: none; border-radius: 6px; font-size: 16px;">
+                        Confirmer mon compte
+                    </a>
+                </div>
 
-            System.out.println("Email de confirmation envoyé → " + email);
+                <p>Ou copiez-collez ce lien dans votre navigateur :</p>
+                <p>%s</p>
 
-        } catch (Exception e) {
-            System.err.println("⚠ Erreur lors de l’envoi de l’email : " + e.getMessage());
-            e.printStackTrace();
-        }
+                <p style="margin-top:40px; font-size:12px; color:#777;">
+                    Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.
+                </p>
+            </div>
+        </body>
+        </html>
+        """.formatted(link, link);
 
-        // Retourner le token
+        // Envoi du mail HTML
+        EmailServiceImpl mail = new EmailServiceImpl();
+        mail.sendEmail(email, "Confirmation d'inscription", htmlMessage);
+
         return token;
     }
 }

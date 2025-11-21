@@ -231,60 +231,60 @@ public class ApiServer {
                 user.setConfirmed(true);
                 repoUser.update(user);
 
-                res.redirect("/confirm.html");
+                // 🔵 Redirection vers index.html
+                res.redirect("/index.html");
                 return null;
             });
 
 
             // =================================================
             // 🔵  CONNEXION UTILISATEUR (SESSION)
-// =================================================
-post("/login", (req, res) -> {
-    res.type("text/plain");
+            // =================================================
+            post("/login", (req, res) -> {
+                res.type("text/plain");
 
-    String email = req.queryParams("email");
-    String password = req.queryParams("password");
+                String email = req.queryParams("email");
+                String password = req.queryParams("password");
 
-    FileUserRepository repoUser = new FileUserRepository();
-    User user = repoUser.findByEmail(email);
+                FileUserRepository repoUser = new FileUserRepository();
+                User user = repoUser.findByEmail(email);
 
-    if (user == null) {
-        res.status(400);
-        return "Utilisateur inconnu";
-    }
+                if (user == null) {
+                    res.status(400);
+                    return "Utilisateur inconnu";
+                }
 
-    if (!user.getPassword().equals(password)) {
-        res.status(400);
-        return "Mot de passe incorrect";
-    }
+                if (!user.getPassword().equals(password)) {
+                    res.status(400);
+                    return "Mot de passe incorrect";
+                }
 
-    if (!user.isConfirmed()) {
-        res.status(400);
-        return "Veuillez confirmer votre compte avant de vous connecter.";
-    }
+                if (!user.isConfirmed()) {
+                    res.status(400);
+                    return "Veuillez confirmer votre compte avant de vous connecter.";
+                }
 
-    // 🔵 Création session
-    req.session(true).attribute("user", email);
+                req.session(true).attribute("user", email);
 
-    return "Connexion réussie !";
-});
+                return "Connexion réussie !";
+            });
 
-// =================================================
-// 🔵  LOGOUT
-// =================================================
-post("/logout", (req, res) -> {
-    req.session().invalidate();
-    return "Déconnecté.";
-});
+            // =================================================
+            // 🔵  LOGOUT
+            // =================================================
+            post("/logout", (req, res) -> {
+                req.session().invalidate();
+                return "Déconnecté.";
+            });
 
-// =================================================
-// 🔵  STATUS SESSION
-// =================================================
-get("/session", (req, res) -> {
-    String user = req.session().attribute("user");
-    if (user == null) return "Aucun utilisateur connecté";
-    return "Connecté : " + user;
-});
+            // =================================================
+            // 🔵  STATUS SESSION
+            // =================================================
+            get("/session", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) return "Aucun utilisateur connecté";
+                return "Connecté : " + user;
+            });
 
 
             // =================================================
