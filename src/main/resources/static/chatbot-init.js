@@ -12,12 +12,12 @@ function initChatbotWidget() {
     // Créer le HTML du widget
     const chatbotHTML = `
         <!-- Bulle de message d'accueil -->
-        <div class="chatbot-welcome-bubble show" id="chatbotWelcomeBubble">
+        <div class="chatbot-welcome-bubble show" id="chatbotWelcomeBubble" style="pointer-events: auto; cursor: pointer;">
             👋 Bonjour ! Besoin d'aide ? Je suis là !
         </div>
         
         <!-- Bouton flottant -->
-        <div class="chatbot-trigger" id="chatbotTrigger">
+        <div class="chatbot-trigger" id="chatbotTrigger" style="pointer-events: auto; cursor: pointer;">
             <i class="bi bi-robot"></i>
             <div class="chatbot-badge" id="chatbotBadge" style="display: none;">1</div>
         </div>
