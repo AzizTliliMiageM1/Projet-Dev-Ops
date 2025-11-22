@@ -506,6 +506,7 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
 
         if (!entities.price) {
             return `❌ Je n'ai pas trouvé le prix.\n\n🐛 Debug: Trouvé prix="${entities.price}"`;
+        }
 
         if (!entities.startDate) {
             // Date par défaut : aujourd'hui
