@@ -492,18 +492,20 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
     async handleAddSubscription(message) {
         const entities = this.extractEntities(message);
 
+        // DEBUG: Afficher ce qui a été extrait
+        console.log("🔍 Extraction:", entities);
+
         // Validation des données minimales
         if (!entities.service) {
-            return "❌ Je n'ai pas compris le nom du service. Exemple : \"Ajoute Netflix pour Jean à 15.99€\"";
+            return `❌ Je n'ai pas compris le nom du service.\n\n🐛 Debug: service="${entities.service}", client="${entities.client}", prix="${entities.price}"`;
         }
 
         if (!entities.client) {
-            return "❌ Je n'ai pas identifié le nom du client. Exemple : \"Ajoute Netflix pour Jean Dupont\"";
+            return `❌ Je n'ai pas identifié le nom du client.\n\n🐛 Debug: service="${entities.service}", client="${entities.client}"`;
         }
 
         if (!entities.price) {
-            return "❌ Je n'ai pas trouvé le prix. Exemple : \"Ajoute Netflix à 15.99€\"";
-        }
+            return `❌ Je n'ai pas trouvé le prix.\n\n🐛 Debug: Trouvé prix="${entities.price}"`;
 
         if (!entities.startDate) {
             // Date par défaut : aujourd'hui
@@ -529,11 +531,12 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
             dateDebut: entities.startDate,
             dateFin: entities.endDate,
             categorie: entities.category,
-            statut: 'actif',
-            dernierUtilisation: new Date().toISOString()
+            derniereUtilisation: new Date().toISOString()
         };
 
         try {
+            console.log("📤 Envoi:", newAbonnement);
+            
             const response = await fetch('/api/abonnements', {
                 method: 'POST',
                 headers: {
@@ -542,6 +545,8 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
                 body: JSON.stringify(newAbonnement)
             });
 
+            console.log("📥 Response status:", response.status);
+            
             if (response.ok) {
                 // Recharger la page pour voir le nouvel abonnement
                 setTimeout(() => location.reload(), 1500);
@@ -557,10 +562,13 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
 
 La page va se rafraîchir dans un instant...`;
             } else {
-                return "❌ Erreur lors de l'ajout. Vérifiez les données et réessayez.";
+                const errorText = await response.text();
+                console.error("❌ Erreur serveur:", errorText);
+                return `❌ Erreur ${response.status}: ${errorText}\n\n🐛 Données envoyées: ${JSON.stringify(newAbonnement, null, 2)}`;
             }
         } catch (error) {
-            return "❌ Impossible de contacter le serveur. Assurez-vous qu'il est démarré.";
+            console.error("❌ Exception:", error);
+            return `❌ Impossible de contacter le serveur.\n\n🐛 Erreur: ${error.message}`;
         }
     }
 
