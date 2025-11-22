@@ -185,8 +185,8 @@ Quelle fonctionnalité vous intéresse ?`
             endDate: null
         };
 
-        // Extract prix (15.99€, 15.99, 15€, 20 euros)
-        const priceMatch = message.match(/(?:prix de|à|pour)\s*(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i);
+        // Extract prix - cherche n'importe quel nombre suivi de € ou euros
+        const priceMatch = message.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i);
         if (priceMatch) {
             entities.price = parseFloat(priceMatch[1].replace(',', '.'));
         }
@@ -203,42 +203,38 @@ Quelle fonctionnalité vous intéresse ?`
         // Extract catégorie
         const categories = ['streaming', 'musique', 'sport', 'cloud', 'gaming', 'productivité', 'autre'];
         for (const cat of categories) {
-            if (message.toLowerCase().includes(cat)) {
+            if (message.toLowerCase().includes('catégorie ' + cat)) {
                 entities.category = cat;
                 break;
             }
         }
 
-        // Extract nom du client - AMÉLIORATION pour détecter "Ferkous Maissara"
-        const clientPatterns = [
-            /(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)+)(?=\s+[A-Z][a-z]+\s+(?:début|fin|catégorie|à|pour|$))/i,
-            /(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*)/i
-        ];
-        
-        for (const pattern of clientPatterns) {
-            const match = message.match(pattern);
-            if (match) {
-                entities.client = match[1].trim();
-                break;
-            }
+        // Extract nom du client - cherche après "au nom de" ou "pour"
+        // On cherche 1 ou 2 mots avec majuscule (prénom + nom)
+        const clientMatch = message.match(/(?:au nom de|pour)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)?)/i);
+        if (clientMatch) {
+            entities.client = clientMatch[1].trim();
         }
 
-        // Extract nom du service - AMÉLIORATION pour "Basic Fit", "Disney Plus", etc.
-        // Cherche entre "abonnement/ajoute" et "pour/au nom de"
-        const servicePatterns = [
-            // Pattern 1: "ajoute [SERVICE] pour [CLIENT]"
-            /(?:ajoute|créer?|nouveau|enregistre)\s+(?:un\s+abonnement\s+)?(?:au nom de\s+[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*\s+)?([A-Z][a-zA-Z0-9\s]+?)(?=\s+(?:pour|début|fin|catégorie|à|$))/i,
-            // Pattern 2: nom du service après le nom du client
-            /pour\s+[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*\s+([A-Z][a-zA-Z0-9\s]+?)(?=\s+(?:début|fin|catégorie|à|pour|$))/i,
-            // Pattern 3: extraction basique
-            /(?:abonnement|service|ajoute)\s+([A-Za-zÀ-ÿ0-9\s]+?)(?=\s+(?:au nom de|pour|début|fin|catégorie|prix|à|$))/i
-        ];
-
-        for (const pattern of servicePatterns) {
-            const match = message.match(pattern);
-            if (match) {
-                entities.service = match[1].trim();
-                break;
+        // Extract nom du service - LOGIQUE UNIVERSELLE
+        // On cherche tout ce qui vient après le nom du client jusqu'au prochain mot-clé
+        if (entities.client) {
+            // Cherche après le nom du client
+            const afterClient = message.split(entities.client)[1];
+            if (afterClient) {
+                // Extrait tout jusqu'au premier mot-clé (début, fin, catégorie, prix, à, pour)
+                const serviceMatch = afterClient.match(/^\s+([A-Za-zÀ-ÿ0-9\s]+?)(?=\s+(?:début|fin|catégorie|prix|à|pour un|et|$))/i);
+                if (serviceMatch) {
+                    entities.service = serviceMatch[1].trim();
+                }
+            }
+        }
+        
+        // Si pas de service trouvé avec la méthode précédente, essayer après "ajoute"
+        if (!entities.service) {
+            const serviceMatch = message.match(/(?:ajoute|ajouter|créer?|nouveau)\s+(?:un\s+)?(?:abonnement\s+)?(?:au nom de\s+[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)?\s+)?([A-Za-zÀ-ÿ0-9\s]+?)(?=\s+(?:pour|au nom de|début|à|$))/i);
+            if (serviceMatch) {
+                entities.service = serviceMatch[1].trim();
             }
         }
 
