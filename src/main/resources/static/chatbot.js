@@ -38,12 +38,15 @@ class AbonnementChatbot {
                 patterns: ['aide', 'help', 'comment', 'que peux-tu faire', 'fonctionnalités', 'commandes'],
                 responses: [
                     `Je peux vous aider avec :\n
-📊 **Analyse** : "analyse mes dépenses", "montre mes stats"
-➕ **Gestion** : "ajoute un abonnement", "supprime Netflix"
-💡 **Conseils** : "comment économiser", "optimise mon budget"
-🔍 **Recherche** : "cherche Spotify", "mes abonnements actifs"
-📈 **Statistiques** : "quel est mon budget", "combien je dépense"
-⚠️ **Alertes** : "mes alertes", "abonnements inutilisés"
+➕ **Ajouter** : "Ajoute Netflix pour Jean Dupont à 15.99€"
+➕ **Ajouter complet** : "Ajoute Basic Fit pour Marie Sport début 13/12/2025 fin 14/12/2025 catégorie sport à 20€"
+🗑️ **Supprimer** : "Supprime Netflix" ou "Supprime l'abonnement 2"
+📊 **Analyser** : "Analyse mes dépenses", "Mon budget"
+📈 **Stats** : "Quel est mon coût mensuel", "Combien je dépense"
+📋 **Lister** : "Mes abonnements actifs", "Liste tout"
+🔍 **Chercher** : "Cherche Spotify", "Trouve Disney"
+⚠️ **Alertes** : "Mes alertes", "Abonnements inutilisés"
+💡 **Conseils** : "Comment économiser", "Optimise mon budget"
 
 Que voulez-vous faire ?`
                 ]
@@ -108,6 +111,8 @@ Que voulez-vous faire ?`
                 responses: [
                     `🎯 **Fonctionnalités principales :**
 • Gestion CRUD complète des abonnements
+• Chatbot IA avec commandes naturelles
+• Ajout/Suppression en langage naturel
 • Alertes d'inactivité (>30 jours)
 • Statistiques en temps réel
 • Export/Import JSON
@@ -117,6 +122,14 @@ Que voulez-vous faire ?`
 
 Quelle fonctionnalité vous intéresse ?`
                 ]
+            },
+            categories: {
+                patterns: ['catégorie', 'type', 'classification'],
+                responses: this.showCategories.bind(this)
+            },
+            recordUsage: {
+                patterns: ['utilisé', 'utilise', 'j\'ai utilisé', 'marque comme utilisé'],
+                responses: this.recordSubscriptionUsage.bind(this)
             }
         };
     }
@@ -166,13 +179,46 @@ Quelle fonctionnalité vous intéresse ?`
             price: null,
             service: null,
             client: null,
-            number: null
+            number: null,
+            category: null,
+            startDate: null,
+            endDate: null
         };
 
-        // Extract prix (15.99€, 15.99, 15€)
-        const priceMatch = message.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)?/i);
+        // Extract prix (15.99€, 15.99, 15€, 20 euros)
+        const priceMatch = message.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i);
         if (priceMatch) {
             entities.price = parseFloat(priceMatch[1].replace(',', '.'));
+        }
+
+        // Extract dates (format DD/MM/YYYY ou DD-MM-YYYY)
+        const dateMatches = message.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/g);
+        if (dateMatches && dateMatches.length >= 1) {
+            entities.startDate = this.parseDate(dateMatches[0]);
+            if (dateMatches.length >= 2) {
+                entities.endDate = this.parseDate(dateMatches[1]);
+            }
+        }
+
+        // Extract catégorie
+        const categories = ['streaming', 'musique', 'sport', 'cloud', 'gaming', 'productivité', 'autre'];
+        for (const cat of categories) {
+            if (message.toLowerCase().includes(cat)) {
+                entities.category = cat;
+                break;
+            }
+        }
+
+        // Extract nom du client (détection "au nom de X" ou "pour X")
+        const clientMatch = message.match(/(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*)/i);
+        if (clientMatch) {
+            entities.client = clientMatch[1].trim();
+        }
+
+        // Extract nom du service (tout ce qui vient après "abonnement" ou avant "au nom de")
+        const serviceMatch = message.match(/(?:abonnement|service|ajoute)\s+(?:au nom de\s+)?([A-Za-zÀ-ÿ0-9\s]+?)(?:\s+(?:au nom de|pour|début|fin|catégorie|prix)|$)/i);
+        if (serviceMatch) {
+            entities.service = serviceMatch[1].trim();
         }
 
         // Extract nombres simples
@@ -181,16 +227,18 @@ Quelle fonctionnalité vous intéresse ?`
             entities.number = parseInt(numberMatch[1]);
         }
 
-        // Extract noms de services communs
-        const services = ['netflix', 'spotify', 'disney', 'amazon', 'apple', 'youtube', 'basic fit', 'dropbox', 'google'];
-        for (const service of services) {
-            if (message.toLowerCase().includes(service)) {
-                entities.service = service.charAt(0).toUpperCase() + service.slice(1);
-                break;
-            }
-        }
-
         return entities;
+    }
+
+    parseDate(dateStr) {
+        const parts = dateStr.split(/[\/\-]/);
+        if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const year = parseInt(parts[2]);
+            return new Date(year, month, day).toISOString();
+        }
+        return null;
     }
 
     // Récupère les statistiques actuelles
@@ -353,6 +401,25 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
             timestamp: new Date()
         });
 
+        // Détection d'actions CRUD avant l'intent général
+        if (this.isAddCommand(userMessage)) {
+            const response = await this.handleAddSubscription(userMessage);
+            this.saveResponse(response);
+            return response;
+        }
+
+        if (this.isDeleteCommand(userMessage)) {
+            const response = await this.handleDeleteSubscription(userMessage);
+            this.saveResponse(response);
+            return response;
+        }
+
+        if (this.isUpdateCommand(userMessage)) {
+            const response = await this.handleUpdateSubscription(userMessage);
+            this.saveResponse(response);
+            return response;
+        }
+
         const intent = this.detectIntent(userMessage);
         const intentData = this.knowledgeBase[intent];
 
@@ -374,14 +441,241 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
             response = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
         }
 
-        // Sauvegarde la réponse
+        this.saveResponse(response);
+        return response;
+    }
+
+    saveResponse(response) {
         this.context.conversationHistory.push({
-            role: 'assistant',
+            role: 'bot',
             message: response,
             timestamp: new Date()
         });
+    }
 
-        return response;
+    // Détecte si c'est une commande d'ajout
+    isAddCommand(message) {
+        const addKeywords = ['ajoute', 'créer', 'nouveau', 'enregistre', 'add', 'crée'];
+        return addKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+
+    // Détecte si c'est une commande de suppression
+    isDeleteCommand(message) {
+        const deleteKeywords = ['supprime', 'efface', 'retire', 'delete', 'annule'];
+        return deleteKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+
+    // Détecte si c'est une commande de mise à jour
+    isUpdateCommand(message) {
+        const updateKeywords = ['modifie', 'change', 'update', 'met à jour', 'édite'];
+        return updateKeywords.some(keyword => message.toLowerCase().includes(keyword));
+    }
+
+    // Gère l'ajout d'un abonnement
+    async handleAddSubscription(message) {
+        const entities = this.extractEntities(message);
+
+        // Validation des données minimales
+        if (!entities.service) {
+            return "❌ Je n'ai pas compris le nom du service. Exemple : \"Ajoute Netflix pour Jean à 15.99€\"";
+        }
+
+        if (!entities.client) {
+            return "❌ Je n'ai pas identifié le nom du client. Exemple : \"Ajoute Netflix pour Jean Dupont\"";
+        }
+
+        if (!entities.price) {
+            return "❌ Je n'ai pas trouvé le prix. Exemple : \"Ajoute Netflix à 15.99€\"";
+        }
+
+        if (!entities.startDate) {
+            // Date par défaut : aujourd'hui
+            entities.startDate = new Date().toISOString();
+        }
+
+        if (!entities.endDate) {
+            // Date de fin par défaut : +1 mois
+            const endDate = new Date();
+            endDate.setMonth(endDate.getMonth() + 1);
+            entities.endDate = endDate.toISOString();
+        }
+
+        if (!entities.category) {
+            entities.category = 'autre';
+        }
+
+        // Créer l'objet abonnement
+        const newAbonnement = {
+            nomService: entities.service,
+            clientName: entities.client,
+            prixMensuel: entities.price,
+            dateDebut: entities.startDate,
+            dateFin: entities.endDate,
+            categorie: entities.category,
+            statut: 'actif',
+            dernierUtilisation: new Date().toISOString()
+        };
+
+        try {
+            const response = await fetch('/api/abonnements', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newAbonnement)
+            });
+
+            if (response.ok) {
+                // Recharger la page pour voir le nouvel abonnement
+                setTimeout(() => location.reload(), 1500);
+                
+                return `✅ **Abonnement ajouté avec succès !**
+
+📋 **Service :** ${entities.service}
+👤 **Client :** ${entities.client}
+💰 **Prix :** ${entities.price}€/mois
+📅 **Début :** ${new Date(entities.startDate).toLocaleDateString()}
+📅 **Fin :** ${new Date(entities.endDate).toLocaleDateString()}
+🏷️ **Catégorie :** ${entities.category}
+
+La page va se rafraîchir dans un instant...`;
+            } else {
+                return "❌ Erreur lors de l'ajout. Vérifiez les données et réessayez.";
+            }
+        } catch (error) {
+            return "❌ Impossible de contacter le serveur. Assurez-vous qu'il est démarré.";
+        }
+    }
+
+    // Gère la suppression d'un abonnement
+    async handleDeleteSubscription(message) {
+        const entities = this.extractEntities(message);
+
+        if (!entities.service && !entities.number) {
+            return "❌ Précisez quel abonnement supprimer. Ex: \"Supprime Netflix\" ou \"Supprime l'abonnement 1\"";
+        }
+
+        try {
+            const response = await fetch('/api/abonnements');
+            const abonnements = await response.json();
+
+            let toDelete = null;
+            let index = -1;
+
+            if (entities.number !== null && entities.number > 0 && entities.number <= abonnements.length) {
+                toDelete = abonnements[entities.number - 1];
+                index = entities.number - 1;
+            } else if (entities.service) {
+                const found = abonnements.findIndex(a => 
+                    a.nomService.toLowerCase().includes(entities.service.toLowerCase())
+                );
+                if (found !== -1) {
+                    toDelete = abonnements[found];
+                    index = found;
+                }
+            }
+
+            if (!toDelete) {
+                return `❌ Abonnement introuvable. Tapez "liste" pour voir vos abonnements.`;
+            }
+
+            const deleteResponse = await fetch(`/api/abonnements/${index}`, {
+                method: 'DELETE'
+            });
+
+            if (deleteResponse.ok) {
+                setTimeout(() => location.reload(), 1500);
+                return `✅ **Abonnement supprimé !**\n\n🗑️ ${toDelete.nomService} (${toDelete.clientName}) - ${toDelete.prixMensuel}€/mois\n\nLa page va se rafraîchir...`;
+            } else {
+                return "❌ Erreur lors de la suppression.";
+            }
+        } catch (error) {
+            return "❌ Impossible de supprimer l'abonnement.";
+        }
+    }
+
+    // Gère la modification d'un abonnement
+    async handleUpdateSubscription(message) {
+        return "🔧 La modification est en cours de développement. Pour l'instant, supprimez et recréez l'abonnement.";
+    }
+
+    // Affiche les catégories disponibles
+    async showCategories() {
+        try {
+            const response = await fetch('/api/abonnements');
+            const abonnements = await response.json();
+            
+            const categoriesCount = {};
+            abonnements.forEach(ab => {
+                const cat = ab.categorie || 'autre';
+                categoriesCount[cat] = (categoriesCount[cat] || 0) + 1;
+            });
+
+            let message = "📂 **Catégories disponibles :**\n\n";
+            Object.entries(categoriesCount).forEach(([cat, count]) => {
+                const emoji = this.getCategoryEmoji(cat);
+                message += `${emoji} **${cat}** : ${count} abonnement(s)\n`;
+            });
+
+            message += "\n💡 Utilisez ces catégories lors de l'ajout : streaming, musique, sport, cloud, gaming, productivité";
+            return message;
+        } catch (error) {
+            return "❌ Impossible de récupérer les catégories.";
+        }
+    }
+
+    getCategoryEmoji(category) {
+        const emojis = {
+            'streaming': '📺',
+            'musique': '🎵',
+            'sport': '💪',
+            'cloud': '☁️',
+            'gaming': '🎮',
+            'productivité': '💼',
+            'autre': '📦'
+        };
+        return emojis[category.toLowerCase()] || '📦';
+    }
+
+    // Enregistre l'utilisation d'un abonnement
+    async recordSubscriptionUsage(message) {
+        const entities = this.extractEntities(message);
+
+        if (!entities.service) {
+            return "❌ Précisez quel abonnement vous avez utilisé. Ex: \"J'ai utilisé Netflix\"";
+        }
+
+        try {
+            const response = await fetch('/api/abonnements');
+            const abonnements = await response.json();
+
+            const found = abonnements.findIndex(a => 
+                a.nomService.toLowerCase().includes(entities.service.toLowerCase())
+            );
+
+            if (found === -1) {
+                return `❌ Abonnement "${entities.service}" introuvable.`;
+            }
+
+            const abonnement = abonnements[found];
+            abonnement.dernierUtilisation = new Date().toISOString();
+
+            const updateResponse = await fetch(`/api/abonnements/${found}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(abonnement)
+            });
+
+            if (updateResponse.ok) {
+                return `✅ **Utilisation enregistrée !**\n\n📝 ${abonnement.nomService}\n🕐 Dernière utilisation : ${new Date().toLocaleString()}\n\nVotre alerte d'inactivité a été réinitialisée.`;
+            } else {
+                return "❌ Erreur lors de l'enregistrement.";
+            }
+        } catch (error) {
+            return "❌ Impossible d'enregistrer l'utilisation.";
+        }
     }
 
     // Obtient des suggestions de questions
@@ -391,7 +685,9 @@ ${alertes > 0 ? '\n🔔 Vous avez des abonnements inutilisés ! Voulez-vous que 
             "⚠️ Mes alertes d'inactivité",
             "💡 Comment économiser ?",
             "📊 Analyse mes dépenses",
-            "📋 Liste mes abonnements actifs"
+            "📋 Liste mes abonnements actifs",
+            "➕ Ajoute Netflix pour Jean à 15€",
+            "🗑️ Supprime Spotify"
         ];
     }
 
