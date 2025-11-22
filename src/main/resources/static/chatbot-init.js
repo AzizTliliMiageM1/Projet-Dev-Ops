@@ -11,6 +11,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function initChatbotWidget() {
     // Créer le HTML du widget
     const chatbotHTML = `
+        <!-- Bulle de message d'accueil -->
+        <div class="chatbot-welcome-bubble show" id="chatbotWelcomeBubble">
+            👋 Bonjour ! Besoin d'aide ? Je suis là !
+        </div>
+        
         <!-- Bouton flottant -->
         <div class="chatbot-trigger" id="chatbotTrigger">
             <i class="bi bi-robot"></i>
@@ -125,6 +130,23 @@ function initChatbotWidget() {
     // Event listener pour le bouton trigger
     document.getElementById('chatbotTrigger').addEventListener('click', toggleChatbotWidget);
 
+    // Masquer la bulle de bienvenue après 8 secondes ou au clic
+    const welcomeBubble = document.getElementById('chatbotWelcomeBubble');
+    setTimeout(() => {
+        if (welcomeBubble) {
+            welcomeBubble.classList.remove('show');
+            setTimeout(() => welcomeBubble.remove(), 500);
+        }
+    }, 8000);
+    
+    if (welcomeBubble) {
+        welcomeBubble.addEventListener('click', () => {
+            welcomeBubble.classList.remove('show');
+            setTimeout(() => welcomeBubble.remove(), 500);
+            toggleChatbotWidget();
+        });
+    }
+
     // Afficher le badge après 3 secondes
     setTimeout(() => {
         if (!document.getElementById('chatbotWindow').classList.contains('active')) {
@@ -139,6 +161,13 @@ function toggleChatbotWidget() {
     const window = document.getElementById('chatbotWindow');
     const trigger = document.getElementById('chatbotTrigger');
     const badge = document.getElementById('chatbotBadge');
+    const welcomeBubble = document.getElementById('chatbotWelcomeBubble');
+    
+    // Masquer la bulle de bienvenue si elle est encore visible
+    if (welcomeBubble) {
+        welcomeBubble.classList.remove('show');
+        setTimeout(() => welcomeBubble.remove(), 500);
+    }
     
     window.classList.toggle('active');
     trigger.classList.toggle('active');

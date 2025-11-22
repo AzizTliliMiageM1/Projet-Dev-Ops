@@ -6,16 +6,16 @@
 .chatbot-trigger {
     position: fixed;
     bottom: 30px;
-    left: 30px;
+    right: 30px;
     width: 70px;
     height: 70px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #10b981, #06b6d4);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
     transition: all 0.3s ease;
     z-index: 9999;
     border: 3px solid white;
@@ -23,7 +23,7 @@
 
 .chatbot-trigger:hover {
     transform: scale(1.1);
-    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
 }
 
 .chatbot-trigger i {
@@ -32,7 +32,7 @@
 }
 
 .chatbot-trigger.active {
-    background: linear-gradient(135deg, #764ba2, #667eea);
+    background: linear-gradient(135deg, #06b6d4, #10b981);
 }
 
 .chatbot-badge {
@@ -49,7 +49,51 @@
     font-size: 0.75rem;
     font-weight: 700;
     color: white;
-    animation: chatbotPulse 2s infinite;
+    border: 2px solid white;
+}
+
+/* Bulle de message d'accueil */
+.chatbot-welcome-bubble {
+    position: fixed;
+    bottom: 110px;
+    right: 110px;
+    background: linear-gradient(135deg, #10b981, #06b6d4);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 20px 20px 5px 20px;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    font-size: 0.9rem;
+    font-weight: 500;
+    max-width: 250px;
+    z-index: 9997;
+    animation: bubbleFadeIn 0.5s ease, bubbleBounce 2s ease-in-out infinite;
+    display: none;
+}
+
+.chatbot-welcome-bubble.show {
+    display: block;
+}
+
+.chatbot-welcome-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #06b6d4;
+}
+
+@keyframes bubbleFadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bubbleBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
 }
 
 @keyframes chatbotPulse {
@@ -61,7 +105,7 @@
 .chatbot-window {
     position: fixed;
     bottom: 120px;
-    left: 30px;
+    right: 30px;
     width: 380px;
     height: 550px;
     background: white;
