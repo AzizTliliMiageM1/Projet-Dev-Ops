@@ -186,7 +186,7 @@ Quelle fonctionnalité vous intéresse ?`
         };
 
         // Extract prix (15.99€, 15.99, 15€, 20 euros)
-        const priceMatch = message.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i);
+        const priceMatch = message.match(/(?:prix de|à|pour)\s*(\d+(?:[.,]\d{1,2})?)\s*(?:€|euros?)/i);
         if (priceMatch) {
             entities.price = parseFloat(priceMatch[1].replace(',', '.'));
         }
@@ -209,16 +209,37 @@ Quelle fonctionnalité vous intéresse ?`
             }
         }
 
-        // Extract nom du client (détection "au nom de X" ou "pour X")
-        const clientMatch = message.match(/(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*)/i);
-        if (clientMatch) {
-            entities.client = clientMatch[1].trim();
+        // Extract nom du client - AMÉLIORATION pour détecter "Ferkous Maissara"
+        const clientPatterns = [
+            /(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)+)(?=\s+[A-Z][a-z]+\s+(?:début|fin|catégorie|à|pour|$))/i,
+            /(?:au nom de|pour|client)\s+([A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*)/i
+        ];
+        
+        for (const pattern of clientPatterns) {
+            const match = message.match(pattern);
+            if (match) {
+                entities.client = match[1].trim();
+                break;
+            }
         }
 
-        // Extract nom du service (tout ce qui vient après "abonnement" ou avant "au nom de")
-        const serviceMatch = message.match(/(?:abonnement|service|ajoute)\s+(?:au nom de\s+)?([A-Za-zÀ-ÿ0-9\s]+?)(?:\s+(?:au nom de|pour|début|fin|catégorie|prix)|$)/i);
-        if (serviceMatch) {
-            entities.service = serviceMatch[1].trim();
+        // Extract nom du service - AMÉLIORATION pour "Basic Fit", "Disney Plus", etc.
+        // Cherche entre "abonnement/ajoute" et "pour/au nom de"
+        const servicePatterns = [
+            // Pattern 1: "ajoute [SERVICE] pour [CLIENT]"
+            /(?:ajoute|créer?|nouveau|enregistre)\s+(?:un\s+abonnement\s+)?(?:au nom de\s+[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*\s+)?([A-Z][a-zA-Z0-9\s]+?)(?=\s+(?:pour|début|fin|catégorie|à|$))/i,
+            // Pattern 2: nom du service après le nom du client
+            /pour\s+[A-ZÀ-ÿ][a-zà-ÿ]+(?:\s+[A-ZÀ-ÿ][a-zà-ÿ]+)*\s+([A-Z][a-zA-Z0-9\s]+?)(?=\s+(?:début|fin|catégorie|à|pour|$))/i,
+            // Pattern 3: extraction basique
+            /(?:abonnement|service|ajoute)\s+([A-Za-zÀ-ÿ0-9\s]+?)(?=\s+(?:au nom de|pour|début|fin|catégorie|prix|à|$))/i
+        ];
+
+        for (const pattern of servicePatterns) {
+            const match = message.match(pattern);
+            if (match) {
+                entities.service = match[1].trim();
+                break;
+            }
         }
 
         // Extract nombres simples
