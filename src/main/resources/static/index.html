@@ -1,929 +1,62 @@
 <!doctype html>
 <html lang="fr">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard - Gestion d'abonnements</title>
-
+  
   <!-- Bootstrap & Fonts & Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-
-  <style>
-    /* Variables CSS simplifiées */
-    :root {
-      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-      --secondary-gradient: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-      --accent-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      --glass-bg: rgba(255, 255, 255, 0.15);
-      --glass-border: rgba(255, 255, 255, 0.3);
-      --glass-text-bg: rgba(0, 0, 0, 0.4);
-      --shadow-soft: 0 8px 32px rgba(31, 38, 135, 0.2);
-      --shadow-hover: 0 20px 50px rgba(31, 38, 135, 0.3);
-      --border-radius: 20px;
-      --text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--primary-gradient);
-      background-attachment: fixed;
-      min-height: 100vh;
-      margin: 0;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes quantumMorphing {
-      0%, 100% { border-radius: 35px 20px 40px 15px; transform: skew(0deg, 0deg); }
-      25% { border-radius: 15px 40px 20px 35px; transform: skew(1deg, -0.5deg); }
-      50% { border-radius: 40px 15px 35px 20px; transform: skew(-0.5deg, 1deg); }
-      75% { border-radius: 20px 35px 15px 40px; transform: skew(0.5deg, -1deg); }
-    }
-
-    @keyframes dataStream {
-      0% { transform: translateX(-100%) rotateY(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateX(100%) rotateY(360deg); opacity: 0; }
-    }
-
-    .container-fluid {
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Glassmorphisme Simplifié */
-    .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .glass-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    /* Header futuriste */
-    .futuristic-header {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(30px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .logo-container {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .logo-icon {
-      width: 60px;
-      height: 60px;
-      background: var(--text-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease-in-out infinite;
-      border-radius: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 
-        0 10px 25px rgba(102, 126, 234, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    .logo-icon:hover {
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 
-        0 15px 35px rgba(102, 126, 234, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    .logo-text h1 {
-      color: #ffffff;
-      font-weight: 900;
-      margin: 0;
-      font-size: 1.9rem;
-      text-shadow: var(--text-shadow);
-      background: var(--glass-text-bg);
-      padding: 8px 16px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .logo-text p {
-      color: #ffffff;
-      margin: 5px 0 0 0;
-      font-size: 1rem;
-      font-weight: 600;
-      text-shadow: var(--text-shadow);
-      background: rgba(255, 255, 255, 0.15);
-      padding: 4px 12px;
-      border-radius: 8px;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* Boutons modernes */
-    .btn-glass {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      backdrop-filter: blur(15px);
-      border-radius: 30px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      font-weight: 600;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-glass::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .btn-glass:hover::before {
-      left: 100%;
-    }
-
-    .btn-glass:hover {
-      background: rgba(255, 255, 255, 0.35);
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .btn-primary-gradient {
-      background: var(--primary-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease-in-out infinite;
-      border: none;
-      color: white;
-      border-radius: 30px;
-      font-weight: 700;
-      padding: 15px 30px;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 10px 30px rgba(102, 126, 234, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary-gradient::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      transition: left 0.6s ease;
-    }
-
-    .btn-primary-gradient:hover::before {
-      left: 100%;
-    }
-
-    .btn-primary-gradient:hover {
-      transform: translateY(-5px) scale(1.08);
-      box-shadow: 
-        0 20px 50px rgba(102, 126, 234, 0.6),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      color: white;
-    }
-
-    /* Dashboard Cards */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 35px;
-      margin-bottom: 50px;
-    }
-
-    .metric-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px);
-      border-radius: 30px;
-      padding: 40px;
-      text-align: center;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      transition: all var(--animation-speed) cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background: var(--primary-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 4s ease-in-out infinite;
-    }
-
-    .metric-card::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .metric-card:hover {
-      transform: translateY(-12px) scale(1.03);
-      box-shadow: 
-        0 25px 60px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .metric-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 20px;
-      background: var(--primary-gradient);
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: white;
-      box-shadow: 
-        0 15px 35px rgba(102, 126, 234, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-      position: relative;
-      z-index: 1;
-    }
-
-    .metric-card:hover .metric-icon {
-      transform: scale(1.1);
-      box-shadow: 
-        0 20px 50px rgba(102, 126, 234, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    }
-
-    .metric-value {
-      font-size: 3rem;
-      font-weight: 900;
-      background: var(--primary-gradient);
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 4s ease-in-out infinite;
-      margin-bottom: 15px;
-      text-shadow: var(--text-shadow);
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 0 10px rgba(102, 126, 234, 0.5));
-    }
-
-    .metric-label {
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 1.3rem;
-      text-shadow: var(--text-shadow);
-      position: relative;
-      z-index: 1;
-      background: var(--glass-text-bg);
-      padding: 8px 16px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    /* Search Bar Futuriste */
-    .search-section {
-      margin-bottom: 50px;
-    }
-
-    .search-container {
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px);
-      border-radius: 25px;
-      padding: 25px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .search-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 1s ease;
-    }
-
-    .search-container:hover::before {
-      left: 100%;
-    }
-
-    .search-title {
-      color: white;
-      font-weight: 700;
-      font-size: 1.3rem;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .form-control-modern {
-      background: rgba(255, 255, 255, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 20px;
-      color: white;
-      padding: 18px 25px;
-      font-weight: 500;
-      transition: all 0.4s ease;
-      backdrop-filter: blur(10px);
-      font-size: 1rem;
-    }
-
-    .form-control-modern:focus {
-      background: rgba(255, 255, 255, 0.35);
-      border-color: rgba(255, 255, 255, 0.5);
-      box-shadow: 
-        0 0 25px rgba(102, 126, 234, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      color: white;
-      transform: scale(1.02);
-      outline: none;
-    }
-
-    .form-control-modern::placeholder {
-      color: rgba(255, 255, 255, 0.75);
-      font-weight: 500;
-    }
-
-    .form-label-modern {
-      color: #ffffff;
-      font-weight: 700;
-      margin-bottom: 12px;
-      font-size: 1.2rem;
-      text-shadow: var(--text-shadow);
-      background: var(--glass-text-bg);
-      padding: 8px 16px;
-      border-radius: 10px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      display: inline-block;
-    }
-
-    /* Subscription Cards */
-    .subscriptions-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 30px;
-      margin-bottom: 50px;
-    }
-
-    .subscription-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      overflow: hidden;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .subscription-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-hover);
-      border-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .card-header-modern {
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-      position: relative;
-    }
-
-    .service-name {
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-      text-shadow: var(--text-shadow);
-      background: var(--glass-text-bg);
-      padding: 10px 16px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      display: inline-block;
-    }
-
-    .client-name {
-      color: #ffffff;
-      font-size: 1.1rem;
-      font-weight: 600;
-      text-shadow: var(--text-shadow);
-      background: rgba(255, 255, 255, 0.15);
-      padding: 6px 12px;
-      border-radius: 10px;
-      backdrop-filter: blur(5px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: inline-block;
-      margin-top: 5px;
-    }
-
-    .card-body-modern {
-      padding: 25px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .status-badge {
-      padding: 12px 20px;
-      border-radius: 25px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 20px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 
-        0 8px 25px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .status-badge::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s ease;
-    }
-
-    .status-badge:hover::before {
-      left: 100%;
-    }
-
-    .status-badge:hover {
-      transform: translateY(-2px) scale(1.05);
-    }
-
-    .status-active {
-      background: var(--success-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease-in-out infinite;
-      color: white;
-    }
-
-    .status-warning {
-      background: var(--warning-gradient);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease-in-out infinite;
-      color: white;
-    }
-
-    .status-expired {
-      background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 50%, #dc2626 100%);
-      background-size: 200% 200%;
-      animation: gradientShift 3s ease-in-out infinite;
-      color: white;
-    }
-
-    .price-display {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #ffffff;
-      text-shadow: var(--text-shadow);
-      background: var(--glass-text-bg);
-      padding: 12px 20px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      display: inline-block;
-      margin: 10px 0;
-    }
-
-    .date-info {
-      color: #ffffff;
-      font-size: 1rem;
-      font-weight: 600;
-      margin: 10px 0;
-      text-shadow: var(--text-shadow);
-      background: rgba(255, 255, 255, 0.15);
-      padding: 8px 14px;
-      border-radius: 12px;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: inline-block;
-    }
-
-    /* Action Panel */
-    .action-panel {
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px);
-      border-radius: 30px;
-      padding: 35px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      position: sticky;
-      top: 100px;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .action-panel::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-      animation: rotate 20s linear infinite;
-      pointer-events: none;
-    }
-
-    .action-panel:hover {
-      transform: translateY(-5px);
-      box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-
-    .panel-title {
-      color: white;
-      font-weight: 800;
-      font-size: 1.5rem;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      background: var(--text-gradient);
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 4s ease-in-out infinite;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Empty State */
-    .empty-state {
-      text-align: center;
-      padding: 80px 30px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(25px);
-      border-radius: 30px;
-      border: 1px solid var(--glass-border);
-      box-shadow: var(--shadow-soft);
-      grid-column: 1 / -1;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .empty-state::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      transition: left 2s ease;
-    }
-
-    .empty-state:hover::before {
-      left: 100%;
-    }
-
-    .empty-icon {
-      font-size: 5rem;
-      background: var(--text-gradient);
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 4s ease-in-out infinite;
-      margin-bottom: 25px;
-      display: block;
-    }
-
-    .empty-title {
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 2rem;
-      margin-bottom: 15px;
-      text-shadow: var(--text-shadow);
-      background: var(--glass-text-bg);
-      padding: 16px 24px;
-      border-radius: 15px;
-      backdrop-filter: blur(15px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      display: inline-block;
-    }
-
-    .empty-text {
-      color: #ffffff;
-      font-size: 1.3rem;
-      font-weight: 600;
-      text-shadow: var(--text-shadow);
-      background: rgba(255, 255, 255, 0.15);
-      padding: 12px 20px;
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: inline-block;
-      margin-top: 10px;
-    }
-
-    /* Animations */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-10px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes gradientShift {
-      0%, 100% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-    }
-
-    .animate-slide-in {
-      animation: slideIn 0.8s ease-out;
-    }
-
-    .animate-fade-in {
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    .floating {
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .animate-pulse {
-      animation: pulse 2s infinite;
-    }
-
-    /* Classes utilitaires simplifiées */
-    .premium-glow {
-      filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.4));
-      transition: filter 0.3s ease;
-    }
-    
-    .modern-border {
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: var(--border-radius);
-      transition: border-color 0.3s ease;
-    }
-    
-    .modern-border:hover {
-      border-color: rgba(255,255,255,0.4);
-    }
-
-    /* Responsive amélioré */
-    @media (max-width: 768px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 25px;
-      }
-      
-      .subscriptions-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-      
-      .metric-value {
-        font-size: 2.8rem;
-      }
-      
-      .metric-card {
-        padding: 30px 20px;
-      }
-      
-      .search-container {
-        padding: 20px;
-        margin: 15px;
-      }
-      
-      .logo-icon {
-        width: 50px;
-        height: 50px;
-      }
-      
-      .logo-text h1 {
-        font-size: 1.5rem;
-      }
-      
-      .subscription-card {
-        margin: 10px;
-      }
-      
-      body::before {
-        background-size: cover;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .metric-value {
-        font-size: 2.2rem;
-      }
-      
-      .glass-card {
-        margin: 5px;
-        border-radius: 20px;
-      }
-      
-      .btn-primary-gradient {
-        padding: 12px 20px;
-        font-size: 0.9rem;
-      }
-    }
-
-    /* Flash Messages */
-    .flash-message {
-      background: var(--glass-bg);
-      backdrop-filter: blur(20px);
-      border-radius: 15px;
-      border: 1px solid var(--glass-border);
-      padding: 15px 20px;
-      margin-bottom: 20px;
-      color: white;
-      border-left: 4px solid #10b981;
-    }
-
-    /* Card Actions */
-    .card-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-action {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      color: white;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-    }
-
-    .btn-action:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: translateY(-1px);
-      color: white;
-    }
-  </style>
+  <link href="/dashboard.css" rel="stylesheet">
 </head>
 
 <body>
-  <!-- Header Futuriste -->
-  <header class="futuristic-header">
-    <div class="container py-3">
-      <div class="d-flex align-items-center justify-content-between">
-        <div class="logo-container">
-          <div class="logo-icon">
-            <i class="bi bi-layers" style="color: white; font-size: 1.5rem;"></i>
-          </div>
-          <div class="logo-text">
-            <h1>Dashboard Pro</h1>
-            <p>Gestion d'abonnements intelligente</p>
-          </div>
-        </div>
-        
-        <div class="d-flex gap-2">
-          <button id="refreshBtn" class="btn btn-glass btn-sm">
-            <i class="bi bi-arrow-clockwise me-1"></i> Sync
-          </button>
-          <a class="btn btn-glass btn-sm" href="/stats.html">
-            <i class="bi bi-graph-up me-1"></i> Analytics
-          </a>
-          <a class="btn btn-glass btn-sm" href="/help.html">
-            <i class="bi bi-question-circle me-1"></i> Support
-          </a>
-          <a class="btn btn-glass btn-sm" href="/home.html">
-            <i class="bi bi-house me-1"></i> Home
-          </a>
-        </div>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="/index.html">
+        <i class="bi bi-layers"></i>
+        Dashboard Pro
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/index.html">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats.html">
+              <i class="bi bi-graph-up me-1"></i> Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/help.html">
+              <i class="bi bi-question-circle me-1"></i> Support
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/home.html">
+              <i class="bi bi-house me-1"></i> Home
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <main class="container py-4">
-    <!-- Dashboard Metrics -->
-    <section class="dashboard-section mb-5 animate-slide-in">
+  <main class="container-fluid px-4 py-4">
+    <!-- Dashboard KPI -->
+    <section class="dashboard-section mb-4 animate-fade-up">
       <div class="dashboard-grid" id="dashboard">
-        <!-- Métriques injectées par JS -->
+        <!-- Métriques injectées par JavaScript -->
       </div>
     </section>
 
@@ -932,16 +65,19 @@
       <div class="search-container">
         <h2 class="search-title">
           <i class="bi bi-search"></i>
-          Recherche & Filtres Avancés
+          Recherche & Filtres
         </h2>
         
-        <div class="row g-4">
-          <div class="col-md-6">
+        <div class="row g-3">
+          <div class="col-md-5">
             <label class="form-label-modern">
               <i class="bi bi-search me-2"></i>Recherche globale
             </label>
-            <input type="text" id="searchInput" class="form-control form-control-modern" 
-                   placeholder="Rechercher par client, service, catégorie...">
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="form-control form-control-modern" 
+              placeholder="Rechercher par client, service, catégorie...">
           </div>
           
           <div class="col-md-2">
@@ -952,26 +88,27 @@
               <option value="">Tous</option>
               <option value="actif">Actifs</option>
               <option value="expire">Expirés</option>
-              <option value="bientot-expire">Bientôt expirés</option>
+              <option value="bientot-expire">Expire bientôt</option>
             </select>
           </div>
           
-          <div class="col-md-2">
+          <div class="col-md-3">
             <label class="form-label-modern">
-              <i class="bi bi-sort-down me-2"></i>Tri
+              <i class="bi bi-sort-down me-2"></i>Trier par
             </label>
             <select id="sortSelect" class="form-control form-control-modern">
               <option value="date-desc">Plus récent</option>
               <option value="date-asc">Plus ancien</option>
               <option value="client-asc">Client A-Z</option>
-              <option value="prix-desc">Prix ↓</option>
-              <option value="prix-asc">Prix ↑</option>
+              <option value="client-desc">Client Z-A</option>
+              <option value="prix-desc">Prix décroissant</option>
+              <option value="prix-asc">Prix croissant</option>
             </select>
           </div>
           
           <div class="col-md-2">
             <label class="form-label-modern" style="opacity: 0;">.</label>
-            <button id="alertesBtn" class="btn btn-primary-gradient w-100">
+            <button id="alertesBtn" class="btn btn-warning w-100">
               <i class="bi bi-bell me-1"></i> Alertes
             </button>
           </div>
@@ -980,7 +117,7 @@
     </section>
 
     <!-- Flash Messages -->
-    <div id="flash" class="animate-fade-in"></div>
+    <div id="flash"></div>
 
     <!-- Main Content -->
     <div class="row g-4">
@@ -988,12 +125,14 @@
       <div class="col-lg-8">
         <div class="subscriptions-grid" id="cards">
           <!-- État vide -->
-          <div class="empty-state" data-empty-hint>
+          <div class="empty-state glass-card" data-empty-hint>
             <div class="empty-icon">
               <i class="bi bi-inbox"></i>
             </div>
             <h3 class="empty-title">Aucun abonnement</h3>
-            <p class="empty-text">Commencez par ajouter votre premier service via le panneau à droite</p>
+            <p class="empty-text">
+              Commencez par ajouter votre premier service via le panneau à droite
+            </p>
           </div>
         </div>
       </div>
@@ -1008,44 +147,77 @@
               Nouveau Service
             </h3>
             
-            <form id="addForm" class="animate-fade-in">
+            <form id="addForm">
               <div class="mb-3">
-                <label class="form-label-modern">Client</label>
-                <input id="nomClient" class="form-control form-control-modern" 
-                       placeholder="Nom du client" required />
+                <label class="form-label-modern">
+                  <i class="bi bi-person me-1"></i>Client
+                </label>
+                <input 
+                  id="nomClient" 
+                  class="form-control form-control-modern" 
+                  placeholder="Nom du client" 
+                  required />
               </div>
               
               <div class="mb-3">
-                <label class="form-label-modern">Service</label>
-                <input id="nomService" class="form-control form-control-modern" 
-                       placeholder="Ex: Netflix, Spotify..." required />
+                <label class="form-label-modern">
+                  <i class="bi bi-star me-1"></i>Service
+                </label>
+                <input 
+                  id="nomService" 
+                  class="form-control form-control-modern" 
+                  placeholder="Ex: Netflix, Spotify..." 
+                  required />
               </div>
               
               <div class="row g-3 mb-3">
                 <div class="col-6">
-                  <label class="form-label-modern">Début</label>
-                  <input id="dateDebut" type="date" class="form-control form-control-modern" required />
+                  <label class="form-label-modern">
+                    <i class="bi bi-calendar-check me-1"></i>Début
+                  </label>
+                  <input 
+                    id="dateDebut" 
+                    type="date" 
+                    class="form-control form-control-modern" 
+                    required />
                 </div>
                 <div class="col-6">
-                  <label class="form-label-modern">Fin</label>
-                  <input id="dateFin" type="date" class="form-control form-control-modern" required />
+                  <label class="form-label-modern">
+                    <i class="bi bi-calendar-x me-1"></i>Fin
+                  </label>
+                  <input 
+                    id="dateFin" 
+                    type="date" 
+                    class="form-control form-control-modern" 
+                    required />
                 </div>
               </div>
               
               <div class="row g-3 mb-3">
                 <div class="col-6">
-                  <label class="form-label-modern">Catégorie</label>
-                  <input id="categorie" class="form-control form-control-modern" 
-                         placeholder="Streaming, Cloud..." />
+                  <label class="form-label-modern">
+                    <i class="bi bi-tag me-1"></i>Catégorie
+                  </label>
+                  <input 
+                    id="categorie" 
+                    class="form-control form-control-modern" 
+                    placeholder="Streaming, Cloud..." />
                 </div>
                 <div class="col-6">
-                  <label class="form-label-modern">Prix (€)</label>
-                  <input id="prixMensuel" type="number" min="0" step="0.01" 
-                         class="form-control form-control-modern" placeholder="0.00" />
+                  <label class="form-label-modern">
+                    <i class="bi bi-currency-euro me-1"></i>Prix mensuel
+                  </label>
+                  <input 
+                    id="prixMensuel" 
+                    type="number" 
+                    min="0" 
+                    step="0.01" 
+                    class="form-control form-control-modern" 
+                    placeholder="0.00" />
                 </div>
               </div>
               
-              <button type="submit" class="btn btn-primary-gradient w-100">
+              <button type="submit" class="btn btn-primary w-100">
                 <i class="bi bi-plus-lg me-2"></i>Ajouter le service
               </button>
             </form>
@@ -1054,21 +226,25 @@
           <!-- Actions rapides -->
           <div>
             <h4 class="panel-title">
-              <i class="bi bi-lightning"></i>
+              <i class="bi bi-lightning-charge"></i>
               Actions Rapides
             </h4>
             
-            <div class="d-grid gap-3">
-              <label class="btn btn-glass w-100" for="importFile">
+            <div class="d-grid gap-2">
+              <button id="refreshBtn" class="btn btn-glass">
+                <i class="bi bi-arrow-clockwise me-2"></i>Actualiser
+              </button>
+              
+              <label class="btn btn-glass" for="importFile">
                 <i class="bi bi-upload me-2"></i>Importer JSON
               </label>
               <input type="file" id="importFile" style="display: none;" accept=".json">
               
-              <button id="exportBtn" class="btn btn-glass w-100">
+              <button id="exportBtn" class="btn btn-glass">
                 <i class="bi bi-download me-2"></i>Exporter données
               </button>
               
-              <button id="clearAllBtn" class="btn btn-glass w-100">
+              <button id="clearAllBtn" class="btn btn-danger">
                 <i class="bi bi-trash me-2"></i>Tout supprimer
               </button>
             </div>
@@ -1080,23 +256,29 @@
 
   <!-- Modal d'édition -->
   <div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content" style="background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--border-radius);">
-        <div class="modal-header border-bottom border-white-50">
-          <h5 class="modal-title text-white">Modifier l'abonnement</h5>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Modifier l'abonnement
+          </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <form id="editForm">
             <input type="hidden" id="editIndex" />
+            
             <div class="mb-3">
               <label class="form-label-modern">Client</label>
               <input id="editClient" class="form-control form-control-modern" required />
             </div>
+            
             <div class="mb-3">
               <label class="form-label-modern">Service</label>
               <input id="editService" class="form-control form-control-modern" required />
             </div>
+            
             <div class="row g-3 mb-3">
               <div class="col-6">
                 <label class="form-label-modern">Début</label>
@@ -1107,6 +289,7 @@
                 <input id="editFin" type="date" class="form-control form-control-modern" required />
               </div>
             </div>
+            
             <div class="row g-3 mb-3">
               <div class="col-6">
                 <label class="form-label-modern">Catégorie</label>
@@ -1119,9 +302,9 @@
             </div>
           </form>
         </div>
-        <div class="modal-footer border-top border-white-50">
+        <div class="modal-footer">
           <button class="btn btn-glass" data-bs-dismiss="modal">Annuler</button>
-          <button id="saveEditBtn" class="btn btn-primary-gradient">
+          <button id="saveEditBtn" class="btn btn-primary">
             <i class="bi bi-check-lg me-1"></i>Enregistrer
           </button>
         </div>
@@ -1133,5 +316,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/app.js"></script>
 </body>
-
 </html>
