@@ -158,10 +158,15 @@ function initChatbotWidget() {
 
 // Toggle chatbot window
 function toggleChatbotWidget() {
-    const window = document.getElementById('chatbotWindow');
+    const chatWindow = document.getElementById('chatbotWindow');
     const trigger = document.getElementById('chatbotTrigger');
     const badge = document.getElementById('chatbotBadge');
     const welcomeBubble = document.getElementById('chatbotWelcomeBubble');
+    
+    if (!chatWindow) {
+        console.error('Chatbot window not found!');
+        return;
+    }
     
     // Masquer la bulle de bienvenue si elle est encore visible
     if (welcomeBubble) {
@@ -169,12 +174,13 @@ function toggleChatbotWidget() {
         setTimeout(() => welcomeBubble.remove(), 500);
     }
     
-    window.classList.toggle('active');
+    chatWindow.classList.toggle('active');
     trigger.classList.toggle('active');
     
-    if (window.classList.contains('active')) {
-        document.getElementById('chatbotInput').focus();
-        badge.style.display = 'none';
+    if (chatWindow.classList.contains('active')) {
+        const input = document.getElementById('chatbotInput');
+        if (input) input.focus();
+        if (badge) badge.style.display = 'none';
     }
 }
 
