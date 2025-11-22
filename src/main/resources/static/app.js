@@ -84,7 +84,7 @@ function render(list){
   }
 
   list.forEach((a, index) => {
-    const clientName = a.nomClient || a.clientName || 'Client';
+    const clientName = a.clientName || 'Client';
     const nomService = a.nomService || 'Service';
     const dateDebut = a.dateDebut || '-';
     const dateFin = a.dateFin || '-';
@@ -226,7 +226,7 @@ async function editAbonnement(index) {
     
     // Remplir le modal d'édition
     document.getElementById('editIndex').value = index;
-    document.getElementById('editClient').value = abo.nomClient || '';
+    document.getElementById('editClient').value = abo.clientName || '';
     document.getElementById('editService').value = abo.nomService || '';
     document.getElementById('editDebut').value = abo.dateDebut || '';
     document.getElementById('editFin').value = abo.dateFin || '';
@@ -277,7 +277,7 @@ async function loadAndRender(){
 
   let filtered = all.filter(a => {
     if (!q) return true;
-    const searchText = `${a.nomClient || ''} ${a.nomService || ''} ${a.categorie || ''}`.toLowerCase();
+    const searchText = `${a.clientName || ''} ${a.nomService || ''} ${a.categorie || ''}`.toLowerCase();
     return searchText.includes(q);
   });
 
@@ -295,8 +295,8 @@ async function loadAndRender(){
   }
 
   // Tri
-  if (sortBy === 'client-asc') filtered.sort((a,b) => (a.nomClient||'').localeCompare(b.nomClient||''));
-  else if (sortBy === 'client-desc') filtered.sort((a,b) => (b.nomClient||'').localeCompare(a.nomClient||''));
+  if (sortBy === 'client-asc') filtered.sort((a,b) => (a.clientName||'').localeCompare(b.clientName||''));
+  else if (sortBy === 'client-desc') filtered.sort((a,b) => (b.clientName||'').localeCompare(a.clientName||''));
   else if (sortBy === 'date-asc') filtered.sort((a,b) => new Date(a.dateDebut) - new Date(b.dateDebut));
   else if (sortBy === 'date-desc') filtered.sort((a,b) => new Date(b.dateDebut) - new Date(a.dateDebut));
   else if (sortBy === 'prix-asc') filtered.sort((a,b) => (parseFloat(a.prixMensuel) || 0) - (parseFloat(b.prixMensuel) || 0));
@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
-      nomClient: document.getElementById('nomClient').value,
+      clientName: document.getElementById('nomClient').value,
       nomService: document.getElementById('nomService').value,
       dateDebut: document.getElementById('dateDebut').value,
       dateFin: document.getElementById('dateFin').value,
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('saveEditBtn').addEventListener('click', async () => {
     const index = document.getElementById('editIndex').value;
     const payload = {
-      nomClient: document.getElementById('editClient').value,
+      clientName: document.getElementById('editClient').value,
       nomService: document.getElementById('editService').value,
       dateDebut: document.getElementById('editDebut').value,
       dateFin: document.getElementById('editFin').value,
@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const joursRestants = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
         
         if (joursRestants <= 7) {
-          alertes.push(`${abo.nomService} (${abo.nomClient}) expire dans ${joursRestants} jour(s)`);
+          alertes.push(`${abo.nomService} (${abo.clientName}) expire dans ${joursRestants} jour(s)`);
         }
         
         if (abo.derniereUtilisation) {
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
           const joursInactivite = Math.ceil((now - dernierUtilisation) / (1000 * 60 * 60 * 24));
           
           if (joursInactivite > 30) {
-            alertes.push(`${abo.nomService} (${abo.nomClient}) non utilisé depuis ${joursInactivite} jours`);
+            alertes.push(`${abo.nomService} (${abo.clientName}) non utilisé depuis ${joursInactivite} jours`);
           }
         }
       }
