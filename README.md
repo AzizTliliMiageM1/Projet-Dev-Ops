@@ -1,6 +1,44 @@
-# 🚀 Gestion d'Abonnements - Interface Révolutionnaire
+# 🎯 Gestion d'Abonnements - Application Full-Stack Moderne
 
-Cette application moderne combine la puissance de Java avec une interface web ultra-stylée utilisant le design **glassmorphisme**. Plus qu'un simple projet étudiant, c'est une démonstration de technologies de pointe avec des statistiques en temps réel et une expérience utilisateur exceptionnelle.
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Java](https://img.shields.io/badge/Java-17-orange.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+Une application complète de gestion d'abonnements avec interface moderne glassmorphism, analytics avancés, **chatbot IA intelligent** et tutoriels vidéo interactifs.
+
+## ✨ Fonctionnalités Principales
+
+### 🎨 Interface Utilisateur Premium
+- **Dashboard moderne** avec design glassmorphism professionnel
+- **4 KPI en temps réel** : Total, Actifs, Coût mensuel, Alertes
+- **Design responsive** adapté mobile/tablette/desktop
+- **Gradient violet** cohérent (#667eea → #764ba2)
+- **Animations fluides** et transitions CSS avancées
+
+### 🤖 **NOUVEAU ! Chatbot IA Intelligent**
+- **Assistant conversationnel** avec NLP (Natural Language Processing)
+- **Analyse automatique** de vos dépenses et budget
+- **Conseils personnalisés** d'optimisation financière
+- **Recherche intelligente** d'abonnements en langage naturel
+- **Détection d'intentions** : statistiques, alertes, recherche, aide
+- **Interface moderne** avec fenêtre flottante élégante
+- **Réponses contextuelles** basées sur vos données réelles
+
+**Exemples de questions :**
+- "Quel est mon budget mensuel ?"
+- "Mes alertes d'inactivité"
+- "Comment économiser ?"
+- "Cherche Netflix"
+- "Liste mes abonnements actifs"
+
+### 📹 Tutoriels Vidéo Interactifs
+- **2 tutoriels complets** (13 minutes au total)
+  - 🌟 Débutant (5 min) : Premiers pas
+  - 🎓 Avancé (8 min) : Fonctionnalités expertes
+- **Navigation par chapitres** avec timeline interactive
+- **Contrôles vidéo** (Play/Pause, seek bar cliquable)
+- **Raccourcis clavier** (Espace, flèches)
+- **18 slides animées** au total
 
 ## Fonctionnalités Clés Développées
 
