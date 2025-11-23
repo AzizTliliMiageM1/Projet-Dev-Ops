@@ -15,6 +15,7 @@ import com.projet.user.User;
 import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 
+import static spark.Spark.before;
 import static spark.Spark.delete;
 import static spark.Spark.get;
 import static spark.Spark.halt;
@@ -45,20 +46,6 @@ public class ApiServer {
             res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
         });
 
-        // =================================================
-        // 🔒 PROTECTION : Routes abonnements - créer repo par utilisateur
-        // =================================================
-        spark.Spark.before("/api/abonnements/*", (req, res) -> {
-            String user = req.session().attribute("user");
-            if (user == null) {
-                halt(401, "Non autorisé - veuillez vous connecter");
-            }
-            
-            // Créer un repository pour cet utilisateur spécifique
-            AbonnementRepository userRepo = new com.projet.repository.UserAbonnementRepository(user);
-            req.attribute("userRepo", userRepo);
-        });
-
         // ---- JSON ----
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -69,6 +56,24 @@ public class ApiServer {
         //     🔵  API /api/...
         // =================================================
         path("/api", () -> {
+
+            // =================================================
+            // 🔒 PROTECTION : Routes abonnements - créer repo par utilisateur
+            // =================================================
+            before("/abonnements*", (req, res) -> {
+                String user = req.session().attribute("user");
+                
+                AbonnementRepository userRepo;
+                if (user == null) {
+                    // Utilisateur non connecté : utiliser fichier partagé
+                    userRepo = new FileAbonnementRepository("abonnements.txt");
+                } else {
+                    // Utilisateur connecté : fichier personnel
+                    userRepo = new com.projet.repository.UserAbonnementRepository(user);
+                }
+                
+                req.attribute("userRepo", userRepo);
+            });
 
             // ---------------------------------------
             // 🔵 ABONNEMENTS (PAR UTILISATEUR)
