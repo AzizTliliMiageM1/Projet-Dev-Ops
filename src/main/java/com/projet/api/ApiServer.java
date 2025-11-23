@@ -46,24 +46,18 @@ public class ApiServer {
         });
 
         // =================================================
-        // 🔒 PROTECTION : Routes abonnements uniquement si connecté
+        // 🔒 PROTECTION : Routes abonnements - créer repo par utilisateur
         // =================================================
         spark.Spark.before("/api/abonnements/*", (req, res) -> {
             String user = req.session().attribute("user");
             if (user == null) {
-                halt(401, "Non autorisé");
+                halt(401, "Non autorisé - veuillez vous connecter");
             }
+            
+            // Créer un repository pour cet utilisateur spécifique
+            AbonnementRepository userRepo = new com.projet.repository.UserAbonnementRepository(user);
+            req.attribute("userRepo", userRepo);
         });
-
-        // ---- ABONNEMENT REPO ----
-        String repoType = System.getenv().getOrDefault("REPO", "file");
-        AbonnementRepository repo;
-        if ("db".equalsIgnoreCase(repoType)) {
-            String jdbc = System.getProperty("JDBC_URL", "jdbc:h2:./abonnements-db;AUTO_SERVER=TRUE");
-            repo = new com.projet.repository.DatabaseAbonnementRepository(jdbc);
-        } else {
-            repo = new FileAbonnementRepository("abonnements.txt");
-        }
 
         // ---- JSON ----
         ObjectMapper mapper = new ObjectMapper();
@@ -77,17 +71,19 @@ public class ApiServer {
         path("/api", () -> {
 
             // ---------------------------------------
-            // 🔵 ABONNEMENTS
+            // 🔵 ABONNEMENTS (PAR UTILISATEUR)
             // ---------------------------------------
 
             get("/abonnements", (req, res) -> {
                 res.type("application/json");
+                AbonnementRepository repo = req.attribute("userRepo");
                 List<Abonnement> list = repo.findAll();
                 return mapper.writeValueAsString(list);
             });
 
             get("/abonnements/:id", (req, res) -> {
                 res.type("application/json");
+                AbonnementRepository repo = req.attribute("userRepo");
                 String pid = req.params(":id");
                 var opt = repo.findByUuid(pid);
                 if (opt.isEmpty()) {
@@ -110,6 +106,7 @@ public class ApiServer {
                     a.setId(java.util.UUID.randomUUID().toString());
                 }
 
+                AbonnementRepository repo = req.attribute("userRepo");
                 repo.save(a);
                 res.status(201);
                 res.type("application/json");
@@ -118,6 +115,7 @@ public class ApiServer {
 
             post("/abonnements/import", (req, res) -> {
                 res.type("application/json");
+                AbonnementRepository repo = req.attribute("userRepo");
                 List<Abonnement> arr = mapper.readValue(
                     req.body(),
                     new com.fasterxml.jackson.core.type.TypeReference<List<Abonnement>>() {}
@@ -156,6 +154,7 @@ public class ApiServer {
 
             put("/abonnements/:id", (req, res) -> {
                 String pid = req.params(":id");
+                AbonnementRepository repo = req.attribute("userRepo");
 
                 Abonnement updated = mapper.readValue(req.body(), Abonnement.class);
                 var opt = repo.findByUuid(pid);
@@ -182,6 +181,7 @@ public class ApiServer {
 
             delete("/abonnements/:id", (req, res) -> {
                 String pid = req.params(":id");
+                AbonnementRepository repo = req.attribute("userRepo");
                 var opt = repo.findByUuid(pid);
                 if (opt.isEmpty()) {
                     res.status(404);
