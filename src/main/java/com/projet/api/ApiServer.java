@@ -281,9 +281,12 @@ public class ApiServer {
             // 🔵  STATUS SESSION
             // =================================================
             get("/session", (req, res) -> {
+                res.type("application/json");
                 String user = req.session().attribute("user");
-                if (user == null) return "Aucun utilisateur connecté";
-                return "Connecté : " + user;
+                if (user == null) {
+                    return "{\"authenticated\":false}";
+                }
+                return "{\"authenticated\":true,\"email\":\"" + user + "\"}";
             });
 
 
