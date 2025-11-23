@@ -17,7 +17,8 @@ public class FileUserRepository implements UserRepository {
             fw.write(user.getEmail() + ";" 
                     + user.getPassword() + ";" 
                     + user.isConfirmed() + ";" 
-                    + user.getConfirmationToken() + "\n");
+                    + user.getConfirmationToken() + ";"
+                    + user.getPseudo() + "\n");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -30,7 +31,8 @@ public class FileUserRepository implements UserRepository {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(";");
                 if (p[0].equals(email)) {
-                    User u = new User(p[0], p[1], p[3]);
+                    String pseudo = p.length > 4 ? p[4] : email.split("@")[0];
+                    User u = new User(p[0], p[1], pseudo, p[3]);
                     u.setConfirmed(Boolean.parseBoolean(p[2]));
                     return u;
                 }
@@ -46,7 +48,8 @@ public class FileUserRepository implements UserRepository {
             while ((line = br.readLine()) != null) {
                 String[] p = line.split(";");
                 if (p.length > 3 && p[3].equals(token)) {
-                    User u = new User(p[0], p[1], p[3]);
+                    String pseudo = p.length > 4 ? p[4] : p[0].split("@")[0];
+                    User u = new User(p[0], p[1], pseudo, p[3]);
                     u.setConfirmed(Boolean.parseBoolean(p[2]));
                     return u;
                 }
@@ -70,15 +73,16 @@ public class FileUserRepository implements UserRepository {
                         line = user.getEmail() + ";" 
                              + user.getPassword() + ";" 
                              + user.isConfirmed() + ";" 
-                             + user.getConfirmationToken();
+                             + user.getConfirmationToken() + ";"
+                             + user.getPseudo();
                     }
                     lines.add(line);
                 }
             }
 
-            FileWriter fw = new FileWriter(file);
-            for (String l : lines) fw.write(l + "\n");
-            fw.close();
+            try (FileWriter fw = new FileWriter(file)) {
+                for (String l : lines) fw.write(l + "\n");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

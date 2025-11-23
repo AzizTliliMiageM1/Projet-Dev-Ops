@@ -1,6 +1,7 @@
 package com.projet.user;
 
 import java.util.UUID;
+
 import com.projet.email.EmailServiceImpl;
 
 public class UserServiceImpl implements UserService {
@@ -8,7 +9,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository repository = new FileUserRepository();
 
     @Override
-    public String register(String email, String password) {
+    public String register(String email, String password, String pseudo) {
 
         // Vérifie si l'email existe déjà
         if (repository.findByEmail(email) != null) {
@@ -19,7 +20,7 @@ public class UserServiceImpl implements UserService {
         String token = UUID.randomUUID().toString();
 
         // Création utilisateur
-        User user = new User(email, password, token);
+        User user = new User(email, password, pseudo, token);
         repository.save(user);
 
         // -------------------------------

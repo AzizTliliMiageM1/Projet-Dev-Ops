@@ -23,9 +23,21 @@ import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.put;
+import spark.Request;
 import static spark.Spark.staticFiles;
 
 public class ApiServer {
+
+    private static AbonnementRepository getOrCreateRepo(Request req) {
+        AbonnementRepository repo = req.attribute("userRepo");
+        if (repo == null) {
+            String user = req.session().attribute("user");
+            repo = user == null 
+                ? new FileAbonnementRepository("abonnements.txt")
+                : new com.projet.repository.UserAbonnementRepository(user);
+        }
+        return repo;
+    }
 
     public static void main(String[] args) {
 
@@ -81,14 +93,14 @@ public class ApiServer {
 
             get("/abonnements", (req, res) -> {
                 res.type("application/json");
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> list = repo.findAll();
                 return mapper.writeValueAsString(list);
             });
 
             get("/abonnements/:id", (req, res) -> {
                 res.type("application/json");
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
                 String pid = req.params(":id");
                 var opt = repo.findByUuid(pid);
                 if (opt.isEmpty()) {
@@ -111,7 +123,7 @@ public class ApiServer {
                     a.setId(java.util.UUID.randomUUID().toString());
                 }
 
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
                 repo.save(a);
                 res.status(201);
                 res.type("application/json");
@@ -120,7 +132,7 @@ public class ApiServer {
 
             post("/abonnements/import", (req, res) -> {
                 res.type("application/json");
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> arr = mapper.readValue(
                     req.body(),
                     new com.fasterxml.jackson.core.type.TypeReference<List<Abonnement>>() {}
@@ -159,7 +171,7 @@ public class ApiServer {
 
             put("/abonnements/:id", (req, res) -> {
                 String pid = req.params(":id");
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
 
                 Abonnement updated = mapper.readValue(req.body(), Abonnement.class);
                 var opt = repo.findByUuid(pid);
@@ -186,7 +198,7 @@ public class ApiServer {
 
             delete("/abonnements/:id", (req, res) -> {
                 String pid = req.params(":id");
-                AbonnementRepository repo = req.attribute("userRepo");
+                AbonnementRepository repo = getOrCreateRepo(req);
                 var opt = repo.findByUuid(pid);
                 if (opt.isEmpty()) {
                     res.status(404);
@@ -206,9 +218,13 @@ public class ApiServer {
 
                 String email = req.queryParams("email");
                 String password = req.queryParams("password");
+                String pseudo = req.queryParams("pseudo");
+                if (pseudo == null || pseudo.trim().isEmpty()) {
+                    pseudo = email.split("@")[0];
+                }
 
                 UserService service = new UserServiceImpl();
-                String token = service.register(email, password);
+                String token = service.register(email, password, pseudo);
 
                 if (token == null) {
                     res.status(400);
@@ -286,9 +302,22 @@ public class ApiServer {
             // 🔵  STATUS SESSION
             // =================================================
             get("/session", (req, res) -> {
-                String user = req.session().attribute("user");
-                if (user == null) return "Aucun utilisateur connecté";
-                return "Connecté : " + user;
+                res.type("application/json");
+                String email = req.session().attribute("user");
+                
+                if (email == null) {
+                    return "{\"authenticated\":false}";
+                }
+                
+                FileUserRepository userRepo = new FileUserRepository();
+                User user = userRepo.findByEmail(email);
+                
+                if (user == null) {
+                    return "{\"authenticated\":false}";
+                }
+                
+                return String.format("{\"authenticated\":true,\"email\":\"%s\",\"pseudo\":\"%s\"}", 
+                    email, user.getPseudo());
             });
 
 
