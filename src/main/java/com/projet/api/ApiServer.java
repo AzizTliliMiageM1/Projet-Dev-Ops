@@ -111,6 +111,13 @@ public class ApiServer {
             });
 
             post("/abonnements", (req, res) -> {
+                // Vérification : seuls les utilisateurs connectés peuvent ajouter
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté pour ajouter un abonnement\"}";
+                }
+                
                 Abonnement a = mapper.readValue(req.body(), Abonnement.class);
 
                 if (a.getNomService() == null || a.getNomService().isBlank()) { res.status(400); return "{\"error\":\"nomService manquant\"}"; }
@@ -131,6 +138,13 @@ public class ApiServer {
             });
 
             post("/abonnements/import", (req, res) -> {
+                // Vérification : seuls les utilisateurs connectés peuvent importer
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté pour importer des abonnements\"}";
+                }
+                
                 res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> arr = mapper.readValue(
@@ -170,6 +184,13 @@ public class ApiServer {
             });
 
             put("/abonnements/:id", (req, res) -> {
+                // Vérification : seuls les utilisateurs connectés peuvent modifier
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté pour modifier un abonnement\"}";
+                }
+                
                 String pid = req.params(":id");
                 AbonnementRepository repo = getOrCreateRepo(req);
 
@@ -197,6 +218,13 @@ public class ApiServer {
             });
 
             delete("/abonnements/:id", (req, res) -> {
+                // Vérification : seuls les utilisateurs connectés peuvent supprimer
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté pour supprimer un abonnement\"}";
+                }
+                
                 String pid = req.params(":id");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 var opt = repo.findByUuid(pid);

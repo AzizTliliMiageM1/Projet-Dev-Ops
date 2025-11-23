@@ -193,6 +193,9 @@ async function markAsUsed(index) {
     if (response.ok) {
       showFlash('Service marqué comme utilisé !', 'success');
       await loadAndRender();
+    } else if (response.status === 401) {
+      showFlash('Vous devez être connecté pour modifier un abonnement', 'error');
+      setTimeout(() => window.location.href = '/login.html', 2000);
     } else {
       showFlash('Erreur lors de la mise à jour', 'error');
     }
@@ -210,6 +213,9 @@ async function deleteAbonnement(index) {
     if (response.ok) {
       showFlash('Abonnement supprimé avec succès', 'success');
       await loadAndRender();
+    } else if (response.status === 401) {
+      showFlash('Vous devez être connecté pour supprimer un abonnement', 'error');
+      setTimeout(() => window.location.href = '/login.html', 2000);
     } else {
       showFlash('Erreur lors de la suppression', 'error');
     }
@@ -338,6 +344,11 @@ document.addEventListener('DOMContentLoaded', function() {
         showFlash(`Service ${payload.nomService} ajouté avec succès !`, 'success');
         document.getElementById('addForm').reset();
         await loadAndRender();
+      } else if (r.status === 401) {
+        showFlash('Vous devez être connecté pour ajouter un abonnement', 'error');
+        setTimeout(() => {
+          window.location.href = '/login.html';
+        }, 2000);
       } else {
         let msg = 'Erreur lors de la création';
         try { 

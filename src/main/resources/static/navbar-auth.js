@@ -5,14 +5,16 @@ async function checkSessionAndUpdateNavbar() {
         const data = await response.json();
         
         if (data.authenticated) {
-            // Trouve les boutons de connexion/inscription
-            const loginBtn = document.querySelector('a[href="login.html"]');
-            const registerBtn = document.querySelector('a[href="register.html"]');
+            // Trouve les boutons de connexion/inscription (avec ou sans /)
+            const loginBtn = document.querySelector('a[href="/login.html"], a[href="login.html"]');
+            const registerBtn = document.querySelector('a[href="/register.html"], a[href="register.html"]');
             
             if (loginBtn) {
                 loginBtn.innerHTML = `<i class="bi bi-person-circle"></i> ${data.pseudo}`;
                 loginBtn.href = '#';
                 loginBtn.style.pointerEvents = 'none';
+                loginBtn.style.background = 'rgba(16, 185, 129, 0.2)';
+                loginBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
             }
             
             if (registerBtn) {
@@ -21,7 +23,7 @@ async function checkSessionAndUpdateNavbar() {
                 registerBtn.onclick = async (e) => {
                     e.preventDefault();
                     await fetch('/api/logout', { method: 'POST' });
-                    window.location.reload();
+                    window.location.href = '/home.html';
                 };
             }
         }
