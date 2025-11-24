@@ -269,6 +269,6 @@ Ce projet est une excellente démonstration des compétences en programmation Ja
 
 ## À propos du build GitHub (CI)
 
-Si tu as vu une erreur du type `Tests run: 5, Failures: 1` sur GitHub Actions (échec sur `ApiServerIntegrationTest` avec `expected 201 but was 400`), c'était dû à la désérialisation JSON : la classe `Abonnement` n'avait pas de constructeur sans-argument, donc Jackson renvoyait 400 lors du POST dans le test d'intégration. J'ai ajouté un constructeur sans-argument et committé le fix; les tests passent maintenant localement et dans les runs récents.
+En cas d'erreur du type `Tests run: 5, Failures: 1` sur GitHub Actions (échec sur `ApiServerIntegrationTest` avec `expected 201 but was 400`), cela peut être dû à la désérialisation JSON : la classe `Abonnement` nécessite un constructeur sans argument pour que Jackson puisse correctement traiter les requêtes POST.
 
-Si l'action GitHub continue de montrer l'erreur, vérifie que le workflow GitHub a bien été déclenché après le commit de correction (push sur `main`) et que la cache n'empêche pas le nouvel artefact. Je peux aussi mettre à jour le workflow pour afficher les rapports de tests détaillés.
+Pour résoudre ce problème, vérifier que le workflow GitHub a bien été déclenché après les corrections et que le cache n'empêche pas la prise en compte des nouveaux artefacts.
