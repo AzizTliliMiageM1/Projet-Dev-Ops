@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Contactez-nous - GestionPro" />
+    <title>Contact - GestionPro</title>
+
+    <!-- Bootstrap + Inter + Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        /* Variables CSS GestionPro */
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #64748b;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-glass: rgba(255, 255, 255, 0.1);
+            --bg-glass-dark: rgba(255, 255, 255, 0.05);
+            --border-glass: rgba(255, 255, 255, 0.2);
+            
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --text-dark: #1f2937;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            --radius: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            background: var(--bg-primary);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .animate-fade-up { animation: fadeInUp 0.8s ease-out; }
+        .animate-slide-right { animation: slideInRight 0.8s ease-out 0.2s both; }
+
+        /* Glass Effect */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            color: var(--text-primary) !important;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: var(--radius) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary) !important;
+            background: var(--bg-glass) !important;
+        }
+
+        /* Hero Section */
+        .hero-contact {
+            padding: 8rem 0 4rem;
+            text-align: center;
+        }
+
+        .hero-contact h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Contact Cards */
+        .contact-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .contact-card .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .contact-card h3 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+
+        /* Form Styles */
+        .contact-form {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-xl);
+            padding: 3rem;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .form-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            padding: 0.875rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 0.25rem rgba(245, 158, 11, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-secondary);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--accent), #ea580c);
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            font-size: 1.1rem;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: #ffffff;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid var(--border-glass);
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-outline-custom:hover {
+            background: var(--bg-glass);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Map Section */
+        .map-container {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            height: 400px;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: grayscale(20%) brightness(0.9);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            margin-top: 5rem;
+        }
+
+        /* Success Message */
+        .alert-success-custom {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            padding: 1rem;
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-contact h1 {
+                font-size: 2.5rem;
+            }
+
+            .contact-form {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/home.html">
+                <div class="me-3 p-2 rounded-3" style="background: linear-gradient(135deg, var(--accent), #ea580c);">
+                    <i class="bi bi-briefcase text-white fs-5"></i>
+                </div>
+                <span>GestionPro</span>
+            </a>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto me-4">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/home.html">
+                            <i class="bi bi-house me-2"></i>Accueil
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/index.html">
+                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api.html">
+                            <i class="bi bi-code-slash me-2"></i>API
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/contact.html">
+                            <i class="bi bi-envelope me-2"></i>Contact
+                        </a>
+                    </li>
+                </ul>
+                <a href="/login.html" class="btn-outline-custom">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Connexion
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-contact">
+        <div class="container">
+            <div class="animate-fade-up">
+                <h1>Contactez-nous</h1>
+                <p class="lead" style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+                    Une question ? Un projet ? Notre équipe est là pour vous accompagner.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Info Cards -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-md-4 animate-fade-up">
+                    <div class="contact-card">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-geo-alt-fill text-white"></i>
+                        </div>
+                        <h3>Adresse</h3>
+                        <p>200 Avenue de la République<br>92000 Nanterre, France</p>
+                    </div>
+                </div>
+                <div class="col-md-4 animate-fade-up" style="animation-delay: 0.1s;">
+                    <div class="contact-card">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-envelope-fill text-white"></i>
+                        </div>
+                        <h3>Email</h3>
+                        <p>contact@gestionpro.fr<br>support@gestionpro.fr</p>
+                    </div>
+                </div>
+                <div class="col-md-4 animate-fade-up" style="animation-delay: 0.2s;">
+                    <div class="contact-card">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-telephone-fill text-white"></i>
+                        </div>
+                        <h3>Téléphone</h3>
+                        <p>+33 1 40 97 72 00<br>Lun - Ven : 9h - 18h</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="contact-form animate-fade-up">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold">Envoyez-nous un message</h2>
+                            <p style="color: var(--text-secondary);">Nous vous répondrons dans les plus brefs délais</p>
+                        </div>
+
+                        <div id="successMessage" class="alert-success-custom mb-4">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Votre message a été envoyé avec succès ! Nous vous répondrons rapidement.
+                        </div>
+
+                        <form id="contactForm">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">Prénom *</label>
+                                    <input type="text" class="form-control" id="firstName" placeholder="Jean" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Nom *</label>
+                                    <input type="text" class="form-control" id="lastName" placeholder="Dupont" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="email" placeholder="jean.dupont@exemple.fr" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Téléphone</label>
+                                    <input type="tel" class="form-control" id="phone" placeholder="+33 6 12 34 56 78">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="company" class="form-label">Entreprise</label>
+                                <input type="text" class="form-control" id="company" placeholder="Nom de votre entreprise">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="subject" class="form-label">Sujet *</label>
+                                <select class="form-select" id="subject" required>
+                                    <option value="">Sélectionnez un sujet</option>
+                                    <option value="demo">Demande de démonstration</option>
+                                    <option value="pricing">Informations tarifaires</option>
+                                    <option value="support">Support technique</option>
+                                    <option value="partnership">Partenariat</option>
+                                    <option value="other">Autre</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="message" class="form-label">Message *</label>
+                                <textarea class="form-control" id="message" rows="5" placeholder="Décrivez votre demande..." required></textarea>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn-primary-custom">
+                                    <i class="bi bi-send-fill"></i>
+                                    Envoyer le message
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map Section -->
+            <div class="row mt-5">
+                <div class="col-12 animate-fade-up">
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.2919184368774!2d2.2156399!3d48.8964562!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e665e0e9d9e00f%3A0x7c8c8e0f1b9e8b8e!2s200%20Avenue%20de%20la%20R%C3%A9publique%2C%2092000%20Nanterre!5e0!3m2!1sfr!2sfr!4v1234567890123"
+                            allowfullscreen="" 
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="p-2 rounded-3" style="background: linear-gradient(135deg, var(--accent), #ea580c);">
+                            <i class="bi bi-briefcase text-white fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-white">GestionPro</div>
+                            <small>Gestion d'abonnements professionnelle</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <small>© 2024 GestionPro — Tous droits réservés.</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form Submission
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            
+            // Scroll to success message
+            successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Reset form
+            this.reset();
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
