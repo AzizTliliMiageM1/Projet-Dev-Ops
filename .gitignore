@@ -1,0 +1,20 @@
+# Fichiers Java compilés
+*.class
+*.jar
+*.war
+
+# Répertoires build
+target/
+build/
+.gradle/
+out/
+
+# IDE
+*.idea/
+*.iml
+.vscode/
+
+# OS / fichiers temporaires
+.DS_Store
+*.log
+*.tmp

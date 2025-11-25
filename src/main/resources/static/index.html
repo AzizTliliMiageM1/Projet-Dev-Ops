@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - Gestion d'abonnements</title>
+  
+  <!-- Bootstrap & Fonts & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/dashboard.css" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand" href="/index.html">
+        <i class="bi bi-layers"></i>
+        Dashboard Pro
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link active" href="/index.html">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/stats.html">
+              <i class="bi bi-graph-up me-1"></i> Analytics
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/help.html">
+              <i class="bi bi-question-circle me-1"></i> Support
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/home.html">
+              <i class="bi bi-house me-1"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/login.html">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/register.html" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 8px 16px;">
+              <i class="bi bi-person-plus me-1"></i> S'inscrire
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container-fluid px-4 py-4">
+    <!-- Dashboard KPI -->
+    <section class="dashboard-section mb-4 animate-fade-up">
+      <div class="dashboard-grid" id="dashboard">
+        <!-- Métriques injectées par JavaScript -->
+      </div>
+    </section>
+
+    <!-- Search & Filters -->
+    <section class="search-section animate-slide-in">
+      <div class="search-container">
+        <h2 class="search-title">
+          <i class="bi bi-search"></i>
+          Recherche & Filtres
+        </h2>
+        
+        <div class="row g-3">
+          <div class="col-md-5">
+            <label class="form-label-modern">
+              <i class="bi bi-search me-2"></i>Recherche globale
+            </label>
+            <input 
+              type="text" 
+              id="searchInput" 
+              class="form-control form-control-modern" 
+              placeholder="Rechercher par client, service, catégorie...">
+          </div>
+          
+          <div class="col-md-2">
+            <label class="form-label-modern">
+              <i class="bi bi-funnel me-2"></i>Statut
+            </label>
+            <select id="statusFilter" class="form-control form-control-modern">
+              <option value="">Tous</option>
+              <option value="actif">Actifs</option>
+              <option value="expire">Expirés</option>
+              <option value="bientot-expire">Expire bientôt</option>
+            </select>
+          </div>
+          
+          <div class="col-md-3">
+            <label class="form-label-modern">
+              <i class="bi bi-sort-down me-2"></i>Trier par
+            </label>
+            <select id="sortSelect" class="form-control form-control-modern">
+              <option value="date-desc">Plus récent</option>
+              <option value="date-asc">Plus ancien</option>
+              <option value="client-asc">Client A-Z</option>
+              <option value="client-desc">Client Z-A</option>
+              <option value="prix-desc">Prix décroissant</option>
+              <option value="prix-asc">Prix croissant</option>
+            </select>
+          </div>
+          
+          <div class="col-md-2">
+            <label class="form-label-modern" style="opacity: 0;">.</label>
+            <button id="alertesBtn" class="btn btn-warning w-100">
+              <i class="bi bi-bell me-1"></i> Alertes
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Flash Messages -->
+    <div id="flash"></div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+      <!-- Subscriptions Grid -->
+      <div class="col-lg-8">
+        <div class="subscriptions-grid" id="cards">
+          <!-- État vide -->
+          <div class="empty-state glass-card" data-empty-hint>
+            <div class="empty-icon">
+              <i class="bi bi-inbox"></i>
+            </div>
+            <h3 class="empty-title">Aucun abonnement</h3>
+            <p class="empty-text">
+              Commencez par ajouter votre premier service via le panneau à droite
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel -->
+      <div class="col-lg-4">
+        <div class="action-panel">
+          <!-- Formulaire d'ajout -->
+          <div class="mb-4">
+            <h3 class="panel-title">
+              <i class="bi bi-plus-circle"></i>
+              Nouveau Service
+            </h3>
+            
+            <form id="addForm">
+              <div class="mb-3">
+                <label class="form-label-modern">
+                  <i class="bi bi-person me-1"></i>Client
+                </label>
+                <input 
+                  id="nomClient" 
+                  class="form-control form-control-modern" 
+                  placeholder="Nom du client" 
+                  required />
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label-modern">
+                  <i class="bi bi-star me-1"></i>Service
+                </label>
+                <input 
+                  id="nomService" 
+                  class="form-control form-control-modern" 
+                  placeholder="Ex: Netflix, Spotify..." 
+                  required />
+              </div>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label class="form-label-modern">
+                    <i class="bi bi-calendar-check me-1"></i>Début
+                  </label>
+                  <input 
+                    id="dateDebut" 
+                    type="date" 
+                    class="form-control form-control-modern" 
+                    required />
+                </div>
+                <div class="col-6">
+                  <label class="form-label-modern">
+                    <i class="bi bi-calendar-x me-1"></i>Fin
+                  </label>
+                  <input 
+                    id="dateFin" 
+                    type="date" 
+                    class="form-control form-control-modern" 
+                    required />
+                </div>
+              </div>
+              
+              <div class="row g-3 mb-3">
+                <div class="col-6">
+                  <label class="form-label-modern">
+                    <i class="bi bi-tag me-1"></i>Catégorie
+                  </label>
+                  <input 
+                    id="categorie" 
+                    class="form-control form-control-modern" 
+                    placeholder="Streaming, Cloud..." />
+                </div>
+                <div class="col-6">
+                  <label class="form-label-modern">
+                    <i class="bi bi-currency-euro me-1"></i>Prix mensuel
+                  </label>
+                  <input 
+                    id="prixMensuel" 
+                    type="number" 
+                    min="0" 
+                    step="0.01" 
+                    class="form-control form-control-modern" 
+                    placeholder="0.00" />
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-plus-lg me-2"></i>Ajouter le service
+              </button>
+            </form>
+          </div>
+
+          <!-- Actions rapides -->
+          <div>
+            <h4 class="panel-title">
+              <i class="bi bi-lightning-charge"></i>
+              Actions Rapides
+            </h4>
+            
+            <div class="d-grid gap-2">
+              <button id="refreshBtn" class="btn btn-glass">
+                <i class="bi bi-arrow-clockwise me-2"></i>Actualiser
+              </button>
+              
+              <label class="btn btn-glass" for="importFile">
+                <i class="bi bi-upload me-2"></i>Importer JSON
+              </label>
+              <input type="file" id="importFile" style="display: none;" accept=".json">
+              
+              <button id="exportBtn" class="btn btn-glass">
+                <i class="bi bi-download me-2"></i>Exporter données
+              </button>
+              
+              <button id="clearAllBtn" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Tout supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal d'édition -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil-square me-2"></i>
+            Modifier l'abonnement
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <input type="hidden" id="editIndex" />
+            
+            <div class="mb-3">
+              <label class="form-label-modern">Client</label>
+              <input id="editClient" class="form-control form-control-modern" required />
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label-modern">Service</label>
+              <input id="editService" class="form-control form-control-modern" required />
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label-modern">Début</label>
+                <input id="editDebut" type="date" class="form-control form-control-modern" required />
+              </div>
+              <div class="col-6">
+                <label class="form-label-modern">Fin</label>
+                <input id="editFin" type="date" class="form-control form-control-modern" required />
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label class="form-label-modern">Catégorie</label>
+                <input id="editCategorie" class="form-control form-control-modern" />
+              </div>
+              <div class="col-6">
+                <label class="form-label-modern">Prix (€)</label>
+                <input id="editPrix" type="number" min="0" step="0.01" class="form-control form-control-modern" />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-glass" data-bs-dismiss="modal">Annuler</button>
+          <button id="saveEditBtn" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/app.js"></script>
+  
+  <!-- Auth navbar -->
+  <script src="/navbar-auth.js"></script>
+  
+  <!-- Chatbot Widget -->
+  <script src="/chatbot.js"></script>
+  <style>
+    .chatbot-trigger {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      z-index: 1000;
+      border: 3px solid white;
+    }
+    .chatbot-trigger:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.6);
+    }
+    .chatbot-trigger i {
+      font-size: 2rem;
+      color: white;
+    }
+  </style>
+  
+  <!-- Chatbot Widget -->
+  <link href="/chatbot-styles.css" rel="stylesheet">
+  <script src="/chatbot.js"></script>
+  <script src="/chatbot-init.js"></script>
+</body>
+</html>
