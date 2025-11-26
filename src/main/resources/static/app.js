@@ -398,107 +398,208 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  /* ---------- actions rapides ---------- */
-  document.getElementById('refreshBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('refreshBtn');
-    const original = btn.innerHTML;
-    btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite;"></i> Sync';
-    await loadAndRender();
-    setTimeout(() => {
-      btn.innerHTML = original;
-    }, 1000);
-  });
+    /* ---------- actions rapides ---------- */
 
-  document.getElementById('exportBtn').addEventListener('click', async () => {
-    const data = await fetchAll();
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `abonnements_export_${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showFlash('Export terminé !', 'success');
-  });
-
-  document.getElementById('clearAllBtn').addEventListener('click', async () => {
-    if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUS les abonnements ?\n\nCette action est irréversible !')) return;
-    
-    try {
-      const abonnements = await fetchAll();
-      for (let i = abonnements.length - 1; i >= 0; i--) {
-        await fetch(`${apiBase}/${i}`, { method: 'DELETE' });
-      }
-      showFlash('Tous les abonnements ont été supprimés', 'success');
+  // 🔁 Actualiser
+  const refreshBtn = document.getElementById('refreshBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      const original = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite;"></i> Sync';
       await loadAndRender();
-    } catch (error) {
-      showFlash('Erreur lors de la suppression', 'error');
-    }
-  });
+      setTimeout(() => {
+        refreshBtn.innerHTML = original;
+      }, 1000);
+    });
+  }
 
-  document.getElementById('importFile').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    try {
-      const text = await file.text();
-      const data = JSON.parse(text);
-      
-      if (Array.isArray(data)) {
-        for (const item of data) {
-          await fetch(apiBase, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(item)
-          });
-        }
-        showFlash(`${data.length} abonnements importés avec succès !`, 'success');
-        await loadAndRender();
-      } else {
-        showFlash('Format de fichier invalide', 'error');
-      }
-    } catch (error) {
-      showFlash('Erreur lors de l\'import: ' + error.message, 'error');
-    }
-    e.target.value = '';
-  });
+  // 📤 Export JSON (via menu Export)
+  const exportJsonLink = document.getElementById('exportJson');
+  if (exportJsonLink) {
+    exportJsonLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const data = await fetchAll();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `abonnements_export_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showFlash('Export JSON terminé !', 'success');
+    });
+  }
 
-  document.getElementById('alertesBtn').addEventListener('click', async () => {
-    const abonnements = await fetchAll();
-    const alertes = [];
-    
-    abonnements.forEach((abo, index) => {
-      if (isActive(abo)) {
-        const now = new Date();
-        const dateFin = new Date(abo.dateFin);
-        const joursRestants = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
-        
-        if (joursRestants <= 7) {
-          alertes.push(`${abo.nomService} (${abo.clientName}) expire dans ${joursRestants} jour(s)`);
+  // 📤 Export CSV (via menu Export)
+  const exportCsvLink = document.getElementById('exportCsv');
+  if (exportCsvLink) {
+    exportCsvLink.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const resp = await fetch('/api/abonnements/export/csv');
+        if (!resp.ok) {
+          showFlash('Erreur export CSV : ' + resp.status, 'error');
+          return;
         }
-        
-        if (abo.derniereUtilisation) {
-          const dernierUtilisation = new Date(abo.derniereUtilisation);
-          const joursInactivite = Math.ceil((now - dernierUtilisation) / (1000 * 60 * 60 * 24));
-          
-          if (joursInactivite > 30) {
-            alertes.push(`${abo.nomService} (${abo.clientName}) non utilisé depuis ${joursInactivite} jours`);
-          }
-        }
+
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'abonnements.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        showFlash('Export CSV terminé !', 'success');
+      } catch (err) {
+        console.error(err);
+        showFlash('Erreur lors de l’export CSV', 'error');
       }
     });
-    
-    if (alertes.length > 0) {
-      alert('🚨 ALERTES DÉTECTÉES 🚨\n\n' + alertes.join('\n\n'));
-    } else {
-      showFlash('✅ Aucune alerte détectée !', 'success');
-    }
-  });
+  }
+
+  // 📥 Import JSON
+  const importFileInput = document.getElementById('importFile');
+  if (importFileInput) {
+    importFileInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (Array.isArray(data)) {
+          for (const item of data) {
+            await fetch(apiBase, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(item)
+            });
+          }
+          showFlash(`${data.length} abonnements importés avec succès !`, 'success');
+          await loadAndRender();
+        } else {
+          showFlash('Format de fichier invalide', 'error');
+        }
+      } catch (error) {
+        showFlash('Erreur lors de l\'import: ' + error.message, 'error');
+      }
+      e.target.value = '';
+    });
+  }
+
+  // 📥 Import CSV
+  const inputCsv = document.getElementById('inputImportCsv');
+  if (inputCsv) {
+    inputCsv.addEventListener('change', () => {
+      const file = inputCsv.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        const csvContent = evt.target.result;
+
+        try {
+          const resp = await fetch('/api/abonnements/import/csv', {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            body: csvContent
+          });
+
+          if (resp.status === 401) {
+            showFlash('Vous devez être connecté pour importer un CSV.', 'error');
+            return;
+          }
+
+          if (!resp.ok) {
+            const txt = await resp.text();
+            showFlash('Erreur import CSV (' + resp.status + ') ' + txt, 'error');
+            return;
+          }
+
+          const result = await resp.json();
+          showFlash(`Import CSV terminé : ${result.imported} ajoutés, ${result.errors.length} erreurs`, 'success');
+
+          await loadAndRender();
+
+        } catch (err) {
+          console.error(err);
+          showFlash('Erreur import CSV', 'error');
+        } finally {
+          inputCsv.value = "";
+        }
+      };
+
+      reader.readAsText(file, 'utf-8');
+    });
+  }
+
+  // 🗑️ Tout supprimer
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  if (clearAllBtn) {
+    clearAllBtn.addEventListener('click', async () => {
+      if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer TOUS les abonnements ?\n\nCette action est irréversible !')) return;
+
+      try {
+        const abonnements = await fetchAll();
+        for (let i = abonnements.length - 1; i >= 0; i--) {
+          await fetch(`${apiBase}/${i}`, { method: 'DELETE' });
+        }
+        showFlash('Tous les abonnements ont été supprimés', 'success');
+        await loadAndRender();
+      } catch (error) {
+        showFlash('Erreur lors de la suppression', 'error');
+      }
+    });
+  }
+
+  // 🚨 Bouton alertes
+  const alertesBtn = document.getElementById('alertesBtn');
+  if (alertesBtn) {
+    alertesBtn.addEventListener('click', async () => {
+      const abonnements = await fetchAll();
+      const alertes = [];
+      
+      abonnements.forEach((abo, index) => {
+        if (isActive(abo)) {
+          const now = new Date();
+          const dateFin = new Date(abo.dateFin);
+          const joursRestants = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
+          
+          if (joursRestants <= 7) {
+            alertes.push(`${abo.nomService} (${abo.clientName}) expire dans ${joursRestants} jour(s)`);
+          }
+          
+          if (abo.derniereUtilisation) {
+            const dernierUtilisation = new Date(abo.derniereUtilisation);
+            const joursInactivite = Math.ceil((now - dernierUtilisation) / (1000 * 60 * 60 * 24));
+            
+            if (joursInactivite > 30) {
+              alertes.push(`${abo.nomService} (${abo.clientName}) non utilisé depuis ${joursInactivite} jours`);
+            }
+          }
+        }
+      });
+      
+      if (alertes.length > 0) {
+        alert('🚨 ALERTES DÉTECTÉES 🚨\n\n' + alertes.join('\n\n'));
+      } else {
+        showFlash('✅ Aucune alerte détectée !', 'success');
+      }
+    });
+  }
 
   /* ---------- filtres en temps réel ---------- */
-  document.getElementById('searchInput').addEventListener('input', loadAndRender);
-  document.getElementById('statusFilter').addEventListener('change', loadAndRender);
-  document.getElementById('sortSelect').addEventListener('change', loadAndRender);
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.addEventListener('input', loadAndRender);
+
+  const statusFilter = document.getElementById('statusFilter');
+  if (statusFilter) statusFilter.addEventListener('change', loadAndRender);
+
+  const sortSelect = document.getElementById('sortSelect');
+  if (sortSelect) sortSelect.addEventListener('change', loadAndRender);
 
   // CSS pour l'animation de rotation
   const style = document.createElement('style');

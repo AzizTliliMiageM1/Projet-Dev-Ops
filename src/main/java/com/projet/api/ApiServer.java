@@ -1,5 +1,7 @@
 package com.projet.api;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -237,6 +239,105 @@ public class ApiServer {
                 return "";
             });
 
+                        // =================================================
+            // 🔵  EXPORT CSV DES ABONNEMENTS
+            // =================================================
+            get("/abonnements/export/csv", (req, res) -> {
+
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> list = repo.findAll();
+
+                res.type("text/csv; charset=utf-8");
+                res.header("Content-Disposition", "attachment; filename=\"abonnements.csv\"");
+
+                StringBuilder csv = new StringBuilder();
+                csv.append("id;nomService;dateDebut;dateFin;prixMensuel;clientName;derniereUtilisation;categorie\n");
+
+                for (Abonnement a : list) {
+                    csv.append(safeCsv(a.getId())).append(";")
+                       .append(a.getNomService()).append(";")
+                       .append(a.getDateDebut()).append(";")
+                       .append(a.getDateFin()).append(";")
+                       .append(a.getPrixMensuel()).append(";")
+                       .append(a.getClientName()).append(";")
+                       .append(a.getDerniereUtilisation()).append(";")
+                       .append(a.getCategorie())
+                       .append("\n");
+                }
+
+                return csv.toString();
+            });
+
+                        // =================================================
+            // 🔵  IMPORT CSV DES ABONNEMENTS
+            // =================================================
+            post("/abonnements/import/csv", (req, res) -> {
+
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté pour importer (CSV)\"}";
+                }
+
+                String body = req.body();
+                if (body == null || body.isBlank()) {
+                    res.status(400);
+                    return "{\"error\":\"CSV vide\"}";
+                }
+
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> existing = repo.findAll();
+
+                String[] lignes = body.split("\\R");
+                int imported = 0;
+                List<String> errors = new ArrayList<>();
+
+                for (int i = 1; i < lignes.length; i++) {
+                    String line = lignes[i].trim();
+                    if (line.isEmpty()) continue;
+
+                    String[] p = line.split(";");
+                    if (p.length < 8) {
+                        errors.add("Ligne " + i + " invalide (colonnes manquantes)");
+                        continue;
+                    }
+
+                    try {
+                        Abonnement a = new Abonnement(
+                            p[1],                                 // nomService
+                            LocalDate.parse(p[2]),                // dateDebut
+                            LocalDate.parse(p[3]),                // dateFin
+                            Double.parseDouble(p[4]),             // prixMensuel
+                            p[5],                                 // clientName
+                            LocalDate.parse(p[6]),                // derniereUtilisation
+                            p[7]                                  // categorie
+                        );
+
+                        if (p[0] == null || p[0].isBlank()) {
+                            a.setId(java.util.UUID.randomUUID().toString());
+                        } else {
+                            a.setId(p[0]);
+                        }
+
+                        existing.add(a);
+                        imported++;
+
+                    } catch (Exception e) {
+                        errors.add("Erreur ligne " + i + " : " + e.getMessage());
+                    }
+                }
+
+                repo.saveAll(existing);
+
+                res.status(201);
+                res.type("application/json");
+                return mapper.writeValueAsString(
+                    Map.of("imported", imported, "errors", errors)
+                );
+            });
+
+            
+
 
             // =================================================
             //     🔵  INSCRIPTION UTILISATEUR
@@ -364,4 +465,10 @@ public class ApiServer {
 
         System.out.println("API server démarré sur http://localhost:" + httpPort);
     }
+
+        private static String safeCsv(String s) {
+    if (s == null) return "";
+    return s.replace(";", ",");
+}
+
 }
