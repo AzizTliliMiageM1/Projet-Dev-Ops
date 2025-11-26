@@ -35,7 +35,7 @@ public class ApiServer {
     private static AbonnementRepository getOrCreateRepo(Request req) {
         AbonnementRepository repo = req.attribute("userRepo");
         if (repo == null) {
-            String user = req.session().attribute("user");
+            String user = req.session().attribute("user_email");
             repo = user == null 
                 ? new FileAbonnementRepository("abonnements.txt")
                 : new com.projet.repository.UserAbonnementRepository(user);
@@ -77,7 +77,7 @@ public class ApiServer {
             // 🔒 PROTECTION : Routes abonnements - créer repo par utilisateur
             // =================================================
             before("/abonnements*", (req, res) -> {
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 
                 AbonnementRepository userRepo;
                 if (user == null) {
@@ -116,7 +116,7 @@ public class ApiServer {
 
             post("/abonnements", (req, res) -> {
                 // Vérification : seuls les utilisateurs connectés peuvent ajouter
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté pour ajouter un abonnement\"}";
@@ -143,7 +143,7 @@ public class ApiServer {
 
             post("/abonnements/import", (req, res) -> {
                 // Vérification : seuls les utilisateurs connectés peuvent importer
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté pour importer des abonnements\"}";
@@ -189,7 +189,7 @@ public class ApiServer {
 
             put("/abonnements/:id", (req, res) -> {
                 // Vérification : seuls les utilisateurs connectés peuvent modifier
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté pour modifier un abonnement\"}";
@@ -223,7 +223,7 @@ public class ApiServer {
 
             delete("/abonnements/:id", (req, res) -> {
                 // Vérification : seuls les utilisateurs connectés peuvent supprimer
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté pour supprimer un abonnement\"}";
@@ -275,7 +275,7 @@ public class ApiServer {
             // =================================================
             post("/abonnements/import/csv", (req, res) -> {
 
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté pour importer (CSV)\"}";
@@ -416,7 +416,7 @@ public class ApiServer {
             // 🔵  ANALYTICS - DÉTECTION ANOMALIES
             // =================================================
             get("/analytics/anomalies", (req, res) -> {
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
@@ -448,7 +448,7 @@ public class ApiServer {
             // 🔵  ANALYTICS - DOUBLONS
             // =================================================
             get("/analytics/duplicates", (req, res) -> {
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
@@ -468,7 +468,7 @@ public class ApiServer {
             // 🔵  ANALYTICS - RAPPORT MENSUEL
             // =================================================
             get("/analytics/monthly-report", (req, res) -> {
-                String user = req.session().attribute("user");
+                String user = req.session().attribute("user_email");
                 if (user == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
@@ -485,7 +485,7 @@ public class ApiServer {
             });
 
             // Endpoint: Clustering des abonnements
-            get("/api/analytics/clusters", (req, res) -> {
+            get("/analytics/clusters", (req, res) -> {
                 String email = req.session().attribute("user_email");
                 if (email == null) {
                     res.status(401);
@@ -502,7 +502,7 @@ public class ApiServer {
             });
 
             // Endpoint: Prédiction des dépenses
-            get("/api/analytics/predict-spending", (req, res) -> {
+            get("/analytics/predict-spending", (req, res) -> {
                 String email = req.session().attribute("user_email");
                 if (email == null) {
                     res.status(401);
@@ -519,7 +519,7 @@ public class ApiServer {
             });
 
             // Endpoint: Détection patterns saisonniers
-            get("/api/analytics/seasonal-patterns", (req, res) -> {
+            get("/analytics/seasonal-patterns", (req, res) -> {
                 String email = req.session().attribute("user_email");
                 if (email == null) {
                     res.status(401);
@@ -536,7 +536,7 @@ public class ApiServer {
             });
 
             // Endpoint: Score santé du portefeuille
-            get("/api/analytics/portfolio-health", (req, res) -> {
+            get("/analytics/portfolio-health", (req, res) -> {
                 String email = req.session().attribute("user_email");
                 if (email == null) {
                     res.status(401);
@@ -550,6 +550,36 @@ public class ApiServer {
                 int healthScore = SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
                 
                 return "{\"healthScore\": " + healthScore + "}";
+            });
+
+            // =================================================
+            // 🔵  STATUS SESSION (pour navbar)
+            // =================================================
+            get("/session", (req, res) -> {
+                res.type("application/json");
+                String email = req.session().attribute("user_email");
+                
+                if (email == null) {
+                    return "{\"authenticated\":false}";
+                }
+                
+                FileUserRepository userRepo = new FileUserRepository();
+                User user = userRepo.findByEmail(email);
+                
+                if (user == null) {
+                    return "{\"authenticated\":false}";
+                }
+                
+                return String.format("{\"authenticated\":true,\"email\":\"%s\",\"pseudo\":\"%s\"}", 
+                    email, user.getPseudo());
+            });
+
+            // =================================================
+            // 🔵  LOGOUT (pour navbar)
+            // =================================================
+            post("/logout", (req, res) -> {
+                req.session().invalidate();
+                return "Déconnecté.";
             });
 
 
@@ -628,7 +658,7 @@ public class ApiServer {
                     return "Veuillez confirmer votre compte avant de vous connecter.";
                 }
 
-                req.session(true).attribute("user", email);
+                req.session(true).attribute("user_email", email);
 
                 return "Connexion réussie !";
             });
@@ -646,7 +676,7 @@ public class ApiServer {
             // =================================================
             get("/session", (req, res) -> {
                 res.type("application/json");
-                String email = req.session().attribute("user");
+                String email = req.session().attribute("user_email");
                 
                 if (email == null) {
                     return "{\"authenticated\":false}";

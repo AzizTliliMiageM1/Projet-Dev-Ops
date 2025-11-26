@@ -280,12 +280,6 @@
         // Charger toutes les analytics
         async function loadAnalytics() {
             try {
-                // Vérifier la connexion d'abord
-                const userCheck = await fetch('/api/user/current');
-                if (userCheck.status === 401 || userCheck.status === 404) {
-                    throw new Error('Non connecté');
-                }
-
                 // Charger données en parallèle
                 const [optimize, forecast, metrics, anomalies, duplicates, monthlyReport, clusters, predictions, patterns, portfolioHealth] = await Promise.all([
                     fetch('/api/analytics/optimize').then(r => {
