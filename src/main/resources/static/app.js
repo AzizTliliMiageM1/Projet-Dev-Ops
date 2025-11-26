@@ -1,5 +1,31 @@
 const apiBase = '/api/abonnements';
 
+// 🔆 / 🌙 Thème clair / sombre
+const THEME_KEY = 'dashboard_theme';
+
+function applyTheme() {
+  const theme = localStorage.getItem(THEME_KEY) || 'light';
+  
+  if (theme === 'dark') {
+    document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
+  }
+
+  // Met à jour l'icône du bouton
+  const btn = document.getElementById('toggleTheme');
+  if (btn) {
+    if (theme === 'dark') {
+      btn.innerHTML = '<i class="bi bi-sun"></i>';
+      btn.setAttribute('title', 'Passer en mode clair');
+    } else {
+      btn.innerHTML = '<i class="bi bi-moon-stars"></i>';
+      btn.setAttribute('title', 'Passer en mode sombre');
+    }
+  }
+}
+
+
 // 🔹 Gestion des FAVORIS (localStorage)
 const FAVORITES_KEY = 'abonnements_favoris';
 
@@ -417,6 +443,20 @@ const load = loadAndRender;
 
 /* ---------- ajout ---------- */
 document.addEventListener('DOMContentLoaded', function() {
+    // Appliquer le thème sauvegardé au chargement
+  applyTheme();
+
+  // Gestion du bouton de thème
+  const toggleBtn = document.getElementById('toggleTheme');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const current = localStorage.getItem(THEME_KEY) || 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme();
+    });
+  }
+
   document.getElementById('addForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
