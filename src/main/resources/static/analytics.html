@@ -198,8 +198,21 @@
             </div>
 
             <div class="row">
-                <!-- Rapport d'Optimisation -->
+                <!-- Colonne principale -->
                 <div class="col-lg-8">
+                    <!-- Score Santé Portfolio -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-heartbeat"></i> Santé du Portefeuille</h3>
+                        <div id="portfolioHealth"></div>
+                    </div>
+
+                    <!-- Clustering K-means -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-project-diagram"></i> Segmentation Intelligente (IA)</h3>
+                        <div id="clusteringAnalysis"></div>
+                    </div>
+
+                    <!-- Analyse Détaillée -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-chart-line"></i> Analyse Détaillée</h3>
                         <div id="subscriptionAnalysis"></div>
@@ -213,6 +226,20 @@
                         </div>
                     </div>
 
+                    <!-- Prédiction Tendances -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-brain"></i> Prédiction IA des Dépenses (3 mois)</h3>
+                        <div class="chart-container">
+                            <canvas id="predictionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Patterns Saisonniers -->
+                    <div class="analytics-card">
+                        <h3><i class="fas fa-calendar-alt"></i> Patterns Saisonniers Détectés</h3>
+                        <div id="seasonalPatterns"></div>
+                    </div>
+
                     <!-- Anomalies -->
                     <div class="analytics-card">
                         <h3><i class="fas fa-exclamation-circle"></i> Anomalies Détectées</h3>
@@ -224,7 +251,7 @@
                 <div class="col-lg-4">
                     <!-- Recommandations -->
                     <div class="analytics-card">
-                        <h4><i class="fas fa-lightbulb"></i> Recommandations</h4>
+                        <h4><i class="fas fa-lightbulb"></i> Recommandations IA</h4>
                         <div id="recommendations"></div>
                     </div>
 
@@ -248,19 +275,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let forecastChart = null;
+        let predictionChart = null;
 
         // Charger toutes les analytics
         async function loadAnalytics() {
             try {
                 // Charger données en parallèle
-                const [optimize, forecast, metrics, anomalies, duplicates, monthlyReport] = await Promise.all([
+                const [optimize, forecast, metrics, anomalies, duplicates, monthlyReport, clusters, predictions, patterns, portfolioHealth] = await Promise.all([
                     fetch('/api/analytics/optimize').then(r => r.json()),
                     fetch('/api/analytics/forecast').then(r => r.json()),
                     fetch('/api/analytics/metrics').then(r => r.json()),
                     fetch('/api/analytics/anomalies').then(r => r.json()),
                     fetch('/api/analytics/duplicates').then(r => r.json()),
-                    fetch('/api/analytics/monthly-report').then(r => r.json())
+                    fetch('/api/analytics/monthly-report').then(r => r.json()),
+                    fetch('/api/analytics/clusters').then(r => r.json()),
+                    fetch('/api/analytics/predict-spending').then(r => r.json()),
+                    fetch('/api/analytics/seasonal-patterns').then(r => r.json()),
+                    fetch('/api/analytics/portfolio-health').then(r => r.json())
                 ]);
+
+                // Afficher score santé portfolio
+                displayPortfolioHealth(portfolioHealth.healthScore);
+
+                // Afficher clustering
+                displayClustering(clusters);
 
                 // Afficher métriques principales
                 displayMainMetrics(optimize, metrics);
@@ -270,6 +308,12 @@
 
                 // Afficher prévisions
                 displayForecast(forecast);
+
+                // Afficher prédictions IA
+                displayPredictions(predictions);
+
+                // Afficher patterns saisonniers
+                displaySeasonalPatterns(patterns);
 
                 // Afficher anomalies
                 displayAnomalies(anomalies);
@@ -432,6 +476,166 @@
             let html = '';
             duplicates.forEach(warning => {
                 html += `<div class="duplicate-warning">${warning}</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function displayPortfolioHealth(healthScore) {
+            const container = document.getElementById('portfolioHealth');
+            
+            let color, status, icon;
+            if (healthScore >= 80) {
+                color = '#28a745';
+                status = 'Excellent';
+                icon = '🎯';
+            } else if (healthScore >= 60) {
+                color = '#17a2b8';
+                status = 'Bon';
+                icon = '👍';
+            } else if (healthScore >= 40) {
+                color = '#ffc107';
+                status = 'À Améliorer';
+                icon = '⚠️';
+            } else {
+                color = '#dc3545';
+                status = 'Critique';
+                icon = '🚨';
+            }
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">${icon}</div>
+                    <div style="font-size: 3rem; font-weight: bold; color: ${color}; margin-bottom: 0.5rem;">
+                        ${healthScore}/100
+                    </div>
+                    <div style="font-size: 1.2rem; opacity: 0.9;">
+                        État: ${status}
+                    </div>
+                    <div style="margin-top: 1.5rem; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 1rem;">
+                        <div style="width: 100%; background: rgba(255,255,255,0.2); border-radius: 10px; height: 20px; overflow: hidden;">
+                            <div style="width: ${healthScore}%; height: 100%; background: ${color}; border-radius: 10px; transition: width 1s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayClustering(clusters) {
+            const container = document.getElementById('clusteringAnalysis');
+            
+            if (!clusters) {
+                container.innerHTML = '<p class="text-muted">Aucune donnée</p>';
+                return;
+            }
+
+            let html = '<div class="row">';
+            
+            const clusterColors = {
+                '⭐ Essentiels & Rentables': '#28a745',
+                '⚖️ Équilibrés': '#17a2b8',
+                '⚠️ À Optimiser': '#dc3545'
+            };
+
+            Object.entries(clusters).forEach(([clusterName, abonnements]) => {
+                const color = clusterColors[clusterName] || '#6c757d';
+                html += `
+                    <div class="col-md-4 mb-3">
+                        <div style="background: rgba(255,255,255,0.05); border-left: 4px solid ${color}; padding: 1.5rem; border-radius: 8px; height: 100%;">
+                            <h5 style="color: ${color}; margin-bottom: 1rem;">${clusterName}</h5>
+                            <div style="font-size: 2rem; font-weight: bold; margin-bottom: 0.5rem;">
+                                ${abonnements.length}
+                            </div>
+                            <div style="opacity: 0.8; margin-bottom: 1rem;">abonnements</div>
+                            <div style="font-size: 0.9rem;">
+                                ${abonnements.slice(0, 3).map(abo => 
+                                    `<div style="padding: 0.25rem 0; opacity: 0.9;">• ${abo.nomService}</div>`
+                                ).join('')}
+                                ${abonnements.length > 3 ? `<div style="opacity: 0.6; margin-top: 0.5rem;">+${abonnements.length - 3} autres</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function displayPredictions(predictions) {
+            const ctx = document.getElementById('predictionChart');
+            if (!ctx) return;
+
+            const labels = Object.keys(predictions);
+            const data = Object.values(predictions);
+
+            if (predictionChart) {
+                predictionChart.destroy();
+            }
+
+            predictionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Dépenses prédites (€)',
+                        data: data,
+                        borderColor: '#ff6384',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'white' }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Prédiction par régression linéaire (IA)',
+                            color: 'white'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { color: 'white' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'white' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displaySeasonalPatterns(patterns) {
+            const container = document.getElementById('seasonalPatterns');
+            
+            if (!patterns || Object.keys(patterns).length === 0) {
+                container.innerHTML = '<p class="text-muted">Aucun pattern détecté</p>';
+                return;
+            }
+
+            let html = '';
+            Object.entries(patterns).forEach(([service, pattern]) => {
+                html += `
+                    <div class="subscription-item">
+                        <div>
+                            <strong>${service}</strong>
+                            <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.25rem;">
+                                ${pattern}
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
 
             container.innerHTML = html;

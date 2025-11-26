@@ -470,7 +470,73 @@ public class ApiServer {
                 return mapper.writeValueAsString(report);
             });
 
-            
+            // Endpoint: Clustering des abonnements
+            get("/api/analytics/clusters", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                var clusters = SubscriptionAnalytics.clusterSubscriptions(abonnements);
+                
+                return mapper.writeValueAsString(clusters);
+            });
+
+            // Endpoint: Prédiction des dépenses
+            get("/api/analytics/predict-spending", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                var predictions = SubscriptionAnalytics.predictSpendingTrend(abonnements);
+                
+                return mapper.writeValueAsString(predictions);
+            });
+
+            // Endpoint: Détection patterns saisonniers
+            get("/api/analytics/seasonal-patterns", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                var patterns = SubscriptionAnalytics.detectSeasonalPatterns(abonnements);
+                
+                return mapper.writeValueAsString(patterns);
+            });
+
+            // Endpoint: Score santé du portefeuille
+            get("/api/analytics/portfolio-health", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                int healthScore = SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
+                
+                return "{\"healthScore\": " + healthScore + "}";
+            });
 
 
             // =================================================
