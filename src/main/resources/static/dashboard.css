@@ -682,3 +682,56 @@ body {
     width: 100%;
   }
 }
+
+/* ==== DARK MODE / LIGHT MODE ==== */
+
+body.dark-mode {
+  background-color: #050816 !important;
+  color: #f8f9fa !important;
+}
+
+/* cards / panneaux */
+body.dark-mode .subscriptions-grid .subscription-card,
+body.dark-mode .action-panel,
+body.dark-mode .glass-card,
+body.dark-mode .dashboard-section {
+  background: rgba(15, 23, 42, 0.9) !important;
+  border-color: rgba(148, 163, 184, 0.4) !important;
+}
+
+body.dark-mode .panel-title,
+body.dark-mode .form-label-modern,
+body.dark-mode .search-title {
+  color: #e5e7eb !important;
+}
+
+/* inputs / selects */
+body.dark-mode .form-control-modern,
+body.dark-mode input,
+body.dark-mode select {
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+  border-color: rgba(148, 163, 184, 0.6) !important;
+}
+
+body.dark-mode .form-control-modern::placeholder {
+  color: rgba(148, 163, 184, 0.8) !important;
+}
+
+/* boutons glass */
+body.dark-mode .btn-glass {
+  background: rgba(148, 163, 184, 0.16) !important;
+  border-color: rgba(148, 163, 184, 0.4) !important;
+  color: #e5e7eb !important;
+}
+
+/* navbar */
+body.dark-mode .navbar {
+  background: rgba(15, 23, 42, 0.95) !important;
+}
+
+/* métriques */
+body.dark-mode .metric-card {
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent),
+              radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.15), transparent) !important;
+}
