@@ -99,6 +99,8 @@
               <option value="actif">Actifs</option>
               <option value="expire">Expirés</option>
               <option value="bientot-expire">Expire bientôt</option>
+              <!-- ⭐ nouveau filtre favoris -->
+              <option value="favoris">Favoris ⭐</option>
             </select>
           </div>
           
@@ -234,56 +236,60 @@
           </div>
 
           <!-- Actions rapides -->
-<div>
-  <h4 class="panel-title">
-    <i class="bi bi-lightning-charge"></i>
-    Actions Rapides
-  </h4>
-  
-  <div class="d-grid gap-2">
-    <!-- Actualiser -->
-    <button id="refreshBtn" class="btn btn-glass">
-      <i class="bi bi-arrow-clockwise me-2"></i>Actualiser
-    </button>
-    
-    <!-- Import JSON -->
-    <label class="btn btn-glass" for="importFile">
-      <i class="bi bi-upload me-2"></i>Importer JSON
-    </label>
-    <input type="file" id="importFile" style="display: none;" accept=".json">
+          <div>
+            <h4 class="panel-title">
+              <i class="bi bi-lightning-charge"></i>
+              Actions Rapides
+            </h4>
+            
+            <div class="d-grid gap-2">
+              <!-- Actualiser -->
+              <button id="refreshBtn" class="btn btn-glass">
+                <i class="bi bi-arrow-clockwise me-2"></i>Actualiser
+              </button>
+              
+              <!-- Import JSON -->
+              <label class="btn btn-glass" for="importFile">
+                <i class="bi bi-upload me-2"></i>Importer JSON
+              </label>
+              <input type="file" id="importFile" style="display: none;" accept=".json">
 
-    <!-- Import CSV -->
-    <label class="btn btn-glass mb-0" for="inputImportCsv">
-      <i class="bi bi-file-earmark-arrow-up me-2"></i>Importer CSV
-    </label>
-    <input id="inputImportCsv" type="file" accept=".csv" hidden>
+              <!-- Import CSV -->
+              <label class="btn btn-glass mb-0" for="inputImportCsv">
+                <i class="bi bi-file-earmark-arrow-up me-2"></i>Importer CSV
+              </label>
+              <input id="inputImportCsv" type="file" accept=".csv" hidden>
 
-    <!-- 🔽 Export (JSON / CSV) -->
-    <div class="btn-group">
-      <button class="btn btn-glass dropdown-toggle w-100" data-bs-toggle="dropdown" aria-expanded="false">
-        <i class="bi bi-download me-2"></i>Exporter
-      </button>
-      <ul class="dropdown-menu dropdown-menu-dark w-100">
-        <li>
-          <a class="dropdown-item" href="#" id="exportJson">
-            <i class="bi bi-filetype-json me-2"></i>Exporter en JSON
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="#" id="exportCsv">
-            <i class="bi bi-filetype-csv me-2"></i>Exporter en CSV
-          </a>
-        </li>
-      </ul>
-    </div>
+              <!-- 🔽 Export (JSON / CSV) -->
+              <div class="btn-group">
+                <button class="btn btn-glass dropdown-toggle w-100" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-download me-2"></i>Exporter
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark w-100">
+                  <li>
+                    <a class="dropdown-item" href="#" id="exportJson">
+                      <i class="bi bi-filetype-json me-2"></i>Exporter en JSON
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="#" id="exportCsv">
+                      <i class="bi bi-filetype-csv me-2"></i>Exporter en CSV
+                    </a>
+                  </li>
+                </ul>
+              </div>
 
-    <!-- Tout supprimer -->
-    <button id="clearAllBtn" class="btn btn-danger">
-      <i class="bi bi-trash me-2"></i>Tout supprimer
-    </button>
-  </div>
-</div>
+              <!-- Tout supprimer -->
+              <button id="clearAllBtn" class="btn btn-danger">
+                <i class="bi bi-trash me-2"></i>Tout supprimer
+              </button>
+            </div>
+          </div>
 
+        </div> <!-- .action-panel -->
+      </div> <!-- .col-lg-4 -->
+    </div> <!-- .row -->
+  </main>
 
   <!-- Modal d'édition -->
   <div class="modal fade" id="editModal" tabindex="-1">
@@ -351,7 +357,11 @@
   <script src="/navbar-auth.js"></script>
   
   <!-- Chatbot Widget -->
+  <link href="/chatbot-styles.css" rel="stylesheet">
   <script src="/chatbot.js"></script>
+  <script src="/chatbot-init.js"></script>
+
+  <!-- Styles additionnels (favoris + bouton chatbot) -->
   <style>
     .chatbot-trigger {
       position: fixed;
@@ -378,11 +388,12 @@
       font-size: 2rem;
       color: white;
     }
+
+    /* ⭐ style visuel pour les favoris */
+    .service-name.favorite-active {
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+      filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+    }
   </style>
-  
-  <!-- Chatbot Widget -->
-  <link href="/chatbot-styles.css" rel="stylesheet">
-  <script src="/chatbot.js"></script>
-  <script src="/chatbot-init.js"></script>
 </body>
 </html>

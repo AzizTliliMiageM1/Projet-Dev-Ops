@@ -1,5 +1,28 @@
 const apiBase = '/api/abonnements';
 
+// 🔹 Gestion des FAVORIS (localStorage)
+const FAVORITES_KEY = 'abonnements_favoris';
+
+function getFavorites() {
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveFavorites(list) {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+}
+
+function isFavoriteId(id) {
+  if (!id) return false;
+  return getFavorites().includes(id);
+}
+
 /* ---------- helpers ---------- */
 function escapeHtml(s){
   return String(s ?? "")
@@ -94,6 +117,11 @@ function render(list){
       ? new Date(a.derniereUtilisation).toLocaleDateString('fr-FR')
       : 'Jamais';
     const prixMensuel = Number(a.prixMensuel || 0);
+
+    // ⭐ Favori
+    const isFav = isFavoriteId(a.id);
+    const favIcon = isFav ? 'bi-star-fill' : 'bi-star';
+    const favClass = isFav ? 'favorite-active' : '';
     
     // Calculer le statut
     let statusClass = 'status-expired';
@@ -102,8 +130,8 @@ function render(list){
     
     if (estActif) {
       const now = new Date();
-      const dateFin = new Date(a.dateFin);
-      const joursRestants = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
+      const dateFinDate = new Date(a.dateFin);
+      const joursRestants = Math.ceil((dateFinDate - now) / (1000 * 60 * 60 * 24));
       
       if (joursRestants <= 7) {
         statusClass = 'status-warning';
@@ -122,8 +150,8 @@ function render(list){
     
     card.innerHTML = `
       <div class="card-header-modern">
-        <div class="service-name">
-          <i class="bi bi-star-fill me-2" style="color: #ffd700;"></i>
+        <div class="service-name ${favClass}">
+          <i class="bi ${favIcon} me-2" style="color: #ffd700;"></i>
           ${escapeHtml(nomService)}
         </div>
         <div class="client-name">
@@ -166,6 +194,12 @@ function render(list){
           </button>
           <button class="btn btn-action" onclick="deleteAbonnement(${index})" title="Supprimer">
             <i class="bi bi-trash"></i> Supprimer
+          </button>
+          <button class="btn btn-action" onclick="toggleFavorite(${index})" title="Ajouter aux favoris / retirer">
+            <i class="bi ${favIcon}"></i> Favori
+          </button>
+          <button class="btn btn-action" onclick="duplicateAbonnement(${index})" title="Dupliquer cet abonnement">
+            <i class="bi bi-files"></i> Dupliquer
           </button>
         </div>
       </div>
@@ -247,6 +281,71 @@ async function editAbonnement(index) {
   }
 }
 
+// 📄 Dupliquer un abonnement
+async function duplicateAbonnement(index) {
+  try {
+    const abonnements = await fetchAll();
+    const source = abonnements[index];
+    if (!source) return;
+
+    const payload = {
+      clientName: source.clientName,
+      nomService: (source.nomService || '') + ' (copie)',
+      dateDebut: source.dateDebut,
+      dateFin: source.dateFin,
+      prixMensuel: source.prixMensuel,
+      categorie: source.categorie || 'Autres',
+      derniereUtilisation: null
+    };
+
+    const r = await fetch(apiBase, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (r.status === 201) {
+      showFlash('Abonnement dupliqué avec succès !', 'success');
+      await loadAndRender();
+    } else if (r.status === 401) {
+      showFlash('Vous devez être connecté pour dupliquer un abonnement', 'error');
+      setTimeout(() => window.location.href = '/login.html', 2000);
+    } else {
+      showFlash('Erreur lors de la duplication', 'error');
+    }
+  } catch (err) {
+    showFlash('Erreur: ' + err.message, 'error');
+  }
+}
+
+// ⭐ Toggle favori
+async function toggleFavorite(index) {
+  try {
+    const abonnements = await fetchAll();
+    const abo = abonnements[index];
+    if (!abo || !abo.id) {
+      showFlash('Impossible de gérer le favori (id manquant)', 'error');
+      return;
+    }
+
+    const id = abo.id;
+    let favs = getFavorites();
+
+    if (favs.includes(id)) {
+      favs = favs.filter(x => x !== id);
+      showFlash('Retiré des favoris', 'info');
+    } else {
+      favs.push(id);
+      showFlash('Ajouté aux favoris', 'success');
+    }
+
+    saveFavorites(favs);
+    await loadAndRender();
+  } catch (err) {
+    showFlash('Erreur: ' + err.message, 'error');
+  }
+}
+
 function showFlash(message, type = 'info') {
   const flash = document.getElementById('flash');
   if (!flash) return;
@@ -298,6 +397,8 @@ async function loadAndRender(){
       const joursRestants = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
       return joursRestants <= 7;
     });
+  } else if (status === 'favoris') {
+    filtered = filtered.filter(a => isFavoriteId(a.id));
   }
 
   // Tri
@@ -366,39 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  /* ---------- modal d'édition ---------- */
-  document.getElementById('saveEditBtn').addEventListener('click', async () => {
-    const index = document.getElementById('editIndex').value;
-    const payload = {
-      clientName: document.getElementById('editClient').value,
-      nomService: document.getElementById('editService').value,
-      dateDebut: document.getElementById('editDebut').value,
-      dateFin: document.getElementById('editFin').value,
-      prixMensuel: parseFloat(document.getElementById('editPrix').value) || 0,
-      categorie: document.getElementById('editCategorie').value || 'Autres'
-    };
-    
-    try {
-      const r = await fetch(`${apiBase}/${index}`, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload)
-      });
-      
-      if (r.ok) {
-        showFlash('Abonnement modifié avec succès !', 'success');
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-        modal.hide();
-        await loadAndRender();
-      } else {
-        showFlash('Erreur lors de la modification', 'error');
-      }
-    } catch (err) {
-      showFlash(`Erreur: ${err.message}`, 'error');
-    }
-  });
-
-    /* ---------- actions rapides ---------- */
+  /* ---------- actions rapides ---------- */
 
   // 🔁 Actualiser
   const refreshBtn = document.getElementById('refreshBtn');
