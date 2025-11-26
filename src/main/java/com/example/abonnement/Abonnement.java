@@ -268,6 +268,72 @@ public class Abonnement {
         if (joursSanUtilisation < 60) return "Moyen ⚠️";
         return "Faible ⛔";
     }
+    
+    /**
+     * Calcule le score de valeur (wrapper pour analytics)
+     */
+    public double getValueScore() {
+        if (prixMensuel == 0) return 0;
+        double frequence = getUsageFrequency();
+        return Math.round((frequence * 10) / prixMensuel * 100.0) / 100.0;
+    }
+    
+    /**
+     * Calcule la fréquence d'utilisation estimée
+     */
+    public double getUsageFrequency() {
+        if (derniereUtilisation == null) return 0;
+        
+        long joursSansUtilisation = ChronoUnit.DAYS.between(derniereUtilisation, LocalDate.now());
+        
+        if (joursSansUtilisation < 7) return 20;
+        if (joursSansUtilisation < 30) return 10;
+        if (joursSansUtilisation < 60) return 5;
+        return 1;
+    }
+    
+    /**
+     * Calcule le coût par utilisation
+     */
+    public double getCostPerUse() {
+        double frequence = getUsageFrequency();
+        if (frequence == 0) return prixMensuel;
+        return Math.round((prixMensuel / frequence) * 100.0) / 100.0;
+    }
+    
+    /**
+     * Calcule le risque de résiliation
+     * @return Score 0-100
+     */
+    public double getChurnRisk() {
+        double riskScore = 0;
+        
+        // Utilisation
+        if (derniereUtilisation != null) {
+            long joursSansUtilisation = ChronoUnit.DAYS.between(derniereUtilisation, LocalDate.now());
+            if (joursSansUtilisation > 60) riskScore += 40;
+            else if (joursSansUtilisation > 30) riskScore += 25;
+            else if (joursSansUtilisation > 14) riskScore += 10;
+        } else {
+            riskScore += 40;
+        }
+        
+        // Ratio coût/valeur
+        double valueScore = getValueScore();
+        if (valueScore < 1) riskScore += 30;
+        else if (valueScore < 2) riskScore += 20;
+        else if (valueScore < 3) riskScore += 10;
+        
+        // Priorité
+        if ("Luxe".equals(priorite)) riskScore += 20;
+        else if ("Optionnel".equals(priorite)) riskScore += 10;
+        
+        // Expiration proche
+        long joursAvantExpiration = getJoursAvantExpiration();
+        if (joursAvantExpiration < 30) riskScore += 10;
+        
+        return Math.min(100, Math.round(riskScore * 100.0) / 100.0);
+    }
 
     @Override
     public String toString() {

@@ -16,6 +16,8 @@ import com.projet.user.FileUserRepository;
 import com.projet.user.User;
 import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
+import com.projet.analytics.SubscriptionAnalytics;
+import com.projet.service.SubscriptionOptimizer;
 
 import static spark.Spark.before;
 import static spark.Spark.delete;
@@ -334,6 +336,138 @@ public class ApiServer {
                 return mapper.writeValueAsString(
                     Map.of("imported", imported, "errors", errors)
                 );
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - RAPPORT D'OPTIMISATION
+            // =================================================
+            get("/analytics/optimize", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionOptimizer optimizer = new SubscriptionOptimizer();
+                var report = optimizer.generateOptimizationReport(abonnements);
+                
+                return mapper.writeValueAsString(report);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - PRÉVISION TRÉSORERIE
+            // =================================================
+            get("/analytics/forecast", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
+                var forecast = analytics.forecastCashflow(abonnements, 6);
+                
+                return mapper.writeValueAsString(forecast);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - MÉTRIQUES AVANCÉES
+            // =================================================
+            get("/analytics/metrics", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
+                var metrics = analytics.calculateAdvancedMetrics(abonnements);
+                
+                return mapper.writeValueAsString(metrics);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - DÉTECTION ANOMALIES
+            // =================================================
+            get("/analytics/anomalies", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
+                List<Map<String, Object>> anomalies = new ArrayList<>();
+                
+                for (Abonnement abo : abonnements) {
+                    boolean isAnomaly = analytics.detectPriceAnomaly(abonnements, abo);
+                    if (isAnomaly) {
+                        anomalies.add(Map.of(
+                            "id", abo.getId(),
+                            "nomService", abo.getNomService(),
+                            "prix", abo.getPrixMensuel(),
+                            "message", "Prix anormalement élevé"
+                        ));
+                    }
+                }
+                
+                return mapper.writeValueAsString(anomalies);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - DOUBLONS
+            // =================================================
+            get("/analytics/duplicates", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
+                var duplicates = analytics.detectDuplicates(abonnements);
+                
+                return mapper.writeValueAsString(duplicates);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - RAPPORT MENSUEL
+            // =================================================
+            get("/analytics/monthly-report", (req, res) -> {
+                String user = req.session().attribute("user");
+                if (user == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+                
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                
+                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
+                var report = analytics.generateMonthlyReport(abonnements);
+                
+                return mapper.writeValueAsString(report);
             });
 
             
