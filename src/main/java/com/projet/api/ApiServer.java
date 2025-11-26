@@ -339,11 +339,25 @@ public class ApiServer {
             });
 
             // =================================================
+            // 🔵  USER - VÉRIFIER SESSION
+            // =================================================
+            get("/api/user/current", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Non connecté\"}";
+                }
+                
+                res.type("application/json");
+                return "{\"email\":\"" + email + "\", \"connected\": true}";
+            });
+
+            // =================================================
             // 🔵  ANALYTICS - RAPPORT D'OPTIMISATION
             // =================================================
             get("/analytics/optimize", (req, res) -> {
-                String user = req.session().attribute("user");
-                if (user == null) {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
@@ -362,8 +376,8 @@ public class ApiServer {
             // 🔵  ANALYTICS - PRÉVISION TRÉSORERIE
             // =================================================
             get("/analytics/forecast", (req, res) -> {
-                String user = req.session().attribute("user");
-                if (user == null) {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
@@ -382,8 +396,8 @@ public class ApiServer {
             // 🔵  ANALYTICS - MÉTRIQUES AVANCÉES
             // =================================================
             get("/analytics/metrics", (req, res) -> {
-                String user = req.session().attribute("user");
-                if (user == null) {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }

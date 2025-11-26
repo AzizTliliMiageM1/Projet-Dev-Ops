@@ -280,18 +280,54 @@
         // Charger toutes les analytics
         async function loadAnalytics() {
             try {
+                // Vérifier la connexion d'abord
+                const userCheck = await fetch('/api/user/current');
+                if (userCheck.status === 401 || userCheck.status === 404) {
+                    throw new Error('Non connecté');
+                }
+
                 // Charger données en parallèle
                 const [optimize, forecast, metrics, anomalies, duplicates, monthlyReport, clusters, predictions, patterns, portfolioHealth] = await Promise.all([
-                    fetch('/api/analytics/optimize').then(r => r.json()),
-                    fetch('/api/analytics/forecast').then(r => r.json()),
-                    fetch('/api/analytics/metrics').then(r => r.json()),
-                    fetch('/api/analytics/anomalies').then(r => r.json()),
-                    fetch('/api/analytics/duplicates').then(r => r.json()),
-                    fetch('/api/analytics/monthly-report').then(r => r.json()),
-                    fetch('/api/analytics/clusters').then(r => r.json()),
-                    fetch('/api/analytics/predict-spending').then(r => r.json()),
-                    fetch('/api/analytics/seasonal-patterns').then(r => r.json()),
-                    fetch('/api/analytics/portfolio-health').then(r => r.json())
+                    fetch('/api/analytics/optimize').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement optimize');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/forecast').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement forecast');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/metrics').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement metrics');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/anomalies').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement anomalies');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/duplicates').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement duplicates');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/monthly-report').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement report');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/clusters').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement clusters');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/predict-spending').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement predictions');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/seasonal-patterns').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement patterns');
+                        return r.json();
+                    }),
+                    fetch('/api/analytics/portfolio-health').then(r => {
+                        if (!r.ok) throw new Error('Erreur chargement health');
+                        return r.json();
+                    })
                 ]);
 
                 // Afficher score santé portfolio
