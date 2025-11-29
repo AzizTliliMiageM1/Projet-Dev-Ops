@@ -7,10 +7,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="/theme-variables.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
-            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 100%);
             --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
             --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -19,7 +20,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, var(--primary-color, #667eea) 0%, var(--secondary-color, #764ba2) 50%, var(--accent-color, #f093fb) 100%);
             min-height: 100vh;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
@@ -277,10 +278,16 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="analytics.html">Analytics</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="expenses.html">💰 Dépenses</a></li>
-                    <li class="nav-item"><a class="nav-link" href="login.html">Connexion</a></li>
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="analytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="expenses.html"><i class="bi bi-wallet2"></i> Dépenses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/export-import.html"><i class="bi bi-download"></i> Export/Import</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/bank-integration.html"><i class="bi bi-bank"></i> Banque</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/notifications.html"><i class="bi bi-envelope"></i> Notifications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/themes.html"><i class="bi bi-palette"></i> Thèmes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="stats.html"><i class="bi bi-graph-up"></i> Stats</a></li>
+                    <li class="nav-item"><a class="nav-link" href="api.html"><i class="bi bi-code-slash"></i> API</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html"><i class="bi bi-house"></i> Home</a></li>
                 </ul>
             </div>
         </div>
@@ -396,6 +403,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="themes.js"></script>
+    <script>
+        // Charger le thème au démarrage
+        if (window.ThemeManager) {
+            window.ThemeManager.loadSavedTheme();
+        }
+    </script>
     <script src="navbar-auth.js"></script>
     <script src="expenses.js"></script>
 </body>

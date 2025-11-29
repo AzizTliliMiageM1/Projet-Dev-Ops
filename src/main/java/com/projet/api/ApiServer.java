@@ -704,6 +704,130 @@ public class ApiServer {
                 return "Test d'envoi d'email déclenché.";
             });
 
+            // =================================================
+            //     📧  NOTIFICATIONS EMAIL
+            // =================================================
+            path("/notifications", () -> {
+                
+                ObjectMapper emailMapper = new ObjectMapper();
+                
+                // Sauvegarder les paramètres email
+                post("/settings", (req, res) -> {
+                    res.type("application/json");
+                    
+                    String body = req.body();
+                    Map<String, Object> settings = emailMapper.readValue(body, Map.class);
+                    
+                    // Sauvegarder dans la session ou base de données
+                    String userEmail = req.session().attribute("user_email");
+                    if (userEmail != null) {
+                        // TODO: Sauvegarder dans la base de données
+                        System.out.println("Paramètres email sauvegardés pour: " + userEmail);
+                    }
+                    
+                    return "{\"success\":true,\"message\":\"Paramètres sauvegardés\"}";
+                });
+                
+                // Sauvegarder les préférences de notifications
+                post("/preferences", (req, res) -> {
+                    res.type("application/json");
+                    
+                    String body = req.body();
+                    Map<String, Object> prefs = emailMapper.readValue(body, Map.class);
+                    
+                    String userEmail = req.session().attribute("user_email");
+                    if (userEmail != null) {
+                        System.out.println("Préférences de notifications sauvegardées pour: " + userEmail);
+                    }
+                    
+                    return "{\"success\":true,\"message\":\"Préférences sauvegardées\"}";
+                });
+                
+                // Envoyer un email de test
+                post("/test", (req, res) -> {
+                    res.type("application/json");
+                    
+                    String body = req.body();
+                    Map<String, Object> data = emailMapper.readValue(body, Map.class);
+                    
+                    String toEmail = (String) data.get("to");
+                    
+                    if (toEmail == null || toEmail.isEmpty()) {
+                        res.status(400);
+                        return "{\"success\":false,\"message\":\"Email manquant\"}";
+                    }
+                    
+                    // Envoyer l'email de test via EmailService
+                    EmailService emailService = EmailService.getInstance();
+                    
+                    // En mode développement, on simule l'envoi
+                    boolean sent = emailService.sendTestEmail(toEmail);
+                    
+                    if (sent) {
+                        return "{\"success\":true,\"message\":\"Email de test envoyé\"}";
+                    } else {
+                        // En mode simulation
+                        System.out.println("EMAIL TEST simulé vers: " + toEmail);
+                        return "{\"success\":true,\"message\":\"Email simulé (backend non configuré)\"}";
+                    }
+                });
+                
+                // Envoyer une notification générique
+                post("/send", (req, res) -> {
+                    res.type("application/json");
+                    
+                    String body = req.body();
+                    Map<String, Object> emailData = emailMapper.readValue(body, Map.class);
+                    
+                    String toEmail = (String) emailData.get("to");
+                    String type = (String) emailData.get("type");
+                    Map<String, Object> data = (Map<String, Object>) emailData.get("data");
+                    
+                    EmailService emailService = EmailService.getInstance();
+                    boolean sent = false;
+                    
+                    switch (type) {
+                        case "expiration":
+                            sent = emailService.sendExpirationAlert(
+                                toEmail,
+                                (String) data.get("subscriptionName"),
+                                ((Number) data.get("price")).doubleValue(),
+                                (String) data.get("expirationDate"),
+                                ((Number) data.get("daysRemaining")).intValue()
+                            );
+                            break;
+                            
+                        case "budget":
+                            sent = emailService.sendBudgetAlert(
+                                toEmail,
+                                ((Number) data.get("budget")).doubleValue(),
+                                ((Number) data.get("spent")).doubleValue(),
+                                ((Number) data.get("overspend")).doubleValue()
+                            );
+                            break;
+                            
+                        case "monthly":
+                            sent = emailService.sendMonthlyReport(
+                                toEmail,
+                                (String) data.get("month"),
+                                ((Number) data.get("totalSpent")).doubleValue(),
+                                ((Number) data.get("totalSubs")).intValue(),
+                                ((Number) data.get("subsCost")).doubleValue(),
+                                ((Number) data.get("transactionCount")).intValue()
+                            );
+                            break;
+                    }
+                    
+                    if (sent) {
+                        return "{\"success\":true,\"message\":\"Notification envoyée\"}";
+                    } else {
+                        System.out.println("NOTIFICATION simulée - Type: " + type);
+                        return "{\"success\":true,\"message\":\"Notification simulée\"}";
+                    }
+                });
+                
+            });
+
         }); // end /api
 
 

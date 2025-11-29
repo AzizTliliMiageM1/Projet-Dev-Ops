@@ -5,6 +5,9 @@
 
 /* Variables CSS Professionnelles */
 :root {
+  --primary-color: #667eea;
+  --secondary-color: #764ba2;
+  --accent-color: #f093fb;
   --primary: #2563eb;
   --primary-light: #3b82f6;
   --secondary: #64748b;
@@ -13,7 +16,7 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   
-  --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   --bg-glass: rgba(255, 255, 255, 0.1);
   --bg-glass-hover: rgba(255, 255, 255, 0.15);
   --bg-glass-dark: rgba(255, 255, 255, 0.05);

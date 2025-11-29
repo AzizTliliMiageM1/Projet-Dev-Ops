@@ -317,6 +317,4 @@ Le **Module Gestion des Dépenses** est maintenant **opérationnel** et prêt à
 
 ---
 
-**Développé avec ❤️ par GitHub Copilot**  
-**Date** : $(date +"%d/%m/%Y à %H:%M")  
-**Statut** : ✅ Prêt pour Production
+

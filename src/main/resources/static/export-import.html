@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📥 Export/Import - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="/theme-variables.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            padding: 20px 0;
+        }
+
+        .export-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .export-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        .import-zone {
+            border: 2px dashed var(--primary-color);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: var(--card-bg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .import-zone:hover {
+            background: var(--card-hover-bg);
+            border-color: var(--accent-color);
+        }
+
+        .import-zone.dragover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: var(--accent-color);
+            transform: scale(1.02);
+        }
+
+        .format-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin: 5px;
+        }
+
+        .format-pdf {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .format-csv {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .format-json {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .format-ofx {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        .preview-table {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .preview-table th {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px;
+        }
+
+        .preview-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="bi bi-wallet2"></i> Gestion Abonnements
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="analytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="expenses.html"><i class="bi bi-wallet2"></i> Dépenses</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/export-import.html"><i class="bi bi-download"></i> Export/Import</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/bank-integration.html"><i class="bi bi-bank"></i> Banque</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/notifications.html"><i class="bi bi-envelope"></i> Notifications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/themes.html"><i class="bi bi-palette"></i> Thèmes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="stats.html"><i class="bi bi-graph-up"></i> Stats</a></li>
+                    <li class="nav-item"><a class="nav-link" href="api.html"><i class="bi bi-code-slash"></i> API</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html"><i class="bi bi-house"></i> Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                📥 Export & Import de Données
+            </h1>
+            <p class="lead text-white-50">Exportez vos données en plusieurs formats ou importez depuis votre banque</p>
+        </div>
+
+        <!-- Section Export -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-white mb-4"><i class="bi bi-download"></i> Exporter vos données</h2>
+            </div>
+
+            <!-- Export PDF -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="export-card text-center">
+                    <i class="bi bi-file-pdf feature-icon"></i>
+                    <h4 class="text-white mt-3 mb-3">Export PDF</h4>
+                    <p class="text-white-50 mb-4">Rapport complet avec graphiques et statistiques</p>
+                    <span class="format-badge format-pdf">PDF</span>
+                    <button class="btn export-btn w-100 mt-3" onclick="exportToPDF()">
+                        <i class="bi bi-file-pdf me-2"></i> Générer PDF
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export CSV -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="export-card text-center">
+                    <i class="bi bi-file-earmark-spreadsheet feature-icon"></i>
+                    <h4 class="text-white mt-3 mb-3">Export CSV</h4>
+                    <p class="text-white-50 mb-4">Compatible Excel, Google Sheets</p>
+                    <span class="format-badge format-csv">CSV</span>
+                    <button class="btn export-btn w-100 mt-3" onclick="exportToCSV()">
+                        <i class="bi bi-file-earmark-spreadsheet me-2"></i> Générer CSV
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export JSON -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="export-card text-center">
+                    <i class="bi bi-file-code feature-icon"></i>
+                    <h4 class="text-white mt-3 mb-3">Export JSON</h4>
+                    <p class="text-white-50 mb-4">Sauvegarde complète de vos données</p>
+                    <span class="format-badge format-json">JSON</span>
+                    <button class="btn export-btn w-100 mt-3" onclick="exportToJSON()">
+                        <i class="bi bi-file-code me-2"></i> Générer JSON
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export Excel -->
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="export-card text-center">
+                    <i class="bi bi-file-earmark-excel feature-icon"></i>
+                    <h4 class="text-white mt-3 mb-3">Export Excel</h4>
+                    <p class="text-white-50 mb-4">Format XLSX natif</p>
+                    <span class="format-badge format-csv">XLSX</span>
+                    <button class="btn export-btn w-100 mt-3" onclick="exportToExcel()">
+                        <i class="bi bi-file-earmark-excel me-2"></i> Générer Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Import -->
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h2 class="text-white"><i class="bi bi-upload"></i> Importer vos données</h2>
+            </div>
+
+            <!-- Zone de drop -->
+            <div class="col-12 mb-4">
+                <div class="import-zone" id="dropZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                    <i class="bi bi-cloud-upload feature-icon"></i>
+                    <h4 class="text-white mt-3 mb-3">Glissez-déposez vos fichiers ici</h4>
+                    <p class="text-white-50 mb-4">Ou cliquez pour sélectionner</p>
+                    <div>
+                        <span class="format-badge format-csv">CSV</span>
+                        <span class="format-badge format-json">JSON</span>
+                        <span class="format-badge format-ofx">OFX</span>
+                        <span class="format-badge format-pdf">QIF</span>
+                    </div>
+                    <input type="file" id="fileInput" accept=".csv,.json,.ofx,.qif" style="display: none;" onchange="handleFileSelect(event)">
+                    <button class="btn export-btn mt-4" onclick="document.getElementById('fileInput').click()">
+                        <i class="bi bi-folder2-open me-2"></i> Parcourir
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formats supportés -->
+            <div class="col-md-6 mb-4">
+                <div class="export-card">
+                    <h5 class="text-white mb-3"><i class="bi bi-bank"></i> Formats bancaires supportés</h5>
+                    <ul class="text-white-50">
+                        <li><strong class="text-white">OFX</strong> - Open Financial Exchange (banques françaises)</li>
+                        <li><strong class="text-white">CSV</strong> - Relevés bancaires au format CSV</li>
+                        <li><strong class="text-white">QIF</strong> - Quicken Interchange Format</li>
+                        <li><strong class="text-white">JSON</strong> - Sauvegardes de l'application</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Mapping automatique -->
+            <div class="col-md-6 mb-4">
+                <div class="export-card">
+                    <h5 class="text-white mb-3"><i class="bi bi-magic"></i> Détection automatique</h5>
+                    <ul class="text-white-50">
+                        <li><strong class="text-white">Catégories</strong> - Reconnaissance intelligente</li>
+                        <li><strong class="text-white">Abonnements</strong> - Détection des paiements récurrents</li>
+                        <li><strong class="text-white">Montants</strong> - Conversion automatique</li>
+                        <li><strong class="text-white">Dates</strong> - Parsing multi-formats</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Import -->
+        <div id="importPreview" class="row" style="display: none;">
+            <div class="col-12">
+                <div class="export-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="text-white mb-0"><i class="bi bi-eye"></i> Aperçu de l'import</h4>
+                        <button class="btn export-btn" onclick="confirmImport()">
+                            <i class="bi bi-check-circle me-2"></i> Confirmer l'import
+                        </button>
+                    </div>
+                    
+                    <!-- Statistiques -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-white mb-0" id="totalTransactions">0</h3>
+                                <p class="text-white-50 mb-0">Transactions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-white mb-0" id="detectedSubs">0</h3>
+                                <p class="text-white-50 mb-0">Abonnements détectés</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-white mb-0" id="totalAmount">0€</h3>
+                                <p class="text-white-50 mb-0">Montant total</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-white mb-0" id="dateRange">-</h3>
+                                <p class="text-white-50 mb-0">Période</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Table de prévisualisation -->
+                    <div class="table-responsive">
+                        <table class="table preview-table text-white">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Catégorie</th>
+                                    <th>Montant</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody id="previewTableBody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historique des exports -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="export-card">
+                    <h4 class="text-white mb-4"><i class="bi bi-clock-history"></i> Historique des exports</h4>
+                    <div class="table-responsive">
+                        <table class="table preview-table text-white">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Taille</th>
+                                    <th>Période</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exportHistoryBody">
+                                <!-- Rempli dynamiquement -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="themes.js"></script>
+    <script>
+        // Charger le thème au démarrage
+        if (window.ThemeManager) {
+            window.ThemeManager.loadSavedTheme();
+        }
+    </script>
+    <script src="navbar-auth.js"></script>
+    <script src="export-import.js"></script>
+</body>
+</html>

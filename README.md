@@ -1,10 +1,80 @@
 # 🎯 Gestion d'Abonnements - Application Full-Stack Moderne
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![Java](https://img.shields.io/badge/Java-17-orange.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-Une application complète de gestion d'abonnements avec interface moderne glassmorphism, analytics avancés, **chatbot IA intelligent** et tutoriels vidéo interactifs.
+Une application complète de gestion d'abonnements avec interface moderne glassmorphism, analytics avancés, **chatbot IA intelligent**, tutoriels vidéo interactifs, **système de thèmes personnalisables**, **export/import avancé** et **notifications email automatiques**.
+
+## ✨ Nouvelles Fonctionnalités 2.0
+
+### 🎨 Système de Thèmes Personnalisables
+- **6 thèmes prédéfinis** : Violet Premium, Bleu Océan, Rose Sunset, Vert Nature, Orange Énergie, Minimaliste
+- **Personnalisation avancée** : 3 color pickers (primaire, secondaire, accent)
+- **Aperçu en temps réel** avec KPI cards stylisées
+- **Persistance automatique** des préférences utilisateur
+- **Application globale** sur toutes les pages de l'application
+- **CSS Variables dynamiques** pour performance optimale
+
+### 📥 Export/Import Avancé
+- **Export PDF professionnel** avec graphiques et statistiques
+  - Header thématisé avec couleurs personnalisées
+  - Tableaux détaillés des abonnements et dépenses
+  - KPIs et résumés financiers
+- **Export CSV/Excel** compatible avec Google Sheets et Excel
+- **Export JSON** pour sauvegarde complète des données
+- **Import intelligent** de formats bancaires :
+  - OFX (Open Financial Exchange) - banques françaises
+  - CSV avec détection automatique des colonnes
+  - QIF (Quicken Interchange Format)
+  - JSON (restauration de sauvegardes)
+- **Détection automatique** :
+  - Catégories (Streaming, Télécom, Transport, etc.)
+  - Abonnements récurrents vs dépenses ponctuelles
+  - Parsing multi-formats de dates
+- **Prévisualisation avant import** avec statistiques
+- **Historique des exports** avec métadonnées
+
+### 📧 Notifications Email Automatiques
+- **4 types de notifications** :
+  - ⚠️ Alertes d'expiration (X jours avant)
+  - 💸 Dépassement de budget
+  - 📊 Rapports mensuels automatiques
+  - 🔔 Dépenses inhabituelles
+- **Emails HTML professionnels** avec templates thématisés
+- **Configuration flexible** :
+  - Fréquence des rappels (quotidien/hebdomadaire/mensuel)
+  - Personnalisation des délais d'alerte
+  - Activation/désactivation par type
+- **Backend JavaMail** avec support SMTP
+  - Compatible Gmail, SendGrid, etc.
+  - Configuration SMTP avancée (TLS/SSL)
+  - Mode simulation pour développement
+- **Historique des notifications** envoyées
+- **Email de test** pour vérifier la configuration
+
+### 🏦 Intégration Bancaire Intelligente
+- **Import relevés bancaires** multi-formats :
+  - CSV (Excel, Google Sheets)
+  - OFX (Open Financial Exchange - banques françaises)
+  - QIF (Quicken Interchange Format)
+  - Drag & drop intuitif avec validation
+- **Rapprochement automatique** :
+  - Matching transactions ↔ abonnements déclarés
+  - Algorithme intelligent (nom + prix ±2€)
+  - Badges visuels de correspondance
+- **Détection abonnements non déclarés** :
+  - 15+ patterns prédéfinis (Netflix, Spotify, SFR, etc.)
+  - Analyse récurrence automatique (28-32 jours)
+  - Alertes "Abonnement caché détecté"
+  - Bouton ajout rapide en 1 clic
+- **Simulation solde virtuel** :
+  - Calcul impact mensuel des abonnements
+  - Projection sur 6 mois avec graphique Chart.js
+  - Visualisation évolution finances
+  - Aide à la décision (garder/résilier)
+- **Timeline transactions** organisée par mois
+- **Statistiques temps réel** : Rapprochées, Non déclarées, Cachés
 
 ## ✨ Fonctionnalités Principales
 
