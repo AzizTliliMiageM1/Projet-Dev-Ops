@@ -1,4 +1,4 @@
-5e0d6849-4b8a-438e-8364-80e75c69d7d5;BasicFit;2003-02-11;0004-02-11;100.00;Tlili Aziz;2025-11-20;Sport
-cb447fa7-eb32-429a-9544-ba31970db0cf;BasicFit;2025-11-20;2025-11-25;100.00;Alex;;Sport
-e82bb0f4-9cce-4dfb-a457-d06a3397dabf;ITestService;2025-10-01;2026-10-01;5.50;Test;2025-10-15;it
-ab4e988c-e13c-452e-a21e-dad931107fa7;BNPParibas;2025-02-15;2025-03-16;100.00;dorra;;Sport
+5e0d6849-4b8a-438e-8364-80e75c69d7d5;BasicFit;2003-02-11;0004-02-11;100.00;Tlili Aziz;2025-11-20;Sport;;;Important;;1;NON;7;Mensuel
+cb447fa7-eb32-429a-9544-ba31970db0cf;BasicFit;2025-11-20;2025-11-25;100.00;Alex;;Sport;;;Important;;1;NON;7;Mensuel
+e82bb0f4-9cce-4dfb-a457-d06a3397dabf;ITestService;2025-10-01;2026-10-01;5.50;Test;2025-10-15;it;;;Important;;1;NON;7;Mensuel
+ab4e988c-e13c-452e-a21e-dad931107fa7;BNPParibas;2025-02-15;2025-03-16;100.00;dorra;;Sport;;;Important;;1;NON;7;Mensuel

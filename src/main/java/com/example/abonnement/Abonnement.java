@@ -390,22 +390,22 @@ public class Abonnement {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return String.format(
                 "%s;%s;%s;%s;%.2f;%s;%s;%s;%s;%s;%s;%s;%d;%s;%d;%s",
-                id,
-                nomService,
-                dateDebut.format(formatter),
-                dateFin.format(formatter),
+                id != null ? id : "",
+                nomService != null ? nomService : "",
+                dateDebut != null ? dateDebut.format(formatter) : "",
+                dateFin != null ? dateFin.format(formatter) : "",
                 prixMensuel,
-                clientName,
+                clientName != null ? clientName : "",
                 (derniereUtilisation != null ? derniereUtilisation.format(formatter) : ""),
-                categorie,
-                tags.isEmpty() ? "" : String.join("|", tags),
+                categorie != null ? categorie : "Non classé",
+                tags != null && !tags.isEmpty() ? String.join("|", tags) : "",
                 groupeAbonnement != null ? groupeAbonnement : "",
-                priorite,
-                notes != null ? notes.replace(";", "｜") : "",
+                priorite != null ? priorite : "Important",
+                notes != null ? notes.replace(";", "｜").replace("\n", " ").replace("\r", " ") : "",
                 nombreUtilisateurs,
                 partage ? "OUI" : "NON",
                 joursRappelAvantFin,
-                frequencePaiement
+                frequencePaiement != null ? frequencePaiement : "Mensuel"
         );
     }
 
