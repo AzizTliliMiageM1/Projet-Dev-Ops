@@ -1,196 +1,184 @@
-# 📚 Index des Archives - Projet Gestion Abonnements
+# 📚 Index des Archives - Documentation Complète du Projet
 
-> **Documentation du processus de développement et d'évolution du projet**  
+> **Ensemble de la documentation du projet**  
 > Dernière mise à jour : 29 novembre 2024
 
 ---
 
-## 📁 Organisation des Archives
+## 📁 Organisation Complète des Archives
 
-Les archives sont organisées en **4 sous-dossiers thématiques** :
+Toute la documentation est centralisée ici, organisée en **8 sous-dossiers thématiques** :
 
 ```
 archives/
 ├── INDEX_ARCHIVES.md (ce fichier)
-├── corrections/      (corrections et bugs)
-├── recapitulatifs/   (synthèses fonctionnalités)
-├── historique/       (journal et décisions)
-└── listes/           (inventaires fichiers)
+├── guides/              (guides utilisateur)
+├── techniques/          (documentation technique)
+├── fonctionnalites/     (fiches fonctionnalités)
+├── integration-bancaire/(module bancaire)
+├── corrections/         (bugs et corrections)
+├── recapitulatifs/      (synthèses)
+├── historique/          (journal et décisions)
+└── listes/              (inventaires)
 ```
+
+---
+
+## 📖 Guides Utilisateur (`/guides/`)
+
+Documentation pour l'utilisation de l'application.
+
+### Fichiers disponibles :
+
+- **[GUIDE_MODULE_DEPENSES.md](guides/GUIDE_MODULE_DEPENSES.md)** - Guide complet du module de gestion des dépenses
+- **[GUIDE_NOUVELLES_FONCTIONNALITES.md](guides/GUIDE_NOUVELLES_FONCTIONNALITES.md)** - Guide des nouvelles fonctionnalités
+- **[GUIDE_TEST_RAPIDE.md](guides/GUIDE_TEST_RAPIDE.md)** - Guide de test rapide de l'application
+- **[GUIDE_UTILISATION_MAIN.md](guides/GUIDE_UTILISATION_MAIN.md)** - Guide d'utilisation du programme principal
+- **[QUICKSTART_BANQUE.md](guides/QUICKSTART_BANQUE.md)** - Démarrage rapide de l'intégration bancaire
+
+---
+
+## 🔧 Documentation Technique (`/techniques/`)
+
+Spécifications et architecture du projet.
+
+### Fichiers disponibles :
+
+- **[API_documentation.md](techniques/API_documentation.md)** - Documentation complète de l'API REST
+- **[ARCHITECTURE_TECHNIQUE.md](techniques/ARCHITECTURE_TECHNIQUE.md)** - Architecture technique du système
+- **[CAHIER_DES_CHARGES.md](techniques/CAHIER_DES_CHARGES.md)** - Cahier des charges du projet
+- **[PLAN_INTEGRATION_FRONTEND.md](techniques/PLAN_INTEGRATION_FRONTEND.md)** - Plan d'intégration frontend
+
+---
+
+## ⚙️ Fonctionnalités (`/fonctionnalites/`)
+
+Fiches détaillées des fonctionnalités implémentées.
+
+### Fichiers disponibles :
+
+- **[FONCTIONNALITE_DEPENSES.md](fonctionnalites/FONCTIONNALITE_DEPENSES.md)** - Module de gestion des dépenses
+- **[Fiche_Fonctionnalite_Alerte_Inactivite.md](fonctionnalites/Fiche_Fonctionnalite_Alerte_Inactivite.md)** + Diagram.png - Système d'alertes
+- **[Fiche_Fonctionnalite_CRUD.md](fonctionnalites/Fiche_Fonctionnalite_CRUD.md)** + Diagram.png - Opérations CRUD
+- **[Fiche_Fonctionnalite_Export_JSON.md](fonctionnalites/Fiche_Fonctionnalite_Export_JSON.md)** - Export de données JSON
+- **[Fiche_Fonctionnalite_Import_JSON.md](fonctionnalites/Fiche_Fonctionnalite_Import_JSON.md)** - Import de données JSON
+- **[Fiche_Fonctionnalite_Interface_Console.md](fonctionnalites/Fiche_Fonctionnalite_Interface_Console.md)** - Interface console
+- **[Fiche_Fonctionnalite_UUID.md](fonctionnalites/Fiche_Fonctionnalite_UUID.md)** - Gestion des UUID
+
+---
+
+## 🏦 Intégration Bancaire (`/integration-bancaire/`)
+
+Module d'intégration avec les relevés bancaires.
+
+### Fichiers disponibles :
+
+- **[INTEGRATION_BANCAIRE.md](integration-bancaire/INTEGRATION_BANCAIRE.md)** - Documentation complète : import multi-format (CSV/OFX/QIF), réconciliation automatique, détection d'abonnements non déclarés, simulation de solde
 
 ---
 
 ## 🔧 Corrections (`/corrections/`)
 
-Documentation de toutes les corrections effectuées durant le développement.
+Documentation des corrections et résolutions de bugs.
 
 ### Fichiers disponibles :
 
-- **[CORRECTIONS_EFFECTUEES.md](corrections/CORRECTIONS_EFFECTUEES.md)**  
-  Première vague de corrections (exports, notifications, navigation)
-  
-- **[CORRECTIONS_FINALES.md](corrections/CORRECTIONS_FINALES.md)**  
-  Corrections finales avant livraison v2.0
-  
-- **[TOUTES_ERREURS_CORRIGEES.md](corrections/TOUTES_ERREURS_CORRIGEES.md)**  
-  Catalogue exhaustif de tous les bugs résolus
-  
-- **[README_CORRECTIONS.md](corrections/README_CORRECTIONS.md)**  
-  Guide d'utilisation des fichiers de corrections
+- **[CORRECTIONS_EFFECTUEES.md](corrections/CORRECTIONS_EFFECTUEES.md)** - Première vague de corrections
+- **[CORRECTIONS_FINALES.md](corrections/CORRECTIONS_FINALES.md)** - Corrections finales avant livraison
+- **[TOUTES_ERREURS_CORRIGEES.md](corrections/TOUTES_ERREURS_CORRIGEES.md)** - Catalogue exhaustif des bugs
+- **[README_CORRECTIONS.md](corrections/README_CORRECTIONS.md)** - Guide d'utilisation
 
 ---
 
 ## 📝 Récapitulatifs (`/recapitulatifs/`)
 
-Synthèses et résumés des fonctionnalités implémentées.
+Synthèses et bilans des fonctionnalités.
 
 ### Fichiers disponibles :
 
-- **[RECAP_FONCTIONNALITES_V2.md](recapitulatifs/RECAP_FONCTIONNALITES_V2.md)**  
-  Vue d'ensemble complète de la version 2.0
-  
-- **[RECAP_NOUVELLES_FONCTIONNALITES.md](recapitulatifs/RECAP_NOUVELLES_FONCTIONNALITES.md)**  
-  Catalogue des nouvelles features ajoutées
-  
-- **[RESUME_MODIFICATIONS.md](recapitulatifs/RESUME_MODIFICATIONS.md)**  
-  Résumé global des modifications apportées
-  
-- **[SYNTHESE_FINALE_DEPENSES.md](recapitulatifs/SYNTHESE_FINALE_DEPENSES.md)**  
-  Synthèse détaillée du module de gestion des dépenses
-  
-- **[MISSION_ACCOMPLIE.md](recapitulatifs/MISSION_ACCOMPLIE.md)**  
-  Récapitulatif final de mission
+- **[RECAP_FONCTIONNALITES_V2.md](recapitulatifs/RECAP_FONCTIONNALITES_V2.md)** - Vue d'ensemble v2.0
+- **[RECAP_NOUVELLES_FONCTIONNALITES.md](recapitulatifs/RECAP_NOUVELLES_FONCTIONNALITES.md)** - Nouvelles features
+- **[RESUME_MODIFICATIONS.md](recapitulatifs/RESUME_MODIFICATIONS.md)** - Résumé des modifications
+- **[SYNTHESE_FINALE_DEPENSES.md](recapitulatifs/SYNTHESE_FINALE_DEPENSES.md)** - Synthèse module dépenses
+- **[MISSION_ACCOMPLIE.md](recapitulatifs/MISSION_ACCOMPLIE.md)** - Bilan final de mission
 
 ---
 
 ## 📊 Historique (`/historique/`)
 
-Journal de développement, décisions techniques et statistiques du projet.
+Journal de développement, décisions techniques et statistiques.
 
 ### Fichiers disponibles :
 
-- **[JOURNAL_DEVELOPPEMENT.md](historique/JOURNAL_DEVELOPPEMENT.md)**  
-  Chronologie complète du développement jour par jour
-  
-- **[HISTORIQUE_VERSIONS.md](historique/HISTORIQUE_VERSIONS.md)**  
-  Évolution du projet à travers les versions (v1.0 → v2.0)
-  
-- **[DECISIONS_TECHNIQUES.md](historique/DECISIONS_TECHNIQUES.md)**  
-  Choix techniques majeurs et leurs justifications
-  
-- **[STATISTIQUES_PROJET.md](historique/STATISTIQUES_PROJET.md)**  
-  Métriques et statistiques du projet (lignes code, fichiers, etc.)
+- **[JOURNAL_DEVELOPPEMENT.md](historique/JOURNAL_DEVELOPPEMENT.md)** - Chronologie complète du développement
+- **[HISTORIQUE_VERSIONS.md](historique/HISTORIQUE_VERSIONS.md)** - Évolution du projet (v1.0 → v2.0)
+- **[DECISIONS_TECHNIQUES.md](historique/DECISIONS_TECHNIQUES.md)** - Choix techniques et justifications
+- **[STATISTIQUES_PROJET.md](historique/STATISTIQUES_PROJET.md)** - Métriques du projet
 
 ---
 
 ## 📋 Listes (`/listes/`)
 
-Inventaires exhaustifs des fichiers créés et modifiés.
+Inventaires exhaustifs des fichiers.
 
 ### Fichiers disponibles :
 
-- **[LISTE_FICHIERS_CREES.txt](listes/LISTE_FICHIERS_CREES.txt)**  
-  Liste complète de tous les fichiers créés durant le projet
-  
-- **[LISTE_FICHIERS_MODIFIES.md](listes/LISTE_FICHIERS_MODIFIES.md)**  
-  Historique détaillé des modifications par fichier
+- **[LISTE_FICHIERS_CREES.txt](listes/LISTE_FICHIERS_CREES.txt)** - Liste des fichiers créés
+- **[LISTE_FICHIERS_MODIFIES.md](listes/LISTE_FICHIERS_MODIFIES.md)** - Historique des modifications
 
 ---
 
-## 🔍 Navigation Rapide
+## 📄 Autre Document
 
-### Par Type de Besoin
-
-**📖 Je veux comprendre l'évolution du projet :**
-- → `historique/JOURNAL_DEVELOPPEMENT.md`
-- → `historique/HISTORIQUE_VERSIONS.md`
-
-**🐛 Je cherche des infos sur les corrections :**
-- → `corrections/TOUTES_ERREURS_CORRIGEES.md`
-- → `corrections/CORRECTIONS_FINALES.md`
-
-**📊 Je veux un résumé des fonctionnalités :**
-- → `recapitulatifs/RECAP_FONCTIONNALITES_V2.md`
-- → `recapitulatifs/SYNTHESE_FINALE_DEPENSES.md`
-
-**🔧 Je cherche quels fichiers ont été créés/modifiés :**
-- → `listes/LISTE_FICHIERS_CREES.txt`
-- → `listes/LISTE_FICHIERS_MODIFIES.md`
-
-**💡 Je veux comprendre les choix techniques :**
-- → `historique/DECISIONS_TECHNIQUES.md`
+- **[projet_description.txt](projet_description.txt)** - Description originale du projet
 
 ---
 
-## 📈 Timeline du Projet
+## 🔍 Navigation Rapide par Profil
 
-### Phase 1 : Fondations (Octobre 2024)
-- CRUD de base
-- Alertes d'inactivité
-- Interface console
+### 👨‍💻 Développeur
+- Architecture → `techniques/ARCHITECTURE_TECHNIQUE.md`
+- API → `techniques/API_documentation.md`
+- Décisions → `historique/DECISIONS_TECHNIQUES.md`
+- Historique → `historique/HISTORIQUE_VERSIONS.md`
 
-### Phase 2 : Modernisation (Novembre 2024)
-- API REST avec Spark
-- Interface web glassmorphisme
-- Module dépenses + analytics
+### 👤 Utilisateur Final
+- Démarrage → `guides/QUICKSTART_BANQUE.md`
+- Guide complet → `guides/GUIDE_UTILISATION_MAIN.md`
+- Tests rapides → `guides/GUIDE_TEST_RAPIDE.md`
+- Module dépenses → `guides/GUIDE_MODULE_DEPENSES.md`
 
-### Phase 3 : Enrichissement (Novembre 2024)
-- Système de thèmes personnalisables
-- Export/Import avancé (PDF/CSV/Excel)
-- Notifications email automatiques
-- Intégration bancaire intelligente
+### 📊 Chef de Projet
+- Cahier des charges → `techniques/CAHIER_DES_CHARGES.md`
+- Bilan final → `recapitulatifs/MISSION_ACCOMPLIE.md`
+- Statistiques → `historique/STATISTIQUES_PROJET.md`
 
-### Phase 4 : Finalisation (29 Novembre 2024)
-- Corrections finales
-- Réorganisation projet
-- Documentation complète
-
----
-
-## 📦 Contenu des Archives
-
-### Statistiques Globales
-
-- **16 fichiers** archivés au total
-- **4 catégories** thématiques
-- **~100+ pages** de documentation de développement
-- **Période couverte :** Octobre - Novembre 2024
-
-### Types de Documents
-
-- 🔧 **Corrections :** 4 fichiers (bugs, erreurs, améliorations)
-- 📝 **Récapitulatifs :** 5 fichiers (synthèses, résumés)
-- 📊 **Historique :** 4 fichiers (journal, versions, décisions)
-- 📋 **Listes :** 2 fichiers (inventaires)
+### 🐛 QA / Testeur
+- Bugs corrigés → `corrections/TOUTES_ERREURS_CORRIGEES.md`
+- Tests → `guides/GUIDE_TEST_RAPIDE.md`
+- Fonctionnalités → `fonctionnalites/` (toutes les fiches)
 
 ---
 
-## 🎯 Utilisation des Archives
+## �� Statistiques Globales
 
-### Pour les Développeurs
-Consulter `historique/DECISIONS_TECHNIQUES.md` pour comprendre les choix d'architecture.
+- **36 fichiers** de documentation
+- **8 catégories** thématiques
+- **Période :** Octobre - Novembre 2024
 
-### Pour la Maintenance
-Référencer `corrections/TOUTES_ERREURS_CORRIGEES.md` pour éviter les régressions.
-
-### Pour les Rapports
-Utiliser `recapitulatifs/RECAP_FONCTIONNALITES_V2.md` pour les présentations.
-
-### Pour l'Audit
-Vérifier `listes/LISTE_FICHIERS_MODIFIES.md` pour tracer les changements.
-
----
-
-## ⚠️ Note Importante
-
-Ces archives documentent le **processus de développement** et ne sont **pas nécessaires** pour l'utilisation quotidienne de l'application.
-
-Pour la documentation utilisateur, consultez plutôt :
-- `/docs/` (documentation principale)
-- `/README.md` (guide de démarrage)
+### Répartition
+- 📖 Guides : 5 fichiers
+- 🔧 Technique : 4 fichiers
+- ⚙️ Fonctionnalités : 9 fichiers + 2 diagrammes
+- 🏦 Bancaire : 1 fichier
+- 🐛 Corrections : 4 fichiers
+- 📝 Récapitulatifs : 5 fichiers
+- 📊 Historique : 4 fichiers
+- 📋 Listes : 2 fichiers
 
 ---
 
 **Dernière réorganisation :** 29 novembre 2024  
-**Structure :** Organisée en sous-dossiers thématiques  
-**Accès :** Navigation via ce fichier INDEX_ARCHIVES.md
+**Structure :** 8 sous-dossiers thématiques  
+
+[← Retour à la racine](../../README.md)
