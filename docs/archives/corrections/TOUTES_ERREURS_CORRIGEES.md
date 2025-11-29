@@ -332,7 +332,6 @@ Si vous rencontrez un problème :
 
 ---
 
-*Corrections effectuées le 29 Novembre 2024*
 *Version 2.0 - Gestion d'Abonnements*
 *Build : SUCCESS ✅*
 *Tests : PASSED ✅*

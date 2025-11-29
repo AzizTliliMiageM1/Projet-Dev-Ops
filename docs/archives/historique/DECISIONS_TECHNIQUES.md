@@ -640,5 +640,5 @@ public void addAbonnement(Abonnement abo) {
 ---
 
 **Document maintenu par :** Équipe Projet  
-**Dernière mise à jour :** 29 novembre 2024  
+**Dernière mise à jour :**   
 **Version :** 2.0.0

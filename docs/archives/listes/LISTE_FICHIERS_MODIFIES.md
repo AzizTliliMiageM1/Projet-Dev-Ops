@@ -1,6 +1,5 @@
 # 📝 Liste des Fichiers Modifiés/Créés
 
-## 📅 Session du 29 Novembre 2024
 
 ---
 
@@ -342,7 +341,6 @@ Date,Description,Montant,Catégorie
 
 ## 🔄 Historique des Versions
 
-### Version 2.0 - Corrections (29 Nov 2024)
 - ✅ Thèmes appliqués partout
 - ✅ Import connecté backend
 - ✅ Export avec données serveur
@@ -350,7 +348,6 @@ Date,Description,Montant,Catégorie
 - ✅ Isolation utilisateur complète
 - ✅ Documentation complète
 
-### Version 2.0 - Initial (28 Nov 2024)
 - 🆕 Système de thèmes
 - 🆕 Export/Import
 - 🆕 Notifications email
@@ -389,7 +386,4 @@ Date,Description,Montant,Catégorie
 - **Fichiers** : `test_import.csv`, `test_import.ofx`
 - **Guide** : `GUIDE_TEST_RAPIDE.md`
 
----
 
-*Document créé le 29 Novembre 2024*
-*Dernière mise à jour : 29 Novembre 2024, 12:00 UTC*

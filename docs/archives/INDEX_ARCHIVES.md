@@ -1,7 +1,6 @@
 # 📚 Index des Archives - Documentation Complète du Projet
 
 > **Ensemble de la documentation du projet**  
-> Dernière mise à jour : 29 novembre 2024
 
 ---
 
@@ -164,7 +163,6 @@ Inventaires exhaustifs des fichiers.
 
 - **36 fichiers** de documentation
 - **8 catégories** thématiques
-- **Période :** Octobre - Novembre 2024
 
 ### Répartition
 - 📖 Guides : 5 fichiers
@@ -178,7 +176,6 @@ Inventaires exhaustifs des fichiers.
 
 ---
 
-**Dernière réorganisation :** 29 novembre 2024  
 **Structure :** 8 sous-dossiers thématiques  
 
 [← Retour à la racine](../../README.md)

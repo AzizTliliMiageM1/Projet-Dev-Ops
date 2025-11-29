@@ -1,6 +1,6 @@
 # 🔧 Corrections Techniques - Problème de Modification des Abonnements
 
-**Date :** 29 novembre 2024  
+**Date :**   
 **Développeur :** Aziz Tlili  
 **Statut :** ✅ Résolu
 

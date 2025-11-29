@@ -1,6 +1,5 @@
 # 🔧 Corrections Effectuées - Version 2.0
 
-## 📅 Date : 29 Novembre 2024
 
 ## 🎯 Objectif
 Résoudre les problèmes d'intégration identifiés lors du déploiement de la version 2.0 avec les 3 nouvelles fonctionnalités.
@@ -321,5 +320,4 @@ mvn exec:java -Dexec.mainClass="com.projet.api.ApiServer"
 
 ---
 
-*Document généré le 29 Novembre 2024*
 *Version 2.0 - Gestion d'Abonnements*

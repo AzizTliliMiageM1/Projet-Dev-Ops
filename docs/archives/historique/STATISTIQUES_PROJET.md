@@ -491,6 +491,6 @@ Total Technologies : 15+
 
 ---
 
-**Statistiques générées le :** 18 novembre 2025 
+**Statistiques générées le :** 18  
 **Version :** 2.0.0  
 **Méthode :** Analyse automatique + estimation manuelle

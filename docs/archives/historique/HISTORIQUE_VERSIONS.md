@@ -148,7 +148,7 @@ src/main/resources/static/
 
 ## Version 2.0 - Full-Stack Premium
 
-**Date de sortie :** 29 novembre 2024  
+**Date de sortie :**   
 **Statut :** ✅ Production
 
 ### 🎯 Objectifs
@@ -442,13 +442,11 @@ Projet-Dev-Ops/
 
 ## Roadmap Future
 
-### Version 2.1 (Prévue Q1 2025)
 - 🔜 Tests unitaires complets
 - 🔜 CI/CD GitHub Actions
 - 🔜 Docker containerization
 - 🔜 Base de données PostgreSQL
 
-### Version 3.0 (Vision Q2 2025)
 - 🚀 Backend Spring Boot
 - 🚀 Authentification JWT
 - 🚀 Application mobile
@@ -459,5 +457,5 @@ Projet-Dev-Ops/
 ---
 
 **Historique maintenu par :** Équipe Projet  
-**Dernière mise à jour :** 29 novembre 2024  
+**Dernière mise à jour :**   
 **Version actuelle :** 2.0.0

@@ -181,5 +181,4 @@ Un tableau de bord analytique professionnel pour suivre, analyser et optimiser l
 ---
 
 **Développé avec ❤️ par GitHub Copilot (Claude Sonnet 4.5)**  
-**Date** : $(date +"%d/%m/%Y à %H:%M")  
 **Statut** : ✅ **MISSION ACCOMPLIE**

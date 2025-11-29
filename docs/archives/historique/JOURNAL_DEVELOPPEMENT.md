@@ -261,11 +261,11 @@ Créer une application web moderne de gestion d'abonnements avec :
 **Contenu :** Gestion + Export + Import
 
 ### ✅ Intégration bancaire
-**Date :** 29 novembre 2024  
+**Date :**   
 **Contenu :** CSV/OFX/QIF + Détection + Simulation
 
 ### ✅ Réorganisation finale
-**Date :** 29 novembre 2024  
+**Date :**   
 **Contenu :** Structure propre + Documentation complète
 
 ---
@@ -402,6 +402,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 ---
 
 **Journal maintenu par :** Équipe Projet  
-**Période couverte :** Octobre - Novembre 2024  
+**Période couverte :**   
 **Version actuelle :** 2.0.0  
 **Statut :** ✅ Production

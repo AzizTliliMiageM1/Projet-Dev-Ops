@@ -1,6 +1,5 @@
 # ✅ SYNTHÈSE FINALE - Module Dépenses
 
-**Date** : 20 janvier 2025  
 **Développeur** : GitHub Copilot (Claude Sonnet 4.5)
 
 ---

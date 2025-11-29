@@ -633,6 +633,5 @@ Le projet démontre une maîtrise complète du développement web moderne avec u
 ---
 
 **Auteur** : Aziz TLILI  
-**Date** : Novembre 2025  
 **Projet** : Gestion d'Abonnements - Application Full-Stack  
 **Dépôt** : [github.com/AzizTliliMiageM1/Projet-Dev-Ops](https://github.com/AzizTliliMiageM1/Projet-Dev-Ops)

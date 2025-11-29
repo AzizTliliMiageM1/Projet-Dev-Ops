@@ -295,5 +295,5 @@ Si vous rencontrez un problème :
 
 ---
 
-*Guide créé le 29 Novembre 2024*
+*Guide créé le *
 *Version 2.0 - Corrections Intégrées*
