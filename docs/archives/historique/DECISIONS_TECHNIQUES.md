@@ -2,8 +2,6 @@
 
 > **Justifications des choix techniques majeurs du projet**
 
----
-
 ## 📋 Table des Matières
 
 1. [Choix du Langage Backend](#choix-du-langage-backend)
@@ -13,8 +11,6 @@
 5. [Architecture](#architecture)
 6. [Libraries & Dépendances](#libraries--dépendances)
 7. [Build & Deploy](#build--deploy)
-
----
 
 ## Choix du Langage Backend
 
@@ -73,8 +69,6 @@
 - ❌ Moins de documentation pédagogique
 - ❌ Moins enseigné en cours
 - ✅ Mais : Syntaxe plus moderne
-
----
 
 ## Framework Web
 
@@ -137,8 +131,6 @@ public class AbonnementController {
     }
 }
 ```
-
----
 
 ## Frontend & UI
 
@@ -236,8 +228,6 @@ function renderAbonnements(abonnements) {
 }
 ```
 
----
-
 ## Persistance des Données
 
 ### Fichiers Texte + Option H2
@@ -311,8 +301,6 @@ REPO=db mvn exec:java
 - ✅ SQL + fichier unique
 - ⚠️ Pas utilisé car H2 plus Java-natif
 
----
-
 ## Architecture
 
 ### Architecture 3-Tiers Simplifiée
@@ -355,8 +343,6 @@ REPO=db mvn exec:java
    - Code organisé
    - Responsabilités claires
    - Facile à débugger
-
----
 
 ## Libraries & Dépendances
 
@@ -443,8 +429,6 @@ doc.save('export.pdf');
 
 **Déjà justifié ci-dessus**
 
----
-
 ## Build & Deploy
 
 ### Maven
@@ -517,8 +501,6 @@ EXPOSE 4567
 CMD ["java", "-jar", "/app.jar"]
 ```
 
----
-
 ## Décisions de Design
 
 ### Glassmorphisme
@@ -581,8 +563,6 @@ CMD ["java", "-jar", "/app.jar"]
    - Un seul endroit pour couleurs
    - DRY principle
 
----
-
 ## Sécurité
 
 ### Décisions Actuelles
@@ -620,8 +600,6 @@ public void addAbonnement(Abonnement abo) {
 }
 ```
 
----
-
 ## Résumé des Décisions
 
 | Aspect | Choix | Justification |
@@ -636,8 +614,6 @@ public void addAbonnement(Abonnement abo) {
 | **Graphiques** | Chart.js | Docs + responsive |
 | **Export PDF** | jsPDF | Client-side |
 | **Design** | Glassmorphisme | Moderne + original |
-
----
 
 **Document maintenu par :** Équipe Projet  
 **Dernière mise à jour :**   

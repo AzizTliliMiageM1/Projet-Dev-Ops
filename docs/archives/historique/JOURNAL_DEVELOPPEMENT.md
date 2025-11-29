@@ -3,8 +3,6 @@
 > **Chronologie complète du développement du projet**  
 > De l'idée initiale à la version 2.0 déployée
 
----
-
 ## 🎯 Objectif du Projet
 
 Créer une application web moderne de gestion d'abonnements avec :
@@ -14,8 +12,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - Intégration bancaire intelligente
 - Notifications automatiques
 - Personnalisation complète
-
----
 
 ## 📆 Timeline Détaillée
 
@@ -91,8 +87,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 🐛 **Problèmes rencontrés :**
 - Doublons UUID (résolu avec vérification)
 - Format JSON invalide (ajout try-catch)
-
----
 
 ### Novembre 2024 - Évolution vers v2.0
 
@@ -195,8 +189,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - Détection récurrence (ajout tolérance ±3j)
 - Navigation fichiers (réorganisation structure)
 
----
-
 ## 🎨 Évolution du Design
 
 ### v1.0 - Console
@@ -216,8 +208,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - Responsive complet
 - UX optimisée
 
----
-
 ## 📊 Croissance du Projet
 
 ### Lignes de Code
@@ -235,8 +225,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - **v1.0** : CRUD basique (4 features)
 - **v1.5** : +API +Web (12 features)
 - **v2.0** : +Analytics +IA +Thèmes +Bancaire (35+ features)
-
----
 
 ## 🏆 Jalons Importants
 
@@ -268,8 +256,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 **Date :**   
 **Contenu :** Structure propre + Documentation complète
 
----
-
 ## 👥 Contributions (Simulation)
 
 > Ce projet est réalisé dans un cadre pédagogique
@@ -279,8 +265,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - **Designer UI/UX** : Interface glassmorphisme
 - **Architecte** : Structure projet et API
 - **Documentaliste** : Documentation complète
-
----
 
 ## 🔄 Méthodologie Utilisée
 
@@ -301,8 +285,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - SOLID principles (partiel)
 - DRY (Don't Repeat Yourself)
 - Commentaires en français
-
----
 
 ## 📈 Progression des Compétences
 
@@ -336,8 +318,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - ✅ Animations CSS
 - ✅ Théorie des couleurs
 
----
-
 ## 🎓 Leçons Apprises
 
 ### Réussites
@@ -358,8 +338,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 3. 🚀 Base de données SQL
 4. 🚀 Authentification JWT
 5. 🚀 Docker containerization
-
----
 
 ## 📊 Statistiques Finales
 
@@ -382,8 +360,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - **Docs techniques** : 10
 - **Archives** : 15+ fichiers
 
----
-
 ## 🎯 Vision et Futur
 
 ### Version 2.1 (Prévue)
@@ -398,8 +374,6 @@ Créer une application web moderne de gestion d'abonnements avec :
 - Machine Learning pour prédictions
 - Synchronisation multi-devices
 - Open Banking API réelles
-
----
 
 **Journal maintenu par :** Équipe Projet  
 **Période couverte :**   

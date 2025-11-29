@@ -2,8 +2,6 @@
 
 > **Évolution du projet de la v1.0 à la v2.0**
 
----
-
 ## 📋 Table des Matières
 
 1. [Version 1.0 - Console](#version-10---console)
@@ -11,8 +9,6 @@
 3. [Version 2.0 - Full-Stack Premium](#version-20---full-stack-premium)
 4. [Comparaison des Versions](#comparaison-des-versions)
 5. [Migration Guide](#migration-guide)
-
----
 
 ## Version 1.0 - Console
 
@@ -71,8 +67,6 @@ src/main/java/com/example/abonnement/
 - **Classes :** 2
 - **Méthodes :** ~15
 - **Tests :** Manuel uniquement
-
----
 
 ## Version 1.5 - API REST
 
@@ -143,8 +137,6 @@ src/main/resources/static/
 # Ajout simplement UUID lors du chargement
 # Pas de migration spécifique nécessaire
 ```
-
----
 
 ## Version 2.0 - Full-Stack Premium
 
@@ -356,8 +348,6 @@ Projet-Dev-Ops/
 - **Docs techniques :** 10
 - **Archives :** 15+
 
----
-
 ## Comparaison des Versions
 
 ### Tableau Comparatif
@@ -405,8 +395,6 @@ Projet-Dev-Ops/
 - ⚠️ Partiel
 - ❌ Absent
 
----
-
 ## Migration Guide
 
 ### De v1.0 vers v2.0
@@ -438,8 +426,6 @@ Projet-Dev-Ops/
 5. **Banque :** `/bank-integration.html` - Importez vos relevés
 6. **Notifications :** `/notifications.html` - Configurez les alertes
 
----
-
 ## Roadmap Future
 
 - 🔜 Tests unitaires complets
@@ -453,8 +439,6 @@ Projet-Dev-Ops/
 - 🚀 API GraphQL
 - 🚀 Machine Learning avancé
 - 🚀 Open Banking API
-
----
 
 **Historique maintenu par :** Équipe Projet  
 **Dernière mise à jour :**   

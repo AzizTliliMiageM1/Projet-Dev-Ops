@@ -13,8 +13,6 @@ Attendez le message : `API server démarré sur http://localhost:4567`
 ### 2. Ouvrir l'application
 Ouvrez votre navigateur à : **http://localhost:4567**
 
----
-
 ## ✅ Tests à Effectuer
 
 ### 🎨 Test 1 : Système de Thèmes
@@ -32,8 +30,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Toutes les pages utilisent les mêmes couleurs
 - Le thème persiste après rechargement
 - Les gradients et boutons suivent le thème
-
----
 
 ### 📥 Test 2 : Import de Données
 
@@ -63,8 +59,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Abonnements visibles dans la page Dépenses
 - Catégories correctement détectées
 - Aucune erreur dans la console (F12)
-
----
 
 ### 📤 Test 3 : Export de Données
 
@@ -114,8 +108,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Historique mis à jour
 - Bouton "Régénérer" fonctionnel
 
----
-
 ### 📧 Test 4 : Notifications Email
 
 #### Configuration SMTP (Optionnel)
@@ -138,8 +130,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Email reçu dans votre boîte (si SMTP configuré)
 - En mode simulation : message "Mode simulation"
 - Historique des notifications mis à jour
-
----
 
 ### 🔐 Test 5 : Isolation Utilisateur
 
@@ -168,8 +158,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Chaque utilisateur voit uniquement ses propres données
 - Les thèmes sont bien isolés par utilisateur
 - Les exports contiennent uniquement les données de l'utilisateur connecté
-
----
 
 ### 🎯 Test 6 : Navigation et Responsive
 
@@ -208,8 +196,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - Design responsive sur mobile/tablette
 - Aucune erreur JavaScript dans la console
 
----
-
 ## 🐛 Vérification des Bugs Corrigés
 
 ### Bug #1 : Thèmes non appliqués
@@ -231,8 +217,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 ### Bug #4 : Boutons historique
 - [x] Bouton "Régénérer" télécharge un nouveau fichier
 - [x] Type de fichier correct (PDF/CSV/JSON/Excel)
-
----
 
 ## 📊 Checklist Complète
 
@@ -266,8 +250,6 @@ Ouvrez votre navigateur à : **http://localhost:4567**
 - [ ] Import < 2s
 - [ ] Navigation fluide
 
----
-
 ## 🎉 Résultat Final Attendu
 
 Si tous les tests passent :
@@ -278,8 +260,6 @@ Si tous les tests passent :
 ✅ **Isolation** : Données séparées par utilisateur
 ✅ **UI/UX** : Responsive et sans erreurs
 ✅ **Performance** : Rapide et fluide
-
----
 
 ## 📝 Notes de Debug
 
@@ -292,8 +272,6 @@ Si vous rencontrez un problème :
    - Vous êtes connecté
    - Le fichier d'import est valide
 4. **Logs serveur** : Regardez le terminal où le serveur tourne
-
----
 
 *Guide créé le *
 *Version 2.0 - Corrections Intégrées*

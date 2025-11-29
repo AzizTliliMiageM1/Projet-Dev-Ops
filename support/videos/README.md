@@ -27,8 +27,6 @@ Ce dossier contient les tutoriels vidéo interactifs pour l'application de gesti
 6. 4:30 - Page Analytics
 7. 4:50 - Conclusion
 
----
-
 ### 2. Gestion avancée (8 minutes)
 **Fichier :** `tutorial-advanced.html`  
 **Niveau :** Intermédiaire  
@@ -57,8 +55,6 @@ Ce dossier contient les tutoriels vidéo interactifs pour l'application de gesti
 10. 7:30 - Documentation API
 11. 7:50 - Conclusion
 
----
-
 ## 🎬 Format des Tutoriels
 
 Les tutoriels sont des présentations interactives HTML/CSS/JavaScript qui simulent une expérience vidéo :
@@ -73,8 +69,6 @@ Les tutoriels sont des présentations interactives HTML/CSS/JavaScript qui simul
 - **Durée par slide :** 5 secondes en lecture automatique
 - **Navigation manuelle :** Possible via chapitres ou barre de progression
 
----
-
 ## 🚀 Accès aux Tutoriels
 
 ### Via l'interface web
@@ -85,8 +79,6 @@ Les tutoriels sont des présentations interactives HTML/CSS/JavaScript qui simul
 ### Accès direct
 - **Débutant :** `http://localhost:4567/support/videos/tutorial-beginner.html`
 - **Avancé :** `http://localhost:4567/support/videos/tutorial-advanced.html`
-
----
 
 ## 📝 Scripts de Narration
 
@@ -101,8 +93,6 @@ Ces scripts contiennent :
 - Les notes de production
 - Les recommandations d'accessibilité
 
----
-
 ## 🎨 Personnalisation
 
 ### Couleurs
@@ -115,8 +105,6 @@ Les tutoriels utilisent Bootstrap Icons 1.11.3 :
 - `bi-mortarboard` - Apprentissage avancé
 - `bi-check-circle` - Validation
 - Et bien d'autres pour illustrer les concepts
-
----
 
 ## 🔧 Maintenance
 
@@ -132,8 +120,6 @@ Les tutoriels utilisent Bootstrap Icons 1.11.3 :
 3. Copier vers `/src/main/resources/static/support/videos/`
 4. Ajouter le lien dans `help.html`
 
----
-
 ## 📊 Statistiques
 
 - **Nombre de tutoriels :** 2
@@ -141,8 +127,6 @@ Les tutoriels utilisent Bootstrap Icons 1.11.3 :
 - **Nombre de slides :** 18 (7 débutant + 11 avancé)
 - **Chapitres totaux :** 18
 - **Technologies :** HTML5, CSS3, Bootstrap 5, Bootstrap Icons
-
----
 
 ## ✅ Checklist de Qualité
 
@@ -156,8 +140,6 @@ Les tutoriels utilisent Bootstrap Icons 1.11.3 :
 - [x] Icônes cohérentes avec l'application
 - [x] Liens de retour vers le centre d'aide
 
----
-
 ## 🌐 Accessibilité
 
 Les tutoriels respectent les bonnes pratiques d'accessibilité :
@@ -167,16 +149,12 @@ Les tutoriels respectent les bonnes pratiques d'accessibilité :
 - Taille de police adaptative
 - Boutons et liens avec zones de clic suffisantes
 
----
-
 ## 📞 Support
 
 Pour toute question concernant les tutoriels :
 - Consultez la FAQ dans le centre d'aide
 - Référez-vous à la documentation API
 - Contactez le support technique
-
----
 
 **Dernière mise à jour :** Décembre 2024  
 **Version :** 1.0  

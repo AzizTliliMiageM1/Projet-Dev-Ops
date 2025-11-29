@@ -2,8 +2,6 @@
 
 > **Ensemble de la documentation du projet**  
 
----
-
 ## 📁 Organisation Complète des Archives
 
 Toute la documentation est centralisée ici, organisée en **8 sous-dossiers thématiques** :
@@ -21,8 +19,6 @@ archives/
 └── listes/              (inventaires)
 ```
 
----
-
 ## 📖 Guides Utilisateur (`/guides/`)
 
 Documentation pour l'utilisation de l'application.
@@ -35,8 +31,6 @@ Documentation pour l'utilisation de l'application.
 - **[GUIDE_UTILISATION_MAIN.md](guides/GUIDE_UTILISATION_MAIN.md)** - Guide d'utilisation du programme principal
 - **[QUICKSTART_BANQUE.md](guides/QUICKSTART_BANQUE.md)** - Démarrage rapide de l'intégration bancaire
 
----
-
 ## 🔧 Documentation Technique (`/techniques/`)
 
 Spécifications et architecture du projet.
@@ -47,8 +41,6 @@ Spécifications et architecture du projet.
 - **[ARCHITECTURE_TECHNIQUE.md](techniques/ARCHITECTURE_TECHNIQUE.md)** - Architecture technique du système
 - **[CAHIER_DES_CHARGES.md](techniques/CAHIER_DES_CHARGES.md)** - Cahier des charges du projet
 - **[PLAN_INTEGRATION_FRONTEND.md](techniques/PLAN_INTEGRATION_FRONTEND.md)** - Plan d'intégration frontend
-
----
 
 ## ⚙️ Fonctionnalités (`/fonctionnalites/`)
 
@@ -64,8 +56,6 @@ Fiches détaillées des fonctionnalités implémentées.
 - **[Fiche_Fonctionnalite_Interface_Console.md](fonctionnalites/Fiche_Fonctionnalite_Interface_Console.md)** - Interface console
 - **[Fiche_Fonctionnalite_UUID.md](fonctionnalites/Fiche_Fonctionnalite_UUID.md)** - Gestion des UUID
 
----
-
 ## 🏦 Intégration Bancaire (`/integration-bancaire/`)
 
 Module d'intégration avec les relevés bancaires.
@@ -73,8 +63,6 @@ Module d'intégration avec les relevés bancaires.
 ### Fichiers disponibles :
 
 - **[INTEGRATION_BANCAIRE.md](integration-bancaire/INTEGRATION_BANCAIRE.md)** - Documentation complète : import multi-format (CSV/OFX/QIF), réconciliation automatique, détection d'abonnements non déclarés, simulation de solde
-
----
 
 ## 🔧 Corrections (`/corrections/`)
 
@@ -86,8 +74,6 @@ Documentation des corrections et résolutions de bugs.
 - **[CORRECTIONS_FINALES.md](corrections/CORRECTIONS_FINALES.md)** - Corrections finales avant livraison
 - **[TOUTES_ERREURS_CORRIGEES.md](corrections/TOUTES_ERREURS_CORRIGEES.md)** - Catalogue exhaustif des bugs
 - **[README_CORRECTIONS.md](corrections/README_CORRECTIONS.md)** - Guide d'utilisation
-
----
 
 ## 📝 Récapitulatifs (`/recapitulatifs/`)
 
@@ -101,8 +87,6 @@ Synthèses et bilans des fonctionnalités.
 - **[SYNTHESE_FINALE_DEPENSES.md](recapitulatifs/SYNTHESE_FINALE_DEPENSES.md)** - Synthèse module dépenses
 - **[MISSION_ACCOMPLIE.md](recapitulatifs/MISSION_ACCOMPLIE.md)** - Bilan final de mission
 
----
-
 ## 📊 Historique (`/historique/`)
 
 Journal de développement, décisions techniques et statistiques.
@@ -114,8 +98,6 @@ Journal de développement, décisions techniques et statistiques.
 - **[DECISIONS_TECHNIQUES.md](historique/DECISIONS_TECHNIQUES.md)** - Choix techniques et justifications
 - **[STATISTIQUES_PROJET.md](historique/STATISTIQUES_PROJET.md)** - Métriques du projet
 
----
-
 ## 📋 Listes (`/listes/`)
 
 Inventaires exhaustifs des fichiers.
@@ -125,13 +107,9 @@ Inventaires exhaustifs des fichiers.
 - **[LISTE_FICHIERS_CREES.txt](listes/LISTE_FICHIERS_CREES.txt)** - Liste des fichiers créés
 - **[LISTE_FICHIERS_MODIFIES.md](listes/LISTE_FICHIERS_MODIFIES.md)** - Historique des modifications
 
----
-
 ## 📄 Autre Document
 
 - **[projet_description.txt](projet_description.txt)** - Description originale du projet
-
----
 
 ## 🔍 Navigation Rapide par Profil
 
@@ -157,8 +135,6 @@ Inventaires exhaustifs des fichiers.
 - Tests → `guides/GUIDE_TEST_RAPIDE.md`
 - Fonctionnalités → `fonctionnalites/` (toutes les fiches)
 
----
-
 ## �� Statistiques Globales
 
 - **36 fichiers** de documentation
@@ -173,8 +149,6 @@ Inventaires exhaustifs des fichiers.
 - 📝 Récapitulatifs : 5 fichiers
 - 📊 Historique : 4 fichiers
 - 📋 Listes : 2 fichiers
-
----
 
 **Structure :** 8 sous-dossiers thématiques  
 

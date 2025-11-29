@@ -13,8 +13,6 @@ Message : ✨ feat: Ajout de fonctionnalités créatives au système d'abonnemen
 
 Le dernier commit sur `origin/main` est le commit `4bdaa02`, et votre commit local `88edb44` contient toutes les nouvelles fonctionnalités que nous venons d'ajouter.
 
----
-
 ### ✅ 2. Y a-t-il du code métier dans le backend ?
 
 **OUI, ABSOLUMENT !** Le backend contient plusieurs couches métier :
@@ -126,13 +124,9 @@ public String register(String email, String password, String pseudo) {
 }
 ```
 
----
-
 ### ✅ 3. Peut-on utiliser le projet avec une classe Main ?
 
 **OUI, ABSOLUMENT !** Nous venons de créer **`DemoMain.java`** qui démontre tout le code métier de manière interactive.
-
----
 
 ## 🚀 Utilisation de la Classe Main de Démonstration
 
@@ -264,8 +258,6 @@ Option **8** - Impact financier du partage :
 🎉 TOTAL ÉCONOMIES ANNUELLES : 375.60€
 ```
 
----
-
 ## 🧪 Code Métier Démontré
 
 ### 1. **Logique de Domaine**
@@ -295,8 +287,6 @@ Option **8** - Impact financier du partage :
 - ✅ Filtrage abonnements partagés
 - ✅ Détection abonnements à faible ROI
 
----
-
 ## 🎓 Concepts Démontrés
 
 ### Architecture en Couches
@@ -319,8 +309,6 @@ Option **8** - Impact financier du partage :
 - ✅ **Domain Model** : `Abonnement` avec logique métier
 - ✅ **Data Transfer** : Serialization CSV
 - ✅ **Separation of Concerns** : UI / Métier / Persistance
-
----
 
 ## 🔄 Autres Classes Main Disponibles
 
@@ -358,16 +346,12 @@ Le projet contient **4 classes Main** au total :
 - Délègue vers ApiServer
 - Point d'entrée par défaut
 
----
-
 ## 📁 Fichiers Générés par DemoMain
 
 La classe crée un fichier de données séparé :
 ```
 demo_abonnements.txt  ← Abonnements de démonstration (ne perturbe pas vos données)
 ```
-
----
 
 ## 💡 Résumé
 
@@ -396,7 +380,5 @@ mvn exec:java -Dexec.mainClass=com.projet.demo.DemoMain
 - **Plan d'intégration frontend :** `docs/PLAN_INTEGRATION_FRONTEND.md`
 - **API REST :** `docs/API_documentation.md`
 - **Tests :** `tests/README_TESTS.md`
-
----
 
 **🎉 Profitez de votre système de gestion d'abonnements enrichi !**

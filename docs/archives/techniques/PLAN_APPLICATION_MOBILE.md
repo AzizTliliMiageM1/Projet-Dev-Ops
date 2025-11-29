@@ -4,8 +4,6 @@
 
 Créer une application mobile pour gérer les abonnements, synchronisée avec l'API REST existante.
 
----
-
 ## 🛠️ Technologies Recommandées
 
 ### Option 1 : React Native (Recommandée)
@@ -54,8 +52,6 @@ Créer une application mobile pour gérer les abonnements, synchronisée avec l'
 - IndexedDB (stockage offline)
 ```
 
----
-
 ## 📐 Architecture Mobile
 
 ```
@@ -95,8 +91,6 @@ Créer une application mobile pour gérer les abonnements, synchronisée avec l'
 │     http://localhost:4567/api       │
 └─────────────────────────────────────┘
 ```
-
----
 
 ## 📱 Écrans Principaux
 
@@ -232,8 +226,6 @@ Créer une application mobile pour gérer les abonnements, synchronisée avec l'
 └─────────────────────────────┘
 ```
 
----
-
 ## 🔧 Fonctionnalités Mobiles Spécifiques
 
 ### 1. Notifications Push
@@ -270,8 +262,6 @@ Créer une application mobile pour gérer les abonnements, synchronisée avec l'
 - 📤 Partager un abonnement
 - 👥 Gérer les partages famille
 
----
-
 ## 🎨 Design Mobile
 
 ### Palette de Couleurs
@@ -299,8 +289,6 @@ Créer une application mobile pour gérer les abonnements, synchronisée avec l'
 - **Swipe Actions** : Modifier/Supprimer
 - **Pull to Refresh** : Actualisation
 - **Modal Bottom Sheet** : Filtres, options
-
----
 
 ## 🔌 Intégration API
 
@@ -466,8 +454,6 @@ export const AbonnementsProvider = ({ children }) => {
 };
 ```
 
----
-
 ## 📦 Structure du Projet React Native
 
 ```
@@ -505,8 +491,6 @@ mobile-app/
         ├── icons/
         └── images/
 ```
-
----
 
 ## 🚀 Exemple de Composant
 
@@ -652,8 +636,6 @@ const styles = StyleSheet.create({
 export default AbonnementCard;
 ```
 
----
-
 ## 🎯 Plan de Développement
 
 ### Phase 1 : Setup & Authentification (1 semaine)
@@ -688,8 +670,6 @@ export default AbonnementCard;
 - ✅ Tests unitaires
 - ✅ Tests E2E
 - ✅ Optimisations performances
-
----
 
 ## 📋 Checklist Développement
 
@@ -730,8 +710,6 @@ export default AbonnementCard;
 - [ ] Publier sur Google Play
 - [ ] Publier sur App Store
 
----
-
 ## 💡 Recommandations
 
 ### Pour Commencer
@@ -753,8 +731,6 @@ export default AbonnementCard;
 - 🔐 Timeout sessions
 - 🔐 Biométrie pour données sensibles
 
----
-
 ## 🎓 Ressources
 
 ### Documentation
@@ -770,7 +746,5 @@ export default AbonnementCard;
 - [Expo](https://expo.dev/) - Développement React Native simplifié
 - [CodePush](https://microsoft.github.io/code-push/) - Updates OTA
 - [Fastlane](https://fastlane.tools/) - Automatisation déploiement
-
----
 
 **L'application mobile sera un excellent complément à votre système de gestion d'abonnements !** 📱✨

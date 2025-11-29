@@ -608,8 +608,9 @@ Cette architecture **full-stack moderne** combine :
 - **Performance** : Optimisations client/serveur, cache intelligent
 - **Évolutivité** : Architecture modulaire, interfaces, patterns SOLID
 
-Le projet démontre une maîtrise complète du développement web moderne avec une séparation claire des responsabilités (MVC), des API RESTful standards, et une expérience utilisateur premium.
+
 
 **Auteur** : Aziz TLILI  
+**Date** : Novembre 2025  
 **Projet** : Gestion d'Abonnements - Application Full-Stack  
 **Dépôt** : [github.com/AzizTliliMiageM1/Projet-Dev-Ops](https://github.com/AzizTliliMiageM1/Projet-Dev-Ops)

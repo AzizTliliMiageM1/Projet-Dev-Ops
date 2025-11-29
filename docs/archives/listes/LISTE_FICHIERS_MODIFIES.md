@@ -1,8 +1,6 @@
 # 📝 Liste des Fichiers Modifiés/Créés
 
 
----
-
 ## ✏️ Fichiers Modifiés
 
 ### 1. `/src/main/resources/static/dashboard.css`
@@ -18,8 +16,6 @@
 
 **Impact** : Le dashboard utilise maintenant le système de thèmes
 
----
-
 ### 2. `/src/main/resources/static/expenses.html`
 **Lignes modifiées** : 11-30 (environ 10 lignes dans le `<style>`)
 
@@ -33,8 +29,6 @@
 **Raison** : Appliquer les thèmes à la page des dépenses
 
 **Impact** : Les gradients de la page expenses suivent le thème sélectionné
-
----
 
 ### 3. `/src/main/resources/static/export-import.js`
 **Lignes modifiées** : ~150 lignes sur 739 total
@@ -140,8 +134,6 @@ async function reExportFromHistory(index) {
 - Les exports contiennent les données réelles de l'utilisateur
 - L'historique permet de régénérer les exports
 
----
-
 ## 📄 Fichiers Créés
 
 ### 1. `/test_import.csv`
@@ -157,8 +149,6 @@ Date,Description,Montant,Catégorie
 
 **Utilité** : Tester la fonctionnalité d'import CSV
 
----
-
 ### 2. `/test_import.ofx`
 **Taille** : ~1.5 Ko
 **Contenu** : Relevé bancaire OFX standard avec 4 transactions
@@ -171,8 +161,6 @@ Date,Description,Montant,Catégorie
 - SUPERMARCHE CARREFOUR (-85.50€)
 
 **Utilité** : Tester l'import de relevés bancaires OFX
-
----
 
 ### 3. `/CORRECTIONS_EFFECTUEES.md`
 **Taille** : ~12 Ko
@@ -188,8 +176,6 @@ Date,Description,Montant,Catégorie
 7. Validation finale
 
 **Utilité** : Référence technique pour développeurs
-
----
 
 ### 4. `/GUIDE_TEST_RAPIDE.md`
 **Taille** : ~8 Ko
@@ -207,8 +193,6 @@ Date,Description,Montant,Catégorie
 9. Notes de debug
 
 **Utilité** : Guide utilisateur pour validation
-
----
 
 ### 5. `/TOUTES_ERREURS_CORRIGEES.md`
 **Taille** : ~10 Ko
@@ -229,14 +213,10 @@ Date,Description,Montant,Catégorie
 
 **Utilité** : Document de synthèse pour démonstration
 
----
-
 ### 6. `/LISTE_FICHIERS_MODIFIES.md` (ce fichier)
 **Contenu** : Index de tous les changements effectués
 
 **Utilité** : Référence rapide des modifications
-
----
 
 ## 📊 Résumé Statistique
 
@@ -258,8 +238,6 @@ Date,Description,Montant,Catégorie
 | TOUTES_ERREURS_CORRIGEES.md | Doc | 10 KB | Synthèse |
 | LISTE_FICHIERS_MODIFIES.md | Doc | 6 KB | Index |
 | **TOTAL** | - | **~38 KB** | - |
-
----
 
 ## 🔍 Détail des Modifications par Catégorie
 
@@ -294,8 +272,6 @@ Date,Description,Montant,Catégorie
 1. test_import.csv
 2. test_import.ofx
 
----
-
 ## 🎯 Impact Global
 
 ### Code
@@ -319,8 +295,6 @@ Date,Description,Montant,Catégorie
 - ✅ Tests : PASSED
 - ✅ Documentation : COMPLÈTE
 
----
-
 ## 📍 Localisation des Fichiers
 
 ```
@@ -336,8 +310,6 @@ Date,Description,Montant,Catégorie
 ├── TOUTES_ERREURS_CORRIGEES.md        🆕 CRÉÉ
 └── LISTE_FICHIERS_MODIFIES.md         🆕 CRÉÉ (ce fichier)
 ```
-
----
 
 ## 🔄 Historique des Versions
 
@@ -359,8 +331,6 @@ Date,Description,Montant,Catégorie
 - ✅ Import JSON
 - ✅ Alertes inactivité
 - ✅ UUID
-
----
 
 ## 📞 Références Rapides
 

@@ -3,8 +3,6 @@
 Date : 24/11/2025  
 Testeur : Aziz TLILI
 
----
-
 ## 1. Tests Connexion / Inscription
 
 ### Test 1.1 : Se connecter avec un compte qui existe
@@ -62,8 +60,6 @@ Testeur : Aziz TLILI
 | 3 | Je tape "Pass456" dans confirmation | OK | ✅ OK | - |
 | 4 | Je clique "Créer mon compte" | Message "Les mots de passe correspondent pas" | ✅ OK | validation faite |
 
----
-
 ## 2. Tests Gestion des Abonnements
 
 ### Test 2.1 : Ajouter un abonnement
@@ -120,8 +116,6 @@ Testeur : Aziz TLILI
 | 3 | Je refresh la page | Le badge est encore là | ✅ OK | c'est sauvegardé |
 | 4 | Je simule 30 jours après | Badge alerte "Inactif depuis 30j" | ✅ OK | prévient l'inactivité |
 
----
-
 ## 3. Tests Recherche et Filtres
 
 ### Test 3.1 : Rechercher un service par nom
@@ -141,8 +135,6 @@ Testeur : Aziz TLILI
 | 1 | Je tape "xyz123" dans la recherche | Aucune carte | ✅ OK | - |
 | 2 | Je regarde | Message "Aucun abonnement trouvé" | ✅ OK | - |
 | 3 | Je check les stats | Toujours les bonnes valeurs | ✅ OK | pas impacté par la recherche |
-
----
 
 ## 4. Tests Import / Export
 
@@ -175,8 +167,6 @@ Testeur : Aziz TLILI
 | 2 | Je choisis un fichier .txt | Fichier rejeté | ✅ OK | vérifie l'extension |
 | 3 | J'essaie avec un JSON cassé | Message d'erreur "Format invalide" | ✅ OK | bien géré |
 
----
-
 ## 5. Tests Dashboard Statistiques
 
 ### Test 5.1 : Voir les graphiques
@@ -197,8 +187,6 @@ Testeur : Aziz TLILI
 | 2 | Je regarde les stats | Tout à zéro | ✅ OK | 0 abonnements, 0€ |
 | 3 | Je check les graphiques | Message "Aucune donnée" | ✅ OK | pas d'erreur |
 
----
-
 ## 6. Tests Chatbot
 
 ### Test 6.1 : Utiliser le chatbot
@@ -218,8 +206,6 @@ Testeur : Aziz TLILI
 | 2 | Je tape "Cherche Netflix" | Il me donne les détails de Netflix | ✅ OK | comprend bien |
 | 3 | Je demande "Mes alertes" | Liste des trucs inactifs | ✅ OK | - |
 
----
-
 ## 7. Test Déconnexion
 
 ### Test 7.1 : Me déconnecter
@@ -231,8 +217,6 @@ Testeur : Aziz TLILI
 | 3 | Je check la navbar | Boutons "Se connecter" et "S'inscrire" de retour | ✅ OK | pseudo parti |
 | 4 | J'essaie d'aller au dashboard | Je vois plus mes trucs persos | ✅ OK | session terminée |
 
----
-
 ## 8. Test Responsive (Mobile)
 
 ### Test 8.1 : Ouvrir sur téléphone
@@ -243,8 +227,6 @@ Testeur : Aziz TLILI
 | 2 | Je regarde les cartes | Empilées les unes sur les autres | ✅ OK | 1 par ligne |
 | 3 | Je check le formulaire | En dessous de la liste | ✅ OK | bien placé |
 | 4 | Les graphiques | Bien redimensionnés | ✅ OK | - |
-
----
 
 ## Bilan des Tests
 
@@ -260,8 +242,6 @@ Testeur : Aziz TLILI
 | Mobile | 1 | 1 | responsive impec |
 | **TOTAL** | **22** | **22** | **100%** |
 
----
-
 ## Infos Tests
 
 - **Navigateurs** : Chrome, Firefox
@@ -269,8 +249,6 @@ Testeur : Aziz TLILI
 - **Écrans** : PC 1920x1080, portable 1366x768, mobile
 - **Testé le** : 24/11/2025
 - **Par** : Moi
-
----
 
 ## Conclusion
 

@@ -24,8 +24,6 @@ public void tearDown() {
 }
 ```
 
----
-
 ## Tests réalisés
 
 ### 1. Test d'ajout d'un abonnement
@@ -57,8 +55,6 @@ public void testSaveAndFind() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 2. Test de récupération par UUID
 
 **Objectif** : Vérifier qu'on peut retrouver un abonnement par son UUID.
@@ -89,8 +85,6 @@ public void testFindByUuid() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 3. Test de recherche UUID inexistant
 
 **Objectif** : Vérifier que la recherche d'un UUID qui n'existe pas retourne un Optional vide.
@@ -109,8 +103,6 @@ public void testFindByUuidNotFound() {
 - L'Optional est vide (pas de NoSuchElementException)
 
 **Statut** : ✅ PASS
-
----
 
 ### 4. Test de mise à jour
 
@@ -143,8 +135,6 @@ public void testUpdate() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 5. Test de suppression
 
 **Objectif** : Vérifier qu'on peut supprimer un abonnement.
@@ -172,8 +162,6 @@ public void testDelete() {
 - Après suppression, la liste est vide
 
 **Statut** : ✅ PASS
-
----
 
 ### 6. Test de sauvegarde multiple (saveAll)
 
@@ -203,8 +191,6 @@ public void testSaveAll() {
 - Les 3 abonnements sont bien enregistrés
 
 **Statut** : ✅ PASS
-
----
 
 ### 7. Test de persistance après redémarrage
 
@@ -238,8 +224,6 @@ public void testPersistence() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 8. Test avec fichier vide
 
 **Objectif** : Vérifier que le repository gère bien un fichier vide.
@@ -259,8 +243,6 @@ public void testEmptyFile() {
 - Une liste vide (pas null) est retournée
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé des tests
 

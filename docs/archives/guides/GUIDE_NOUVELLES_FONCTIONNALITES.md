@@ -4,8 +4,6 @@
 
 Bienvenue dans ce guide complet des nouvelles fonctionnalités de Gestion Abonnements v2.0 ! Ce document vous aidera à maîtriser les trois grandes nouveautés : les thèmes personnalisables, l'export/import avancé, et les notifications email.
 
----
-
 ## 🎨 1. Système de Thèmes Personnalisables
 
 ### Accès
@@ -78,8 +76,6 @@ La section preview affiche :
 - Couleurs trop claires (mauvaise visibilité sur fond clair)
 - Combinaisons peu contrastées
 - Couleurs trop saturées (fatigue visuelle)
-
----
 
 ## 📥 2. Export/Import Avancé
 
@@ -204,8 +200,6 @@ Consultez vos **10 derniers exports** :
 - Type de fichier (PDF, CSV, JSON)
 - Taille approximative
 - Option de re-téléchargement (à venir)
-
----
 
 ## 📧 3. Notifications Email Automatiques
 
@@ -340,8 +334,6 @@ En environnement de développement (backend non configuré) :
 - Vous voyez les notifications dans la console
 - L'historique indique "Simulé" au lieu de "Envoyé"
 
----
-
 ## 🎯 Conseils d'Utilisation
 
 ### Workflow Recommandé
@@ -381,8 +373,6 @@ En environnement de développement (backend non configuré) :
 - Vérifiez vos **spams** lors du premier email
 - Ne partagez pas vos exports (données personnelles)
 
----
-
 ## 🆘 Dépannage
 
 ### Les thèmes ne s'appliquent pas
@@ -407,8 +397,6 @@ En environnement de développement (backend non configuré) :
 - Vérifiez que jsPDF est chargé (console F12)
 - Essayez avec un navigateur récent (Chrome, Firefox)
 
----
-
 ## 📞 Support
 
 Pour toute question ou problème :
@@ -416,8 +404,6 @@ Pour toute question ou problème :
 - Regardez les **tutoriels vidéo** dans l'application
 - Utilisez le **chatbot IA** pour de l'aide contextuelle
 - Contactez le support : support@gestion-abonnements.fr
-
----
 
 **Version du guide** : 2.0 - Janvier 2024  
 **Dernière mise à jour** : Ajout des fonctionnalités Thèmes, Export/Import, Notifications Email

@@ -40,8 +40,6 @@ public void testRegisterSuccess() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 2. Test d'inscription avec email déjà utilisé
 
 **Objectif** : Vérifier qu'on ne peut pas s'inscrire deux fois avec le même email.
@@ -73,8 +71,6 @@ public void testRegisterDuplicateEmail() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 3. Test d'inscription sans pseudo (génération automatique)
 
 **Objectif** : Vérifier que le pseudo est généré depuis l'email si non fourni.
@@ -102,8 +98,6 @@ public void testRegisterWithoutPseudo() throws Exception {
 - Le pseudo est généré automatiquement
 
 **Statut** : ✅ PASS
-
----
 
 ## Tests POST /api/login
 
@@ -144,8 +138,6 @@ public void testLoginSuccess() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 5. Test de connexion avec mauvais mot de passe
 
 **Objectif** : Vérifier qu'on ne peut pas se connecter avec un mauvais mot de passe.
@@ -180,8 +172,6 @@ public void testLoginWrongPassword() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 6. Test de connexion avec email inexistant
 
 **Objectif** : Vérifier qu'on ne peut pas se connecter avec un email non enregistré.
@@ -206,8 +196,6 @@ public void testLoginNonExistentEmail() throws Exception {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ### 7. Test de connexion avec compte non confirmé
 
@@ -243,8 +231,6 @@ public void testLoginUnconfirmedAccount() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ## Tests GET /api/confirm
 
 ### 8. Test de confirmation d'email
@@ -277,8 +263,6 @@ public void testConfirmEmail() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 9. Test de confirmation avec token invalide
 
 **Objectif** : Vérifier qu'un token invalide est rejeté.
@@ -301,8 +285,6 @@ public void testConfirmInvalidToken() throws Exception {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ## Tests POST /api/logout
 
@@ -340,8 +322,6 @@ public void testLogout() throws Exception {
 - Session invalidée
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé des tests
 

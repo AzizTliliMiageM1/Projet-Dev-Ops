@@ -13,8 +13,6 @@ Accédez directement à : `http://localhost:4567/expenses.html`
 
 ⚠️ **Attention** : Vous devez être connecté pour accéder à cette page.
 
----
-
 ## 🎯 Ce que vous verrez
 
 ### 1️⃣ **Indicateurs Clés (en haut)**
@@ -48,8 +46,6 @@ Chaque catégorie (Streaming, Gaming, Fitness...) avec :
 - Montant total
 - Pourcentage du budget
 
----
-
 ## ⚙️ Fonctionnalités Interactives
 
 ### 💵 Définir votre Budget
@@ -70,8 +66,6 @@ Cliquez sur les ongles pour filtrer par période :
 - **Survolez** les graphiques pour voir les détails
 - **Cliquez** sur les légendes pour afficher/masquer des données
 
----
-
 ## 🏷️ Catégories Automatiques
 
 Le système détecte automatiquement la catégorie de vos abonnements :
@@ -90,8 +84,6 @@ Le système détecte automatiquement la catégorie de vos abonnements :
 
 **Pas besoin de définir manuellement** : Le système le fait pour vous !
 
----
-
 ## 💡 Conseils d'Utilisation
 
 ### Pour Économiser
@@ -109,15 +101,11 @@ Le système détecte automatiquement la catégorie de vos abonnements :
 2. Identifiez la **catégorie la plus coûteuse** (graphique donut)
 3. Consultez la **timeline** pour voir l'historique
 
----
-
 ## 🔄 Rafraîchissement
 
 Les données sont **automatiquement rafraîchies toutes les 30 secondes**.
 
 Vous pouvez aussi **recharger la page** manuellement (F5) pour forcer le rafraîchissement.
-
----
 
 ## 🆘 En cas de Problème
 
@@ -139,15 +127,11 @@ Vous pouvez aussi **recharger la page** manuellement (F5) pour forcer le rafraî
 - Rechargez la page (F5)
 - Videz le cache du navigateur (Ctrl+Shift+Del)
 
----
-
 ## 📱 Compatible avec
 
 ✅ Chrome, Firefox, Edge, Safari  
 ✅ Desktop, Tablette, Mobile  
 ✅ Toutes les résolutions d'écran
-
----
 
 ## 🎨 Interface
 
@@ -156,8 +140,6 @@ L'interface utilise le même **design moderne** que le reste de l'application :
 - Couleurs **violet/bleu dégradé**
 - Animations **fluides**
 - Icônes **Bootstrap Icons**
-
----
 
 ## 📊 Exemple Concret
 
@@ -188,8 +170,6 @@ Vous avez 5 abonnements :
 - Musique : 16% (rose)
 - Productivité : 11% (vert)
 
----
-
 ## 🚀 Prochaines Étapes
 
 Après avoir exploré le module Dépenses :
@@ -198,14 +178,10 @@ Après avoir exploré le module Dépenses :
 3. Résiliez les abonnements inutilisés
 4. Suivez votre progression chaque mois !
 
----
-
 ## 📞 Besoin d'Aide ?
 
 - 💬 **Chatbot** : Cliquez sur l'icône en bas à droite
 - 📧 **Email** : support@abonnements.com
 - 📖 **Documentation** : [/help.html](/help.html)
-
----
 
 **Bon suivi de vos dépenses ! 💰📊**

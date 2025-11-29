@@ -26,8 +26,6 @@ public void testUserCreation() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 2. Test du pseudo par défaut
 
 **Objectif** : Vérifier que si on ne donne pas de pseudo, il est généré à partir de l'email.
@@ -46,8 +44,6 @@ public void testDefaultPseudo() {
 - Le pseudo est "john.doe" (partie avant le @)
 
 **Statut** : ✅ PASS
-
----
 
 ### 3. Test de confirmation
 
@@ -68,8 +64,6 @@ public void testUserConfirmation() {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ## Tests de FileUserRepository
 
@@ -101,8 +95,6 @@ public void testSaveUser() throws IOException {
 
 **Statut** : ✅ PASS
 
----
-
 ### 5. Test de recherche par email
 
 **Objectif** : Vérifier qu'on peut retrouver un utilisateur par son email.
@@ -131,8 +123,6 @@ public void testFindByEmail() throws IOException {
 
 **Statut** : ✅ PASS
 
----
-
 ### 6. Test de recherche par token
 
 **Objectif** : Vérifier qu'on peut retrouver un utilisateur par son token de confirmation.
@@ -157,8 +147,6 @@ public void testFindByToken() throws IOException {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ### 7. Test de mise à jour d'un utilisateur
 
@@ -187,8 +175,6 @@ public void testUpdateUser() throws IOException {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ### 8. Test de compatibilité ancien/nouveau format
 
@@ -221,8 +207,6 @@ public void testBackwardCompatibility() throws IOException {
 
 **Statut** : ✅ PASS
 
----
-
 ### 9. Test d'utilisateur inexistant
 
 **Objectif** : Vérifier qu'on retourne null si l'utilisateur n'existe pas.
@@ -243,8 +227,6 @@ public void testFindNonExistentUser() throws IOException {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé des tests
 

@@ -27,8 +27,6 @@ Abonnement abo = new Abonnement("Netflix",
 
 **Statut** : ✅ PASS
 
----
-
 ### 2. Test de parsing CSV (ancien format)
 
 **Objectif** : Vérifier la compatibilité avec l'ancien format de fichier (6 champs sans catégorie).
@@ -61,8 +59,6 @@ public void testFromCsvStringOldFormat() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 3. Test de parsing CSV (nouveau format)
 
 **Objectif** : Vérifier que le nouveau format avec catégorie fonctionne.
@@ -76,8 +72,6 @@ ServiceY;2025-02-01;2025-11-30;4.50;Bob;2025-03-01;Loisir
 - La catégorie "Loisir" est correctement extraite
 
 **Statut** : ✅ PASS
-
----
 
 ### 4. Test de la méthode estActif()
 
@@ -101,8 +95,6 @@ public void testEstActif() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 5. Test de la méthode estActif() pour un abonnement expiré
 
 **Objectif** : Vérifier qu'un abonnement expiré est bien détecté.
@@ -124,8 +116,6 @@ public void testEstActifExpire() {
 - La méthode retourne `false` car la date de fin est dépassée
 
 **Statut** : ✅ PASS
-
----
 
 ### 6. Test de sérialisation CSV (toCsvString)
 
@@ -155,8 +145,6 @@ public void testToCsvString() {
 
 **Statut** : ✅ PASS
 
----
-
 ### 7. Test avec UUID
 
 **Objectif** : Vérifier que l'UUID est bien généré et persisté.
@@ -181,8 +169,6 @@ public void testUuidGeneration() {
 - L'UUID n'est pas null et n'est pas vide
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé des tests
 

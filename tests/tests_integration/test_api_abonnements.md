@@ -25,8 +25,6 @@ public static void stopServer() {
 }
 ```
 
----
-
 ## Tests GET /api/abonnements
 
 ### 1. Test de récupération de la liste
@@ -55,8 +53,6 @@ public void testGetAllAbonnements() throws Exception {
 - Body est un tableau JSON (commence par "[")
 
 **Statut** : ✅ PASS
-
----
 
 ## Tests POST /api/abonnements
 
@@ -103,8 +99,6 @@ public void testCreateAbonnementAuthenticated() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 3. Test de création sans authentification
 
 **Objectif** : Vérifier qu'un utilisateur non connecté ne peut pas créer d'abonnement.
@@ -144,8 +138,6 @@ public void testCreateAbonnementUnauthenticated() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 4. Test de création avec données invalides
 
 **Objectif** : Vérifier que l'API refuse les données incomplètes.
@@ -184,8 +176,6 @@ public void testCreateAbonnementInvalidData() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ## Tests GET /api/abonnements/:id
 
 ### 5. Test de récupération par UUID
@@ -215,8 +205,6 @@ public void testGetAbonnementById() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 6. Test avec UUID inexistant
 
 **Objectif** : Vérifier qu'on reçoit un 404 pour un UUID qui n'existe pas.
@@ -238,8 +226,6 @@ public void testGetNonExistentAbonnement() throws Exception {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ## Tests PUT /api/abonnements/:id
 
@@ -283,8 +269,6 @@ public void testUpdateAbonnement() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 8. Test de modification sans authentification
 
 **Objectif** : Vérifier qu'on ne peut pas modifier sans être connecté.
@@ -318,8 +302,6 @@ public void testUpdateAbonnementUnauthenticated() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ## Tests DELETE /api/abonnements/:id
 
 ### 9. Test de suppression d'un abonnement
@@ -348,8 +330,6 @@ public void testDeleteAbonnement() throws Exception {
 
 **Statut** : ✅ PASS
 
----
-
 ### 10. Test de suppression sans authentification
 
 **Objectif** : Vérifier qu'on ne peut pas supprimer sans être connecté.
@@ -371,8 +351,6 @@ public void testDeleteAbonnementUnauthenticated() throws Exception {
 ```
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé des tests
 

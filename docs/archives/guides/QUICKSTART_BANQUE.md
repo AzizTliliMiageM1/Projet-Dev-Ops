@@ -11,8 +11,6 @@ mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
 
 **Attendez :** `Server started on http://localhost:4567`
 
----
-
 ### Étape 2 : Ouvrir l'Interface (10 secondes)
 
 **Navigateur :** `http://localhost:4567/bank-integration.html`
@@ -23,8 +21,6 @@ Vous devriez voir :
 Importez vos transactions, détectez les abonnements cachés et simulez votre solde
 ```
 
----
-
 ### Étape 3 : Charger Données de Test (20 secondes)
 
 **Cliquez :** Bouton `[Charger Exemple]`
@@ -34,8 +30,6 @@ Importez vos transactions, détectez les abonnements cachés et simulez votre so
 - ⚠️ 8 abonnements détectés (Netflix, Spotify, etc.)
 - 📊 Graphique de solde affiché
 - 💰 Impact mensuel calculé
-
----
 
 ### Étape 4 : Explorer les Détections (2 minutes)
 
@@ -56,8 +50,6 @@ Dernière: 15/11/2024
 3. ✅ Netflix ajouté à vos abonnements
 4. 🔄 Transactions re-traitées automatiquement
 5. Badge vert "Rapproché" apparaît
-
----
 
 ### Étape 5 : Visualiser la Timeline (1 minute)
 
@@ -82,8 +74,6 @@ Dernière: 15/11/2024
 - 🟠 Orange = Abonnement détecté
 - ⚪ Blanc = Transaction normale
 
----
-
 ### Étape 6 : Consulter la Simulation (1 minute)
 
 **En haut de page :**
@@ -99,8 +89,6 @@ Dernière: 15/11/2024
 - Courbe descendante si dépenses > revenus
 - Tooltip au survol : Détails par mois
 - Aide à décider : Garder/Résilier abonnements
-
----
 
 ## 🎓 Test Avancé : Votre Propre CSV
 
@@ -139,8 +127,6 @@ Date,Description,Montant,Categorie
 
 **Action :** Déclarez-les en 3 clics !
 
----
-
 ## 📥 Template CSV Personnalisé
 
 ### Télécharger Template
@@ -163,8 +149,6 @@ Date,Description,Montant,Categorie
 2. **Remplacez** les lignes par vos vraies données
 3. **Sauvegardez** au format CSV
 4. **Importez** via drag & drop
-
----
 
 ## 🏦 Importer Relevé Bancaire Réel
 
@@ -197,8 +181,6 @@ Date,Description,Montant,Categorie
 - Certaines banques nomment les colonnes différemment
 - Utilisez le template pour adapter si besoin
 
----
-
 ## 🔍 Interpréter les Résultats
 
 ### Badge "Rapproché" (Vert) ✅
@@ -216,8 +198,6 @@ Date,Description,Montant,Categorie
 ### Aucun Badge (Blanc) ⚪
 **Signification :** Transaction ponctuelle normale  
 **Action :** Rien à faire
-
----
 
 ## 💡 Cas d'Usage Pratiques
 
@@ -268,8 +248,6 @@ Date,Description,Montant,Categorie
 4. Exemple : Netflix 13.49€ → Disney+ 8.99€ = -4.50€/mois
 5. Économie annuelle : 54€
 
----
-
 ## 📊 Dashboard de Contrôle
 
 ### KPI à Surveiller
@@ -299,8 +277,6 @@ Date,Description,Montant,Categorie
 - 🟢 Solde prévu > 1000€ : Sain
 - 🟠 Solde prévu 200-1000€ : Attention
 - 🔴 Solde prévu < 200€ : Risque découvert
-
----
 
 ## 🛠️ Configuration Avancée
 
@@ -354,8 +330,6 @@ if (Math.abs(transAmount - subPrice) <= 2) { // ← 2€
 if (Math.abs(transAmount - pattern.avgPrice) <= 5) { // ← 5€
 ```
 
----
-
 ## 🎯 Bonnes Pratiques
 
 ### Fréquence d'Import
@@ -382,8 +356,6 @@ if (Math.abs(transAmount - pattern.avgPrice) <= 5) { // ← 5€
 🔒 **Supprimer** après import  
 🔒 **Utiliser données exemple** pour tests  
 
----
-
 ## ❓ FAQ Express
 
 **Q : Mes transactions n'apparaissent pas**  
@@ -401,8 +373,6 @@ R : Si même date + montant = Normal (plusieurs transactions/jour)
 **Q : Solde négatif prévu**  
 R : Vos abonnements > revenus, résiliez services inutiles
 
----
-
 ## 🎉 Félicitations !
 
 Vous maîtrisez maintenant l'**Intégration Bancaire Intelligente** !
@@ -416,8 +386,6 @@ Vous maîtrisez maintenant l'**Intégration Bancaire Intelligente** !
 
 **Besoin d'aide ?**  
 📖 Lisez `/docs/INTEGRATION_BANCAIRE.md` (documentation complète)
-
----
 
 **Temps total : 5 minutes ⏱️**  
 **Économies potentielles : 50-200€/an 💰**  

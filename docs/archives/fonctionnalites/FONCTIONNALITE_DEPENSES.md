@@ -4,8 +4,6 @@
 
 Le module **Gestion des Dépenses** est un tableau de bord analytique avancé pour suivre, analyser et optimiser vos dépenses d'abonnements. Il offre une vision claire et actionable de vos finances avec des métriques en temps réel, des graphiques interactifs et des recommandations personnalisées.
 
----
-
 ## 🎯 Objectifs
 
 - **Visualiser** toutes vos dépenses d'abonnements en un coup d'œil
@@ -14,15 +12,11 @@ Le module **Gestion des Dépenses** est un tableau de bord analytique avancé po
 - **Prédire** vos dépenses futures grâce à l'historique
 - **Économiser** en détectant les abonnements inutilisés
 
----
-
 ## 🔐 Sécurité
 
 ✅ **Authentification requise** : Seuls les utilisateurs connectés peuvent accéder au module dépenses  
 ✅ **Isolation des données** : Chaque utilisateur ne voit que ses propres abonnements  
 ✅ **Session sécurisée** : Vérification automatique de la session au chargement
-
----
 
 ## 🎨 Interface Utilisateur
 
@@ -95,8 +89,6 @@ Pour chaque catégorie :
 - **Montant** : Total + pourcentage
 - **Barre** : Progression visuelle
 
----
-
 ## 🤖 Détection Automatique des Catégories
 
 Le système utilise **l'intelligence de mots-clés** pour catégoriser automatiquement vos abonnements :
@@ -138,8 +130,6 @@ function detectCategory(abonnement) {
 }
 ```
 
----
-
 ## 💾 Gestion du Budget
 
 ### Stockage Local
@@ -162,8 +152,6 @@ Le budget est immédiatement appliqué :
 - Mise à jour de la barre de progression
 - Recalcul des KPIs
 - Nouvelles recommandations
-
----
 
 ## 📊 Calcul des Métriques
 
@@ -194,8 +182,6 @@ potentialSavings = abonnements
     .reduce((sum, abo) => sum + prixMensuel, 0)
 ```
 
----
-
 ## 🔄 Rafraîchissement Automatique
 
 Les données sont **rafraîchies toutes les 30 secondes** :
@@ -205,8 +191,6 @@ setInterval(loadAbonnements, 30000);
 ```
 
 Cela garantit que le tableau de bord affiche toujours les données les plus récentes.
-
----
 
 ## 🌐 API Endpoints Utilisés
 
@@ -224,8 +208,6 @@ B --> C{Authentifié?}
 C -->|Oui| D[Charger abonnements]
 C -->|Non| E[Redirection /login.html]
 ```
-
----
 
 ## 🎨 Design Système
 
@@ -260,8 +242,6 @@ C -->|Non| E[Redirection /login.html]
    - Durée : 1000ms
    - Refresh : 16ms (60 FPS)
 
----
-
 ## 🚀 Technologies Utilisées
 
 | Technologie | Version | Usage |
@@ -272,8 +252,6 @@ C -->|Non| E[Redirection /login.html]
 | **Vanilla JavaScript** | ES6+ | Logique métier |
 | **LocalStorage API** | - | Stockage du budget |
 | **Fetch API** | - | Requêtes AJAX |
-
----
 
 ## 📱 Responsive Design
 
@@ -291,8 +269,6 @@ Le tableau de bord s'adapte à toutes les tailles d'écran :
     .chart-container { height: 300px; }
 }
 ```
-
----
 
 ## 🔮 Évolutions Futures
 
@@ -314,8 +290,6 @@ Le tableau de bord s'adapte à toutes les tailles d'écran :
 - [ ] Application mobile (PWA)
 - [ ] Dashboard personnalisable (drag & drop)
 
----
-
 ## 🐛 Débogage
 
 ### Console Logs
@@ -334,8 +308,6 @@ console.error('Erreur:', error); // En cas d'erreur
 | **404 Not Found** | Abonnement supprimé | Rafraîchir la page |
 | **Impossible de charger les données** | Serveur down | Vérifier ApiServer |
 | **Chart non affiché** | Canvas manquant | Vérifier expenses.html |
-
----
 
 ## 📝 Exemple de Données
 
@@ -359,8 +331,6 @@ console.error('Erreur:', error); // En cas d'erreur
 **BasicFit** → Détecté comme **Fitness** 💪  
 (Mot-clé : "basicfit" ou "gym" ou "fitness" ou "sport")
 
----
-
 ## 🎓 Utilisation
 
 ### Accès au Module
@@ -383,16 +353,12 @@ Les recommandations apparaissent **automatiquement** si :
 - ⚠️ Le budget est dépassé
 - 📊 Une catégorie dépasse 40% du budget total
 
----
-
 ## 🔗 Liens Utiles
 
 - **Page Principale** : [/expenses.html](/expenses.html)
 - **API Abonnements** : [/api/abonnements](/api/abonnements)
 - **Session** : [/api/session](/api/session)
 - **Documentation Technique** : [ARCHITECTURE_TECHNIQUE.md](./ARCHITECTURE_TECHNIQUE.md)
-
----
 
 ## 👨‍💻 Développement
 
@@ -420,8 +386,6 @@ src/main/resources/static/
 2. **Tester** : Ajouter un abonnement avec le mot-clé
 3. **Vérifier** : Catégorie détectée automatiquement
 
----
-
 ## 📞 Support
 
 En cas de problème :
@@ -429,9 +393,6 @@ En cas de problème :
 - 💬 Chat : Chatbot intégré
 - 📖 Docs : [/help.html](/help.html)
 
----
-
 ## 📄 Licence
 
 © 2025 - Projet DevOps - Gestion des Abonnements  
-Développé avec ❤️ par GitHub Copilot & Équipe DevOps

@@ -3,8 +3,6 @@
 ## 🎯 Objectif
 Mettre à jour l'interface utilisateur pour supporter les nouvelles fonctionnalités ajoutées au modèle `Abonnement`.
 
----
-
 ## 📁 Fichiers à Modifier
 
 ### 1. **app.js** (Principal)
@@ -138,8 +136,6 @@ const data = {
 };
 ```
 
----
-
 ### 2. **index.html** (Structure)
 Fichier : `/src/main/resources/static/index.html`
 
@@ -266,8 +262,6 @@ function updateCoutParPersonne() {
 </script>
 ```
 
----
-
 ### 3. **styles.css** (Apparence)
 Fichier : `/src/main/resources/static/styles.css`
 
@@ -391,8 +385,6 @@ Fichier : `/src/main/resources/static/styles.css`
 }
 ```
 
----
-
 ### 4. **Endpoints API à Ajouter**
 Fichier : `/src/main/java/com/example/server/Server.java`
 
@@ -456,8 +448,6 @@ get("/api/stats/advanced", (req, res) -> {
     return gson.toJson(stats);
 });
 ```
-
----
 
 ## 🎨 Améliorations UX Suggérées
 
@@ -534,8 +524,6 @@ function renderGroupedView(list) {
 }
 ```
 
----
-
 ## ✅ Checklist d'Implémentation
 
 ### Phase 1 : Backend (✅ FAIT)
@@ -592,8 +580,6 @@ function renderGroupedView(list) {
 - [ ] Tri par coût annuel
 - [ ] Animation d'apparition badges
 
----
-
 ## 🚀 Ordre d'Implémentation Recommandé
 
 1. **Jour 1** : API + Endpoints (2-3h)
@@ -605,8 +591,6 @@ function renderGroupedView(list) {
 
 **Total estimé :** 14-19 heures de développement
 
----
-
 ## 📝 Notes Importantes
 
 - **Tester la rétrocompatibilité** : S'assurer que les anciens abonnements (8 colonnes CSV) s'affichent correctement
@@ -614,7 +598,5 @@ function renderGroupedView(list) {
 - **Responsive design** : Vérifier l'affichage sur mobile avec tous les nouveaux éléments
 - **Performance** : Éviter de surcharger les cartes avec trop d'informations visuelles
 - **Accessibilité** : Utiliser des labels ARIA pour les icônes et emojis
-
----
 
 **Prêt pour l'implémentation !** 🎉

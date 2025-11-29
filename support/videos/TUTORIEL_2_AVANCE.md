@@ -5,8 +5,6 @@
 **Prérequis :** Avoir suivi le tutoriel débutant  
 **Objectif :** Maîtriser les fonctionnalités avancées
 
----
-
 ## 📋 SCRIPT DE LA VIDÉO
 
 ### INTRODUCTION (0:00 - 0:30)
@@ -16,8 +14,6 @@
 > Bienvenue dans ce tutoriel avancé ! Vous connaissez déjà les bases ? Parfait. Nous allons maintenant explorer les fonctionnalités qui vont transformer votre gestion d'abonnements : modification, suppression, alertes intelligentes, import/export de données, et analyse approfondie.
 
 **Écran :** Dashboard avec plusieurs abonnements déjà créés
-
----
 
 ### PARTIE 1 : MODIFIER ET SUPPRIMER (0:30 - 2:00)
 **Titre :** "Modifier et gérer vos abonnements"
@@ -50,8 +46,6 @@
 - "Confirmation avant suppression"
 - "Recalcul automatique des totaux"
 
----
-
 ### PARTIE 2 : RECHERCHE ET FILTRES (2:00 - 3:30)
 **Titre :** "Rechercher et filtrer efficacement"
 
@@ -82,8 +76,6 @@
 - "Filtres multiples"
 - "Tri personnalisable"
 
----
-
 ### PARTIE 3 : ALERTES D'INACTIVITÉ (3:30 - 4:30)
 **Titre :** "Surveiller l'activité de vos abonnements"
 
@@ -106,8 +98,6 @@
 - "Badge orange = attention"
 - "Mettez à jour la dernière utilisation"
 - "Économisez sur les services inutilisés"
-
----
 
 ### PARTIE 4 : EXPORT ET IMPORT JSON (4:30 - 6:00)
 **Titre :** "Sauvegarder et restaurer vos données"
@@ -144,8 +134,6 @@
 
 **Note importante à l'écran :**
 ⚠️ "L'import AJOUTE des abonnements sans supprimer les existants"
-
----
 
 ### PARTIE 5 : ANALYTICS AVANCÉES (6:00 - 7:30)
 **Titre :** "Analyser vos dépenses en profondeur"
@@ -184,8 +172,6 @@
 - "Optimisez votre budget"
 - "Graphiques temps réel"
 
----
-
 ### PARTIE 6 : DOCUMENTATION API (7:30 - 7:50)
 **Titre :** "Pour les développeurs : l'API REST"
 
@@ -209,8 +195,6 @@
 - "Exemples de code"
 - "Intégration facile"
 
----
-
 ### CONCLUSION (7:50 - 8:00)
 **Titre :** "Vous êtes maintenant un expert !"
 
@@ -229,8 +213,6 @@
 
 **Appel à l'action :**
 "📚 Consultez le centre d'aide pour plus d'informations !"
-
----
 
 ## 🎬 NOTES DE PRODUCTION
 

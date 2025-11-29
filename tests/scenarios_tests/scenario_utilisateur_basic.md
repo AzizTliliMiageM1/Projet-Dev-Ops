@@ -12,8 +12,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 **Niveau technique** : Basique  
 **Objectif** : Avoir une vue d'ensemble de ses dépenses mensuelles
 
----
-
 ## Étapes du scénario
 
 ### Étape 1 : Découverte de l'application
@@ -32,8 +30,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 ✅ Les animations se déclenchent au scroll
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 2 : Inscription
 
@@ -57,8 +53,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 3 : Confirmation du compte
 
 **Action** : Sophie clique sur le lien dans l'email
@@ -74,8 +68,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 ✅ Bouton "Se connecter" visible
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 4 : Première connexion
 
@@ -98,8 +90,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 5 : Découverte du dashboard vide
 
 **Action** : Sophie arrive sur le dashboard
@@ -115,8 +105,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 ✅ Interface claire et intuitive
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 6 : Ajout du premier abonnement (Netflix)
 
@@ -144,8 +132,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 7 : Ajout d'autres abonnements
 
 **Action** : Sophie ajoute Spotify et Disney+
@@ -164,8 +150,6 @@ Ce scénario simule le parcours complet d'un nouvel utilisateur qui découvre l'
 ✅ Tous les abonnements sont actifs
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 8 : Utilisation du chatbot
 
@@ -189,8 +173,6 @@ Vous avez 3 abonnements actifs :
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 9 : Recherche d'un abonnement
 
 **Action** : Sophie tape "spotify" dans la barre de recherche
@@ -205,8 +187,6 @@ Vous avez 3 abonnements actifs :
 ✅ En effaçant la recherche, tous les abonnements réapparaissent
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 10 : Consultation des statistiques
 
@@ -224,8 +204,6 @@ Vous avez 3 abonnements actifs :
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 11 : Marquage d'utilisation
 
 **Action** : Sophie clique sur "Marquer comme utilisé" sur Netflix
@@ -240,8 +218,6 @@ Vous avez 3 abonnements actifs :
 ✅ Pas d'alerte d'inactivité pour Netflix
 
 **Statut** : ✅ PASS
-
----
 
 ### Étape 12 : Export JSON
 
@@ -276,8 +252,6 @@ Vous avez 3 abonnements actifs :
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 13 : Déconnexion
 
 **Action** : Sophie clique sur "Déconnexion"
@@ -295,8 +269,6 @@ Vous avez 3 abonnements actifs :
 
 **Statut** : ✅ PASS
 
----
-
 ### Étape 14 : Tentative d'accès sans connexion
 
 **Action** : Sophie essaie d'accéder au dashboard sans être connectée
@@ -313,8 +285,6 @@ Vous avez 3 abonnements actifs :
 ✅ Redirection vers `/login.html` après 2 secondes
 
 **Statut** : ✅ PASS
-
----
 
 ## Résumé du scénario
 

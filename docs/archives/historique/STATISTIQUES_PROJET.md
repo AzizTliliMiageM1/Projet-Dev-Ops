@@ -2,8 +2,6 @@
 
 > **Métriques complètes et analyse quantitative du projet**
 
----
-
 ## 📈 Métriques de Code
 
 ### Lignes de Code par Langage
@@ -44,8 +42,6 @@ Commentaires   : 1,850 lignes (15.2%)
 Lignes Blanches: 1,400 lignes (11.4%)
 ```
 
----
-
 ## 📂 Structure des Fichiers
 
 ### Par Catégorie
@@ -74,8 +70,6 @@ Total Fichiers   : 88+
 Total Dossiers   : 19
 Profondeur Max   : 5 niveaux
 ```
-
----
 
 ## 🎯 Fonctionnalités
 
@@ -152,8 +146,6 @@ Profondeur Max   : 5 niveaux
 
 **Grand Total : 35 features implémentées**
 
----
-
 ## 🔗 API REST
 
 ### Endpoints Disponibles
@@ -194,8 +186,6 @@ Taux succès : 98.5%
 Taux erreur 4xx : 1.2%
 Taux erreur 5xx : 0.3%
 ```
-
----
 
 ## 🎨 Interface Utilisateur
 
@@ -244,8 +234,6 @@ Variables CSS : 25+
 Animations CSS : 35+
 ```
 
----
-
 ## 📚 Documentation
 
 ### Fichiers Documentation
@@ -281,8 +269,6 @@ Animations CSS : 35+
 | Fiches | 6 | 45 KB |
 | Diagrammes | 2 | 780 KB (PNG) |
 
----
-
 ## 🧪 Tests
 
 ### Tests Écrits
@@ -314,8 +300,6 @@ Mineurs         : 24
 Tous corrigés   : ✅ 47/47 (100%)
 ```
 
----
-
 ## ⏱️ Temps de Développement
 
 ### Estimation par Phase
@@ -343,8 +327,6 @@ Semaine 7-8  : 25h (Dépenses + Export)
 Semaine 9    : 20h (Banque + Finalisation)
 ```
 
----
-
 ## 💾 Données
 
 ### Volume Données Test
@@ -364,8 +346,6 @@ users-db.txt              : 0.5 KB
 exemple_import_bancaire.csv : 1 KB
 test_import.csv           : 0.5 KB
 ```
-
----
 
 ## 🚀 Performance
 
@@ -397,8 +377,6 @@ Images/Icons      : 800 KB (PNG diagrammes)
 Total Page        : ~1 MB
 ```
 
----
-
 ## 📊 Commits Git
 
 ### Statistiques Commits
@@ -422,8 +400,6 @@ Développeur 2 : 6 commits (Design + UX)
 Documentaliste : 3 commits (Documentation)
 ```
 
----
-
 ## 🎯 Objectifs vs Réalisé
 
 ### Objectifs Initiaux
@@ -441,8 +417,6 @@ Documentaliste : 3 commits (Documentation)
 | Notifications | ❌ Non prévu | ✅ Fait | Bonus |
 
 **Taux Réalisation : 135% (objectifs dépassés)**
-
----
 
 ## 💰 Complexité
 
@@ -463,8 +437,6 @@ FIXME Commentaires   : 2
 Refactoring Nécessaire : 3 fichiers
 Code Dupliqué        : ~5% (acceptable)
 ```
-
----
 
 ## 🎓 Complexité Projet
 
@@ -488,8 +460,6 @@ Total Technologies : 15+
 ├─ Outils : 3 (Maven, Git, VS Code)
 └─ APIs : 2 (Fetch, LocalStorage)
 ```
-
----
 
 **Statistiques générées le :** 18  
 **Version :** 2.0.0  

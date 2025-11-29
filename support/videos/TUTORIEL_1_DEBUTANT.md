@@ -4,8 +4,6 @@
 **Niveau :** Débutant  
 **Objectif :** Apprendre à utiliser les fonctionnalités de base
 
----
-
 ## 📋 SCRIPT DE LA VIDÉO
 
 ### INTRODUCTION (0:00 - 0:30)
@@ -15,8 +13,6 @@
 > Bienvenue dans ce tutoriel sur la gestion d'abonnements. Dans cette vidéo de 5 minutes, nous allons découvrir ensemble comment utiliser l'application pour gérer efficacement vos abonnements.
 
 **Écran :** Page d'accueil home.html avec le logo et le bouton "Ouvrir l'app"
-
----
 
 ### PARTIE 1 : DÉCOUVERTE DE L'INTERFACE (0:30 - 1:30)
 **Titre :** "L'interface principale"
@@ -41,8 +37,6 @@
 - "Barre de recherche et filtres"
 - "Cartes d'abonnements"
 - "Formulaire d'ajout"
-
----
 
 ### PARTIE 2 : AJOUTER UN PREMIER ABONNEMENT (1:30 - 3:00)
 **Titre :** "Créer votre premier abonnement"
@@ -71,8 +65,6 @@
 - Les KPI se mettent à jour automatiquement
 - Message de succès
 
----
-
 ### PARTIE 3 : EXPLORER LE TABLEAU DE BORD (3:00 - 4:00)
 **Titre :** "Comprendre votre tableau de bord"
 
@@ -100,8 +92,6 @@
 - "Toutes les infos en un coup d'œil"
 - "Actions rapides disponibles"
 
----
-
 ### PARTIE 4 : NAVIGATION (4:00 - 4:40)
 **Titre :** "Naviguer dans l'application"
 
@@ -125,8 +115,6 @@
 - "API Docs : pour les développeurs"
 - "Aide : ce centre d'assistance"
 
----
-
 ### CONCLUSION (4:40 - 5:00)
 **Titre :** "Vous êtes prêt !"
 
@@ -140,8 +128,6 @@
 - "✓ Premier abonnement créé"
 - "✓ Navigation comprise"
 - "→ Passez au niveau suivant !"
-
----
 
 ## 🎬 NOTES DE PRODUCTION
 

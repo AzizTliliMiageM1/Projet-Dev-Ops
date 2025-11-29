@@ -1,10 +1,11 @@
 # Cahier des Charges - Application de Gestion d'Abonnements
 
 **Projet** : Système de gestion d'abonnements en ligne  
+**Date** : 3 octobre 2025  
 **Équipe** :
 - Aziz TLILI - 41006201
 - Maissara FERKOUS - 42006149
-- Doan Thi Mai Chi - 40016084
+
 
 ## 1. Contexte du Projet
 
@@ -343,7 +344,7 @@ Projet-Dev-Ops/
 ### 6.2 Contraintes de Temps
 
 - Projet à réaliser en 6 semaines
-- Livraison finale : 
+- Livraison finale : décembre 2025
 - Présentations intermédiaires chaque semaine
 
 ### 6.3 Contraintes de Ressources

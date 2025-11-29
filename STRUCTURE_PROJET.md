@@ -62,8 +62,6 @@ Projet-Dev-Ops/
     └── videos/                     # Tutoriels vidéo
 ```
 
----
-
 ## 🎯 Points Clés de l'Organisation
 
 ### ✅ Ce qui a été fait
@@ -89,8 +87,6 @@ Projet-Dev-Ops/
    - ✅ Frontend moderne (12 pages HTML)
    - ✅ API REST fonctionnelle
 
----
-
 ## 📊 Statistiques du Projet
 
 ### Code
@@ -107,8 +103,6 @@ Projet-Dev-Ops/
 - **25+ fichiers** de documentation
 - **INDEX.md** avec navigation complète
 - **Archives organisées** dans `docs/archives/`
-
----
 
 ## 🚀 Accès Rapide
 
@@ -127,8 +121,6 @@ Projet-Dev-Ops/
 - Architecture : `docs/ARCHITECTURE_TECHNIQUE.md`
 - Guides : `docs/GUIDE_*.md`
 
----
-
 ## 🎓 Structure Pédagogique
 
 **Organisation pensée pour :**
@@ -142,8 +134,6 @@ Projet-Dev-Ops/
 - 📚 Documentation structurée
 - 🗄️ Archives préservées mais isolées
 - 🧹 Racine propre et claire
-
----
 
 **Dernière réorganisation :** 29 novembre 2024  
 **Commit :** b336a69 - "feat: ajout module intégration bancaire + refonte interface v2.0"

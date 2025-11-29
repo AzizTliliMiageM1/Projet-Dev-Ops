@@ -2,8 +2,6 @@
 
 ## Date : Janvier 2024
 
----
-
 ## ✅ Fonctionnalités Implémentées
 
 ### 1. 🎨 Système de Thèmes Personnalisables
@@ -26,8 +24,6 @@
 - JavaScript localStorage
 - Bootstrap 5.3.2
 - Color input HTML5
-
----
 
 ### 2. 📥 Export/Import Avancé
 
@@ -86,8 +82,6 @@
 - jsPDF-autotable 3.5.31
 - File API (drag & drop)
 - Parsing XML/CSV/JSON
-
----
 
 ### 3. 📧 Notifications Email Automatiques
 
@@ -151,8 +145,6 @@
 - Jackson JSON 2.15.2
 - Spark Framework 2.9.4
 
----
-
 ## 📊 Statistiques du Développement
 
 **Fichiers créés : 8**
@@ -173,8 +165,6 @@
 - expenses.html (navbar)
 - themes.html (navbar)
 - export-import.html (navbar)
-
----
 
 ## 🧪 Tests Effectués
 
@@ -212,8 +202,6 @@
 ✅ **Frontend** : Aucune erreur console JavaScript
 ✅ **Responsive** : Design adaptatif testé
 
----
-
 ## 📚 Documentation Créée
 
 ### Documentation Technique
@@ -236,8 +224,6 @@
 - Tous les fichiers JS documentés avec sections claires
 - Templates HTML avec commentaires explicatifs
 - Backend Java avec JavaDoc
-
----
 
 ## 🚀 Déploiement
 
@@ -271,8 +257,6 @@ Pour activer les notifications email réelles :
    - Port : `587`
    - Sécurité : `TLS`
 
----
-
 ## 🎯 Prochaines Étapes (Suggestions)
 
 ### Court Terme
@@ -293,8 +277,6 @@ Pour activer les notifications email réelles :
 - [ ] API REST publique pour intégrations tierces
 - [ ] Tableau de bord d'administration
 
----
-
 ## 🐛 Problèmes Connus
 
 ### Mineurs
@@ -310,8 +292,6 @@ Pour activer les notifications email réelles :
 - Import OFX limité au format standard (certaines banques peuvent avoir des variations)
 - Export PDF limité à 1000 transactions (performance)
 - Thèmes limités à 6 prédéfinis + 1 custom (extensible facilement)
-
----
 
 ## 📈 Impact des Nouvelles Fonctionnalités
 
@@ -330,8 +310,6 @@ Pour activer les notifications email réelles :
 - Niveau de finition élevé (design, UX, fonctionnalités)
 - Base solide pour évolution future
 
----
-
 ## ✨ Conclusion
 
 Les 3 nouvelles fonctionnalités ont été **implémentées avec succès** :
@@ -343,7 +321,5 @@ Les 3 nouvelles fonctionnalités ont été **implémentées avec succès** :
 **Total** : ~3000 lignes de code, 8 fichiers créés, documentation complète, tests fonctionnels réussis.
 
 L'application est maintenant **prête pour déploiement** et utilisation en production.
-
----
 
 **Développé avec** ❤️ **par Copilot pour Gestion Abonnements v2.0**
