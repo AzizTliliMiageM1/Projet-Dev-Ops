@@ -10,15 +10,18 @@ async function checkSessionAndUpdateNavbar() {
             const registerBtn = document.querySelector('a[href="/register.html"], a[href="register.html"]');
             
             if (loginBtn) {
-                loginBtn.innerHTML = `<i class="bi bi-person-circle"></i> ${data.pseudo}`;
-                loginBtn.href = '#';
-                loginBtn.style.pointerEvents = 'none';
+                // 🔹 On affiche le pseudo (alex) et on ENVOIE vers upgrade.html
+                loginBtn.innerHTML = `<i class="bi bi-person-circle me-1"></i> ${data.pseudo}`;
+                loginBtn.href = '/upgrade.html';          // ⬅ redirection vers la page upgrade
+                loginBtn.style.pointerEvents = 'auto';    // ⬅ on réactive le clic
                 loginBtn.style.background = 'rgba(16, 185, 129, 0.2)';
                 loginBtn.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                loginBtn.title = 'Mon compte / Upgrade';
             }
             
             if (registerBtn) {
-                registerBtn.innerHTML = '<i class="bi bi-box-arrow-right"></i> Déconnexion';
+                // 🔹 Le bouton d’inscription devient "Déconnexion"
+                registerBtn.innerHTML = '<i class="bi bi-box-arrow-right me-1"></i> Déconnexion';
                 registerBtn.href = '#';
                 registerBtn.onclick = async (e) => {
                     e.preventDefault();
