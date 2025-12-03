@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devenir Premium – GestionPro</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            min-height: 100vh;
+            padding: 50px 0;
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,0.15);
+            border-radius: 25px;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 2.1rem;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .feature-item {
+            background: rgba(255,255,255,0.2);
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .pricing-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 3px 15px rgba(0,0,0,0.4);
+        }
+
+        .btn-premium {
+            background: linear-gradient(90deg, #ff8a05, #ff5478);
+            color: white;
+            font-weight: 700;
+            padding: 14px 20px;
+            border-radius: 40px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 8px 20px rgba(255, 84, 120, 0.4);
+            border: none;
+        }
+
+        .btn-premium:hover {
+            transform: scale(1.04);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="text-center mb-5">
+        <h1 class="title">🚀 Passez au plan PRO</h1>
+        <p class="text-white-50 fs-5">Optimisez vos abonnements grâce à des fonctionnalités avancées.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        
+        <!-- Free Plan -->
+        <div class="col-md-4">
+            <div class="glass-card mb-4">
+                <h3 class="text-white fw-bold mb-3"><i class="bi bi-box"></i> Gratuit</h3>
+
+                <div class="feature-item"><i class="bi bi-check-circle"></i> Gestion basique</div>
+                <div class="feature-item"><i class="bi bi-check-circle"></i> Alertes d’expiration</div>
+                <div class="feature-item"><i class="bi bi-check-circle"></i> Export JSON</div>
+
+                <div class="mt-4 text-center">
+                    <div class="pricing-number">0€</div>
+                    <p class="text-white-50">Par mois</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pro Plan -->
+        <div class="col-md-4">
+            <div class="glass-card border-warning" style="border: 2px solid gold;">
+                <h3 class="text-white fw-bold mb-3"><i class="bi bi-stars"></i> Premium</h3>
+
+                <div class="feature-item"><i class="bi bi-lightning-charge"></i> Insights intelligents</div>
+                <div class="feature-item"><i class="bi bi-graph-up"></i> Dashboard avancé</div>
+                <div class="feature-item"><i class="bi bi-people"></i> Partage multi-profils</div>
+                <div class="feature-item"><i class="bi bi-hourglass-split"></i> Suivi ROI automatique</div>
+                <div class="feature-item"><i class="bi bi-cash-coin"></i> Estimation du coût annuel</div>
+                <div class="feature-item"><i class="bi bi-lock-fill"></i> Données sécurisées</div>
+
+                <div class="mt-4 text-center">
+                    <div class="pricing-number">3.99€</div>
+                    <p class="text-white-50">Par mois</p>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn-premium" onclick="upgradePro()">
+                        <i class="bi bi-arrow-up-circle"></i> Devenir Premium
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/home.html" class="text-white">← Retour à l’accueil</a>
+    </div>
+</div>
+
+<script>
+    function upgradePro() {
+        alert("🎉 Merci ! Les fonctionnalités Premium sont maintenant activées (simulation).");
+    }
+</script>
+
+</body>
+</html>
