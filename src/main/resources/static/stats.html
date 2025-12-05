@@ -303,6 +303,17 @@
                     <div class="stat-number text-white" id="prochainRenouvellement">-</div>
                     <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Renouvellement</p>
                 </div>
+                <div class="col-md-3">
+                <div class="metric-badge mb-2">
+                    <i class="bi bi-calculator"></i>
+                    Prévision
+                </div>
+                <div class="stat-number text-white" id="prediction3mois">-€</div>
+                <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600;">
+                    3 prochains mois
+                </p>
+                </div>
+
             </div>
         </div>
 
@@ -453,6 +464,8 @@
             updateKPIs(stats);
             updateCharts(stats, abonnements);
             generateInsights(stats, abonnements);
+            document.getElementById('prediction3mois').textContent = (stats.coutTotal * 3).toFixed(2) + '€';
+
         }
 
         function calculateStats(abonnements, now) {
