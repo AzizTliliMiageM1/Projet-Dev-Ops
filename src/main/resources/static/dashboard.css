@@ -735,3 +735,12 @@ body.dark-mode .metric-card {
   background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.25), transparent),
               radial-gradient(circle at bottom right, rgba(129, 140, 248, 0.15), transparent) !important;
 }
+/* Assurer que la barre du haut et le menu alex passent au-dessus des cartes */
+.navbar {
+  position: relative;
+  z-index: 2000;
+}
+
+.navbar .dropdown-menu {
+  z-index: 2100; /* plus haut que les cartes */
+}
