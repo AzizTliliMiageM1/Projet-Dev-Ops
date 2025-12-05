@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Statut du compte – Dashboard Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="/dashboard.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      min-height: 100vh;
+    }
+    .status-card {
+      background: rgba(255,255,255,0.16);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.25);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+    }
+    .progress-level {
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.45);
+      overflow: hidden;
+    }
+    .progress-level > div {
+      height: 100%;
+      background: linear-gradient(90deg,#22c55e,#a3e635,#f97316);
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar navbar-expand-lg px-4 py-3">
+    <div class="container-fluid">
+      <a class="navbar-brand text-white fw-bold" href="/index.html">
+        <i class="bi bi-layers me-1"></i> Dashboard Pro
+      </a>
+    </div>
+  </nav>
+
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="status-card p-4 p-md-5 text-white">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="mb-0">
+              <i class="bi bi-activity me-2"></i>Statut du compte
+            </h2>
+            <a href="/account.html" class="btn btn-outline-light btn-sm">
+              <i class="bi bi-arrow-left me-1"></i> Retour compte
+            </a>
+          </div>
+          <p class="text-white-50 mb-4">Suivez votre progression et le niveau de votre compte.</p>
+
+          <div class="mb-3">
+            <span class="badge bg-success me-2" id="statusBadge">Gratuit</span>
+            <span class="badge bg-info" id="tierBadge">Tier 1</span>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-4 text-center">
+              <div class="text-uppercase small text-white-50">Points</div>
+              <div class="fs-2 fw-bold" id="pointsVal">0</div>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="text-uppercase small text-white-50">Niveau</div>
+              <div class="fs-2 fw-bold" id="levelVal">1</div>
+            </div>
+            <div class="col-md-4 text-center">
+              <div class="text-uppercase small text-white-50">Abonnements</div>
+              <div class="fs-2 fw-bold" id="subsVal">0</div>
+            </div>
+          </div>
+
+          <h5 class="mb-2">Progression vers le prochain niveau</h5>
+          <div class="progress-level mb-2">
+            <div id="levelProgress" style="width: 20%;"></div>
+          </div>
+          <div class="d-flex justify-content-between text-white-50 mb-4">
+            <span id="currentLevelLabel">Niveau 1</span>
+            <span id="nextLevelLabel">Niveau 2</span>
+          </div>
+
+          <h5 class="mb-3">Avantages du compte</h5>
+          <ul class="list-unstyled text-white-50 mb-3">
+            <li><i class="bi bi-check2-circle text-success me-2"></i><span id="benefit1">Suivi des abonnements illimité</span></li>
+            <li><i class="bi bi-check2-circle text-success me-2"></i><span id="benefit2">Alertes d’inactivité et d’expiration</span></li>
+            <li><i class="bi bi-check2-circle text-success me-2"></i><span id="benefit3">Dashboard analytics temps réel</span></li>
+          </ul>
+
+          <div class="d-flex justify-content-between flex-wrap gap-2">
+            <a href="/upgrade.html" class="btn btn-primary">
+              <i class="bi bi-stars me-1"></i> Découvrir l’offre Premium
+            </a>
+            <a href="/stats.html" class="btn btn-outline-light">
+              <i class="bi bi-graph-up me-1"></i> Voir mes statistiques
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/navbar-auth.js"></script>
+
+  <script>
+    async function loadStatus() {
+      try {
+        const sessionRes = await fetch('/api/session');
+        const session = await sessionRes.json();
+
+        const aboRes = await fetch('/api/abonnements');
+        const abonnements = aboRes.ok ? await aboRes.json() : [];
+
+        const points = session.points ?? (abonnements.length * 10);
+        const level  = session.level  ?? (1 + Math.floor(points / 100));
+
+        document.getElementById('pointsVal').textContent = points;
+        document.getElementById('levelVal').textContent  = level;
+        document.getElementById('subsVal').textContent   = abonnements.length;
+
+        const premium = !!session.isPremium;
+        document.getElementById('statusBadge').textContent = premium ? 'Premium ⭐' : 'Gratuit';
+        document.getElementById('statusBadge').className   = premium ? 'badge bg-warning text-dark' : 'badge bg-success';
+
+        const currentLevelPoints = level * 100;
+        const prevLevelPoints = (level - 1) * 100;
+        const ratio = Math.max(0, Math.min(1, (points - prevLevelPoints) / (currentLevelPoints - prevLevelPoints || 100)));
+        document.getElementById('levelProgress').style.width = (ratio * 100) + '%';
+
+        document.getElementById('currentLevelLabel').textContent = 'Niveau ' + level;
+        document.getElementById('nextLevelLabel').textContent    = 'Niveau ' + (level + 1);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadStatus);
+  </script>
+</body>
+</html>
