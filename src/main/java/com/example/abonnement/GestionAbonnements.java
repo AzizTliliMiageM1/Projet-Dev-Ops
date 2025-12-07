@@ -373,6 +373,18 @@ public class GestionAbonnements {
         System.out.println("-------------------------------------\n");
     }
 
+    public double predictionCout3Mois() {
+    double total = 0;
+
+    for (Abonnement abo : listeAbonnements) {
+        if (abo.getPrixMensuel() > 0) {
+            total += abo.getPrixMensuel() * 3;
+        }
+    }
+
+    return total;
+}
+
     // Sauvegarder les abonnements dans un fichier
     // >>> CHANGEMENT: visibilité public (au lieu de private) pour que le service puisse l'appeler
     public void sauvegarderAbonnements() {
@@ -429,6 +441,7 @@ public class GestionAbonnements {
             System.out.println("8. Exporter en JSON");
             System.out.println("9. Importer depuis JSON");
             System.out.println("10. Quitter");
+            System.out.println("11. Prévision des coûts (3 mois)");
             System.out.print("Votre choix: ");
             choix = 0; // Initialiser pour éviter les erreurs si l'entrée est invalide
             try {
@@ -468,6 +481,11 @@ public class GestionAbonnements {
                     break;
                 case 10:
                     System.out.println("Merci d'avoir utilisé l'application. Au revoir !");
+                    break;
+                case 11:
+                    double prediction = app.predictionCout3Mois();
+                    System.out.println("Dépense estimée pour les 3 prochains mois : " 
+                        + String.format("%.2f€", prediction));
                     break;
                 default:
                     System.out.println("Choix invalide. Veuillez réessayer.");

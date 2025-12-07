@@ -1,4 +1,4 @@
-# 🏦 Intégration Bancaire - Documentation Complète
+cop# 🏦 Intégration Bancaire - Documentation Complète
 
 ## 📋 Vue d'Ensemble
 
@@ -467,6 +467,8 @@ Importez vos relevés pour détecter :
 **Contribuer :**
 Ajoutez vos propres patterns de détection dans `SUBSCRIPTION_PATTERNS` !
 
+---
+
 ## 🚀 Démarrage Rapide
 
 1. **Accès** : `http://localhost:4567/bank-integration.html`
@@ -476,6 +478,8 @@ Ajoutez vos propres patterns de détection dans `SUBSCRIPTION_PATTERNS` !
 5. **Prévision** : Visualisez l'impact sur votre solde
 
 **🎉 C'est tout ! Profitez de votre banque intelligente.**
+
+---
 
 ## 📦 Fichiers Concernés
 

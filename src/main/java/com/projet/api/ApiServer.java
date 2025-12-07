@@ -9,7 +9,6 @@ import com.example.abonnement.Abonnement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import com.projet.repository.AbonnementRepository;
 import com.projet.repository.FileAbonnementRepository;
 import com.projet.user.FileUserRepository;
@@ -19,15 +18,14 @@ import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;
 import com.projet.service.SubscriptionOptimizer;
 
+import spark.Request;
 import static spark.Spark.before;
 import static spark.Spark.delete;
 import static spark.Spark.get;
-import static spark.Spark.halt;
 import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
 import static spark.Spark.put;
-import spark.Request;
 import static spark.Spark.staticFiles;
 
 public class ApiServer {
@@ -113,6 +111,26 @@ public class ApiServer {
                 }
                 return mapper.writeValueAsString(opt.get());
             });
+
+            // 🔵 PRÉVISION DU COÛT SUR 3 MOIS
+            get("/prediction", (req, res) -> {
+                res.type("application/json");
+
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> list = repo.findAll();
+
+                double total = 0;
+                for (Abonnement a : list) {
+                    if (a.getPrixMensuel() > 0) {
+                        total += a.getPrixMensuel() * 3;
+                    }
+                }
+
+                return mapper.writeValueAsString(Map.of(
+                    "prediction3mois", total
+                ));
+            });
+
 
             post("/abonnements", (req, res) -> {
                 // Vérification : seuls les utilisateurs connectés peuvent ajouter

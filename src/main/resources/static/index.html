@@ -93,6 +93,29 @@
               <i class="bi bi-person-plus me-1"></i> S'inscrire
             </a>
           </li>
+
+          <li class="nav-item dropdown" id="userMenu" style="display:none;">
+  <a class="nav-link dropdown-toggle" href="#" id="userMenuLink" role="button"
+     data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-person-circle me-1"></i>
+    <span id="userNameLabel">alex</span>
+  </a>
+  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuLink">
+    <li><h6 class="dropdown-header">Mon compte</h6></li>
+    <li>
+      <a class="dropdown-item" href="/upgrade.html">
+        <i class="bi bi-stars me-2"></i> Upgrade compte
+      </a>
+    </li>
+    <li><hr class="dropdown-divider"></li>
+    <li>
+      <button class="dropdown-item" id="logoutBtn">
+        <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+      </button>
+    </li>
+  </ul>
+</li>
+
           <li class="nav-item">
             <button id="toggleTheme" class="btn btn-outline-light ms-2" type="button" title="Mode sombre / clair">
           <i class="bi bi-moon-stars"></i>
