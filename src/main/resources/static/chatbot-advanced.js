@@ -1058,6 +1058,15 @@ class AdvancedAbonnementChatbot {
         }
     }
 
+    // Assure que le chatbot communique toujours de manière utile
+    ensureValidResponse(response) {
+        // Si la réponse est vide ou null, retourner une help
+        if (!response || response.trim().length === 0) {
+            return "Désolé, je n'ai pas pu générer une réponse 😅\n\n💡 Vous pouvez me demander :\n- Ajouter un abonnement\n- Voir vos statistiques\n- Chercher un service\n- Obtenir des conseils";
+        }
+        return response;
+    }
+
     // ================================
     // 9. RÉPONSE PRINCIPALE
     // ================================
@@ -1120,7 +1129,8 @@ class AdvancedAbonnementChatbot {
 
             this.saveConversationHistory();
 
-            return response;
+            // S'assurer que la réponse est toujours valide et utile
+            return this.ensureValidResponse(response);
         } catch (error) {
             console.error('Erreur générale:', error);
             return `❌ **Erreur système :** Je n'ai pas pu traiter votre demande. Réessayez !`;
