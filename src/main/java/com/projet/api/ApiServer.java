@@ -384,8 +384,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionOptimizer optimizer = new SubscriptionOptimizer();
-                var report = optimizer.generateOptimizationReport(abonnements);
+                var report = SubscriptionOptimizer.generateOptimizationReport(abonnements);
                 
                 return mapper.writeValueAsString(report);
             });
@@ -404,8 +403,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
-                var forecast = analytics.forecastCashflow(abonnements, 6);
+                var forecast = SubscriptionAnalytics.forecastCashflow(abonnements, 6);
                 
                 return mapper.writeValueAsString(forecast);
             });
@@ -424,8 +422,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
-                var metrics = analytics.calculateAdvancedMetrics(abonnements);
+                var metrics = SubscriptionAnalytics.calculateAdvancedMetrics(abonnements);
                 
                 return mapper.writeValueAsString(metrics);
             });
@@ -444,11 +441,10 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
                 List<Map<String, Object>> anomalies = new ArrayList<>();
                 
                 for (Abonnement abo : abonnements) {
-                    boolean isAnomaly = analytics.detectPriceAnomaly(abonnements, abo);
+                    boolean isAnomaly = SubscriptionAnalytics.detectPriceAnomaly(abonnements, abo);
                     if (isAnomaly) {
                         anomalies.add(Map.of(
                             "id", abo.getId(),
@@ -476,8 +472,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
-                var duplicates = analytics.detectDuplicates(abonnements);
+                var duplicates = SubscriptionAnalytics.detectDuplicates(abonnements);
                 
                 return mapper.writeValueAsString(duplicates);
             });
@@ -496,8 +491,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                SubscriptionAnalytics analytics = new SubscriptionAnalytics();
-                var report = analytics.generateMonthlyReport(abonnements);
+                var report = SubscriptionAnalytics.generateMonthlyReport(abonnements);
                 
                 return mapper.writeValueAsString(report);
             });
