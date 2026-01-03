@@ -1,6 +1,7 @@
 /**
- * Chatbot IA Intelligent pour Gestion d'Abonnements
- * Utilise une IA basée sur des patterns et du NLP simple
+ * Chatbot IA Intelligent pour Gestion d'Abonnements v2.0
+ * Utilise une IA avancée avec : NLP, contexte persistant, apprentissage utilisateur, recommandations intelligentes
+ * Features: Dialogue multi-turns, tutoriels interactifs, suggestions contextuelles, historique persistant
  */
 
 class AbonnementChatbot {
@@ -9,22 +10,90 @@ class AbonnementChatbot {
             lastQuestion: null,
             conversationHistory: [],
             userData: null,
-            awaitingResponse: false
+            awaitingResponse: false,
+            userProfile: this.loadUserProfile(),
+            sessionStartTime: new Date(),
+            messageCount: 0,
+            lastIntent: null,
+            followUpMode: false
         };
         
         this.initializeKnowledgeBase();
         this.initializeNLP();
+        this.initializeAdvancedFeatures();
+    }
+
+    // Charge le profil utilisateur sauvegardé en localStorage
+    loadUserProfile() {
+        const saved = localStorage.getItem('chatbot_user_profile');
+        return saved ? JSON.parse(saved) : {
+            preferences: {
+                language: 'fr',
+                showEmojis: true,
+                detailLevel: 'normal' // 'simple', 'normal', 'detailed'
+            },
+            interactions: {
+                totalMessages: 0,
+                frequentQuestions: {},
+                lastTopics: []
+            },
+            preferences_learning: {
+                likesTutorials: null,
+                prefersShortAnswers: null,
+                interestedInAdvancedFeatures: null
+            }
+        };
+    }
+
+    // Sauvegarde le profil utilisateur
+    saveUserProfile() {
+        localStorage.setItem('chatbot_user_profile', JSON.stringify(this.context.userProfile));
+    }
+
+    // Initialise les fonctionnalités avancées
+    initializeAdvancedFeatures() {
+        this.tutorialMode = false;
+        this.tutorialStep = 0;
+        this.tutorials = this.initializeTutorials();
+        this.contextualSuggestions = [];
+        this.responseTemplates = this.initializeResponseTemplates();
+    }
+
+    // Initialise les tutoriels interactifs
+    initializeTutorials() {
+        return {
+            basicUsage: [
+                { title: "Bienvenue dans le tutoriel", content: "Je vais vous montrer comment utiliser au mieux cette application. Commençons !" },
+                { title: "Ajouter un abonnement", content: "Vous pouvez ajouter un abonnement de deux façons:\n1️⃣ Via le formulaire (bouton '➕ Ajouter')\n2️⃣ En tapant : 'Ajoute Netflix pour Jean à 15.99€'" },
+                { title: "Gérer vos abonnements", content: "Pour voir tous vos abonnements, tapez 'liste' ou 'mes abonnements'. Vous pouvez aussi les filtrer par catégorie !" },
+                { title: "Vérifier votre budget", content: "Demandez 'Quel est mon budget ?' pour une analyse complète de vos dépenses mensuelles." },
+                { title: "Recevoir des alertes", content: "Activez les alertes d'inactivité pour être notifié des abonnements non utilisés depuis 30 jours." }
+            ],
+            advancedFeatures: [
+                { title: "Mode Expert", content: "Vous avez accès à des commandes avancées comme l'export/import de données." },
+                { title: "Analyse Intelligente", content: "Utilisez 'Analyse mes dépenses' pour obtenir des graphiques et des recommandations d'optimisation." },
+                { title: "Recherche Intelligente", content: "Recherchez rapidement : 'Cherche Netflix', 'Trouve Spotify', etc." },
+                { title: "Suivi Automatique", content: "L'application suit vos habitudes et vous propose des suggestions personnalisées." }
+            ]
+        };
+    }
+
+    // Initialise les templates de réponse
+    initializeResponseTemplates() {
+        return {
+            confirmation: (action, details) => `✅ **${action}** effectué${action.includes('e') ? 'e' : ''} avec succès !\n\n${details}`,
+            error: (errorType, details) => `❌ **${errorType}**\n\n${details}\n\nBesoin d'aide ? Tapez 'aide' !`,
+            info: (title, details) => `ℹ️ **${title}**\n\n${details}`,
+            suggestion: (suggestion, details) => `💡 **Suggestion :** ${suggestion}\n\n${details}`,
+            question: (question, options) => `❓ **${question}**\n\nOptions :\n${options.map((o, i) => `${i + 1}️⃣ ${o}`).join('\n')}`
+        };
     }
 
     initializeKnowledgeBase() {
         this.knowledgeBase = {
             greetings: {
-                patterns: ['bonjour', 'salut', 'hello', 'hey', 'coucou', 'bonsoir'],
-                responses: [
-                    "Bonjour ! 👋 Je suis votre assistant intelligent pour gérer vos abonnements. Comment puis-je vous aider ?",
-                    "Salut ! 😊 Je peux vous aider à gérer vos abonnements, analyser vos dépenses ou répondre à vos questions. Que souhaitez-vous faire ?",
-                    "Hello ! Je suis là pour optimiser votre gestion d'abonnements. Posez-moi vos questions !"
-                ]
+                patterns: ['bonjour', 'salut', 'hello', 'hey', 'coucou', 'bonsoir', 'bonjour !', 'yo'],
+                responses: this.generateGreetingResponse.bind(this)
             },
             farewell: {
                 patterns: ['au revoir', 'bye', 'à plus', 'merci', 'ciao', 'salut'],
