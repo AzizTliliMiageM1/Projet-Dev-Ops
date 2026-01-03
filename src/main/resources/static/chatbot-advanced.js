@@ -607,10 +607,25 @@ class AdvancedAbonnementChatbot {
     }
 
     generateFallbackResponse() {
+        const message = this.context.conversationHistory[this.context.conversationHistory.length - 2]?.message?.toLowerCase() || '';
+        
+        // Répondre intelligemment selon le contexte
+        if (message.includes('cher') || message.includes('prix') || message.includes('coût')) {
+            return `💰 Je peux vous aider avec les tarifs ! Voulez-vous :\n1. Ajouter un abonnement\n2. Voir les coûts mensuels\n3. Chercher une réduction ?`;
+        }
+        
+        if (message.includes('nom') || message.includes('service') || message.includes('quel')) {
+            return `📱 Exemples de services : Netflix, Spotify, Adobe, Google Drive, Microsoft 365, Canva, ChatGPT Plus, etc.\n\nLequel vous intéresse ?`;
+        }
+
+        if (message.includes('nombre') || message.includes('combien') || message.includes('total')) {
+            return `📊 Je peux vous afficher vos statistiques complètes ! Tapez "statistiques" ou "stats"`;
+        }
+
         const suggestions = [
-            "Je n'ai pas bien compris 🤔 Pouvez-vous reformuler ?",
-            "Hmm, ce sujet ne m'est pas familier. Essayez 'aide' pour voir mes commandes !",
-            "Désolé ! Pour plus d'informations, tapez 'aide' 📚"
+            "Je n'ai pas bien compris 🤔 Pouvez-vous reformuler ?\n\n💡 Essayez :\n- 'Ajoute [service]' pour un abonnement\n- 'Cherche [nom]' pour une recherche\n- 'Aide' pour les commandes",
+            "Hmm, ce sujet ne m'est pas familier 📚\n\nVous pouvez me demander :\n- Mes statistiques\n- Ajouter un abonnement\n- Chercher un service\n- Conseils d'optimisation",
+            "Désolé ! Je n'ai pas bien saisi 🤔\n\nCommandes disponibles :\n- 'Stats' ou 'Statistiques'\n- 'Ajoute [service]' pour un nouvel abonnement\n- 'Supprime [service]'\n- 'Cherche [service]'"
         ];
 
         return suggestions[Math.floor(Math.random() * suggestions.length)];
