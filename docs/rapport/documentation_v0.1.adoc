@@ -1,0 +1,166 @@
+= Projet DevOps – Gestion d'Abonnements
+Documentation – Version 0.1.0
+:sectnums:
+:encoding: utf-8
+
+== Introduction
+
+L’application *Gestion d’Abonnements* est une application permettant aux utilisateurs
+de centraliser, gérer et suivre leurs abonnements (streaming, sport, services numériques, etc.).
+Elle vise à améliorer la maîtrise des dépenses récurrentes et à éviter les oublis
+grâce à un suivi automatisé basé sur les dates.
+
+La version *0.1.0* correspond à la première release fonctionnelle du projet.
+Elle met en œuvre les fonctionnalités essentielles attendues pour la Version 1 du projet.
+
+== Type d’application
+
+Application Web avec un back-end Java.
+Une API REST est proposée de manière optionnelle pour l’accès aux données.
+
+== Fonctionnalités implémentées – Version 0.1.0
+
+=== F1 : Gestion complète des abonnements (CRUD)
+
+Cette fonctionnalité permet de gérer le cycle de vie complet d’un abonnement :
+
+- Ajout d’un abonnement
+- Modification d’un abonnement
+- Suppression d’un abonnement
+- Recherche d’abonnements
+
+Les données sont sauvegardées automatiquement dans un fichier texte `abonnements.txt`,
+assurant la persistance entre deux exécutions de l’application.
+
+==== API REST (optionnelle – Spark Java)
+
+Une API REST minimale basée sur *Spark Java* permet d’interagir avec les abonnements :
+
+[source]
+----
+GET    /api/abonnements
+POST   /api/abonnements
+PUT    /api/abonnements/:id
+DELETE /api/abonnements/:id
+----
+
+Les données sont échangées au format JSON.
+
+=== F2 : Système d’alertes
+
+Un système d’alertes a été implémenté afin d’améliorer le suivi des abonnements :
+
+- Détection automatique des abonnements expirés
+- Alerte lorsque la date de fin approche (X jours avant expiration)
+- Indication visuelle de l’état de l’abonnement (actif, expiré, proche de l’expiration)
+- Calculs de dates réalisés à l’aide de l’API `java.time`
+
+== Interface utilisateur
+
+La version 0.1.0 propose une interface simple et fonctionnelle :
+
+- Affichage responsive
+- Tableau de bord avec indicateurs principaux :
+  * nombre total d’abonnements
+  * abonnements actifs
+  * abonnements expirés
+- Import et export des données au format JSON
+- Design léger inspiré du glassmorphism
+
+== Données manipulées
+
+Les données gérées dans cette version incluent :
+
+- Nom du service
+- Dates de début et de fin
+- Prix de l’abonnement
+- Catégorie
+- Date de dernière utilisation
+- Statut de l’abonnement (actif / expiré)
+
+Les données sont stockées localement dans un fichier texte et peuvent être importées
+ou exportées au format JSON.
+
+== Interconnexions techniques
+
+- Front-end : HTML, CSS, JavaScript
+- Back-end : Java
+- API REST : Spark Java
+- Persistance : fichier texte (`abonnements.txt`)
+
+== Structure du projet
+
+Le projet suit une structure Maven standard :
+
+[source]
+----
+.
+├── pom.xml
+├── abonnements.txt
+├── docs/
+│   └── rapport/
+│       └── documentation_v0.1.adoc
+└── src/
+    └── main/
+        └── java/
+            └── com/
+                └── example/
+                    └── abonnement/
+                        ├── Abonnement.java
+                        └── GestionAbonnements.java
+----
+
+L’architecture respecte les principes de la programmation orientée objet (POO).
+
+== Comment lancer le projet
+
+=== Prérequis
+
+- Java JDK 17
+- Maven
+- Un IDE (Visual Studio Code, IntelliJ IDEA, etc.)
+
+=== Récupération du code
+
+[source,bash]
+----
+git clone <URL_DU_DEPOT>
+cd Projet-Dev-Ops
+----
+
+=== Compilation
+
+[source,bash]
+----
+mvn clean package
+----
+
+=== Lancement de l’application
+
+[source,bash]
+----
+mvn exec:java -Dexec.mainClass=com.example.abonnement.GestionAbonnements
+----
+
+=== Lancement de l’API REST (optionnel)
+
+[source,bash]
+----
+mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+----
+
+== Limites de la version 0.1.0
+
+- Fonctionnalités avancées (statistiques détaillées, chatbot, notifications, intégration bancaire)
+  non incluses dans cette version
+- Tests automatisés encore limités
+- Persistance basée sur fichier texte (évolution possible vers base de données)
+
+== Perspectives (v0.2)
+
+Les évolutions prévues pour la version suivante incluent :
+
+- Amélioration de l’interface utilisateur
+- Ajout de statistiques avancées
+- Renforcement des tests (unitaires et intégration)
+- Évolution de la persistance des données

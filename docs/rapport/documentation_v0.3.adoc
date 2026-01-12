@@ -1,0 +1,92 @@
+== Version 0.3 – Intégration bancaire et analytics avancés
+
+=== Introduction
+
+La version 0.3 marque une évolution majeure du projet Gestion d’Abonnements.
+Cette version étend le périmètre fonctionnel de l’application en introduisant
+un module de dépenses, une première intégration bancaire ainsi que des
+mécanismes d’analytics avancés.
+
+L’objectif principal est de passer d’un simple outil de suivi des abonnements
+à une application orientée analyse financière.
+
+=== Interconnexions
+
+L’architecture de l’application repose sur les composants suivants :
+
+- Front-end : Interface Web (HTML, CSS, JavaScript)
+- Back-end : Java
+- API REST : Endpoints standards et analytics
+- Module bancaire : Import de données financières
+- Module analytics : Traitement des données et calculs avancés
+
+Ces composants interagissent afin de fournir une expérience utilisateur
+cohérente et des analyses pertinentes.
+
+=== Données acquises / manipulées
+
+Les données traitées dans cette version incluent :
+
+- Données de transactions financières
+- Données d’abonnements enrichies
+- Données analytiques (scores, clusters, anomalies)
+- Données utilisateur liées à l’authentification
+
+=== Comment lancer le projet
+
+Les étapes de lancement sont similaires aux versions précédentes.
+
+[source,bash]
+----
+mvn clean package
+mvn exec:java
+----
+
+Certaines classes spécifiques permettent de tester les modules
+d’analytics ou le mode démonstration.
+
+=== Fonctionnalités
+
+==== F1 – Intégration bancaire et module de dépenses
+
+Cette fonctionnalité introduit un nouveau module dédié aux dépenses :
+
+- Visualisation des flux financiers sous forme de graphiques
+- Organisation des transactions par période (ex. par mois)
+- Classification des dépenses par catégories
+- Structure prête pour l’import de données bancaires
+  (CSV, OFX, QIF)
+
+Cette fonctionnalité constitue la base de l’analyse financière avancée
+de l’application.
+
+==== F2 – Analytics intelligents et Machine Learning
+
+Un moteur d’analytics avancés a été intégré afin d’analyser les abonnements
+et les dépenses :
+
+- Calcul de scores de valeur des abonnements
+- Estimation du risque de résiliation (churn)
+- Segmentation des abonnements par clustering
+- Détection d’anomalies et de patterns saisonniers
+- Recommandations d’optimisation budgétaire
+
+Les résultats sont exposés via des endpoints d’analytics dédiés.
+
+==== F3 – Authentification et API améliorées
+
+Cette fonctionnalité renforce la sécurité et la cohérence de l’API :
+
+- Ajout d’endpoints de gestion de session
+- Amélioration de la gestion des erreurs (401, réponses normalisées)
+- Harmonisation des noms de champs pour plus de clarté
+
+==== F4 – Améliorations de l’interface utilisateur
+
+L’interface utilisateur a été améliorée afin de rester cohérente
+avec les nouvelles fonctionnalités :
+
+- Page de connexion modernisée
+- Barre de navigation enrichie
+- Harmonisation globale du design
+- Ajout d’une classe de démonstration du code métier

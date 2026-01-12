@@ -1,0 +1,127 @@
+= Projet DevOps – Gestion d'Abonnements
+Documentation – Version 0.2.0
+:sectnums:
+:encoding: utf-8
+
+== Introduction
+
+L’application *Gestion d’Abonnements* permet aux utilisateurs de centraliser,
+gérer et analyser leurs abonnements récurrents.
+Cette version 0.2.0 s’inscrit dans la continuité de la version 0.1.0
+et apporte des améliorations significatives au niveau de l’interface utilisateur,
+du tableau de bord et de la gestion des données.
+
+== Type d’application
+
+Application Web avec back-end Java et API REST optionnelle.
+
+== Fonctionnalités pour la version 0.2.0
+
+=== F1 : Nouvelle interface utilisateur (Glassmorphism 3.0)
+
+L’interface graphique a été entièrement améliorée afin d’offrir
+une expérience utilisateur moderne et ergonomique :
+
+- Effets de transparence et flou avancés (glassmorphism 3.0)
+- Utilisation de gradients violets animés
+- Cartes avec effets 3D et élévation dynamique
+- Icônes animées lors des interactions
+- Boutons avec animations et transitions fluides
+- Barre de recherche avec animation de focus
+- Micro-interactions modernes
+- Interface responsive optimisée pour mobile, tablette et desktop
+
+=== F2 : Système de thèmes personnalisables (version simple)
+
+Un premier système de personnalisation visuelle a été introduit :
+
+- Gestion des couleurs globales via des variables CSS
+- Thème violet premium utilisé par défaut
+- Préparation technique pour des thèmes plus avancés
+  prévus dans les versions futures
+
+=== F3 : Dashboard amélioré
+
+Le tableau de bord a été enrichi afin d’améliorer la visibilité
+sur les abonnements :
+
+- Affichage de quatre indicateurs clés (KPI) :
+  * total des abonnements
+  * abonnements actifs
+  * abonnements expirés
+  * alertes
+- Mise en page moderne basée sur une grille
+- Amélioration des couleurs de statut
+- Calculs mis à jour dynamiquement à partir des données disponibles
+
+=== F4 : Import / Export amélioré
+
+De nouvelles fonctionnalités de gestion des données ont été ajoutées.
+
+==== Export
+
+- Export des abonnements au format JSON
+- Export CSV simple compatible avec Excel et Google Sheets
+
+==== Import
+
+- Import des données au format JSON
+- Validation basique des fichiers importés
+- Prévisualisation des données avant importation
+
+Les formats bancaires avancés (OFX, QIF) ne sont pas inclus dans cette version.
+
+== Données acquises / manipulées
+
+- Données des abonnements (nom, dates, prix, catégorie)
+- Statut des abonnements (actif, expiré, alerte)
+- Données importées et exportées au format JSON et CSV
+
+== Interconnexions
+
+- Front-end : HTML, CSS, JavaScript
+- Back-end : Java
+- API REST : Spark Java
+- Persistance : fichier texte et fichiers JSON
+
+== Comment lancer le projet
+
+=== Prérequis d’installation
+
+- Java JDK 17
+- Maven
+- Un IDE (Visual Studio Code, IntelliJ IDEA, etc.)
+
+=== Récupération du code
+
+[source,bash]
+----
+git clone <URL_DU_DEPOT>
+cd Projet-Dev-Ops
+----
+
+=== Compilation
+
+[source,bash]
+----
+mvn clean package
+----
+
+=== Lancement de l’application
+
+[source,bash]
+----
+mvn exec:java -Dexec.mainClass=com.example.abonnement.GestionAbonnements
+----
+
+=== Lancement de l’API REST (optionnel)
+
+[source,bash]
+----
+mvn exec:java -Dexec.mainClass=com.projet.api.ApiServer
+----
+
+== Diagramme de classes
+
+Première version du diagramme de classes du projet,
+illustrant les principales entités et leurs relations.
