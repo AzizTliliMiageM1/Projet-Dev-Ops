@@ -17,8 +17,6 @@ import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;
 import com.projet.service.SubscriptionOptimizer;
-import com.projet.service.SmartBudgetAdvisor;
-import com.projet.service.DuplicateDetector;
 import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
 
@@ -844,130 +842,7 @@ public class ApiServer {
                 
             });
 
-            // =================================================
-            // CONSEILLER BUDGET INTELLIGENT - Endpoints
-            // =================================================
-            path("/budget-advisor", () -> {
-                post("/analyze", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
-                    return mapper.writeValueAsString(analyse);
-                });
-
-                get("/recommendations", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
-                    return mapper.writeValueAsString(analyse.recommendations);
-                });
-
-                post("/scenario", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    
-                    Map<String, String> body = mapper.readValue(req.body(), Map.class);
-                    String scenario = body.getOrDefault("scenario", "modere");
-
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    Map<String, Object> resultat = SmartBudgetAdvisor.optimizationScenario(abonnements, scenario);
-                    return mapper.writeValueAsString(resultat);
-                });
-
-                get("/health-score", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
-                    return mapper.writeValueAsString(Map.of(
-                        "scoreSante", analyse.healthScore,
-                        "pourcentageEconomies", analyse.savingsPercentage,
-                        "coutMensuelTotal", analyse.totalMonthlyCost
-                    ));
-                });
-            });
-
-            // =================================================
-            // DETECTEUR DOUBLONS INTELLIGENT - Endpoints
-            // =================================================
-            path("/duplicate-detector", () -> {
-                get("/analyze", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    List<DuplicateDetector.DuplicateGroup> groupes = DuplicateDetector.detectDuplicates(abonnements);
-                    return mapper.writeValueAsString(groupes);
-                });
-
-                get("/report", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    Map<String, Object> rapport = DuplicateDetector.advancedDuplicateReport(abonnements);
-                    return mapper.writeValueAsString(rapport);
-                });
-
-                get("/overlaps", (req, res) -> {
-                    String email = req.session().attribute("user_email");
-                    if (email == null) {
-                        res.status(401);
-                        return "{\"error\":\"Authentification requise\"}";
-                    }
-
-                    res.type("application/json");
-                    AbonnementRepository repo = getOrCreateRepo(req);
-                    List<Abonnement> abonnements = repo.findAll();
-
-                    DuplicateDetector.OverlapAnalysis chevauchements = DuplicateDetector.analyzeOverlaps(abonnements);
-                    return mapper.writeValueAsString(chevauchements);
-                });
-            });
-
-        // ===== SERVICES DISTANTS =====
+        // ===== SERVICES DISTANTS UNIQUEMENT =====
 
         path("/api/email", () -> {
             // Envoyer alerte expiration via Mailgun (API distante)
