@@ -9,6 +9,10 @@ build/
 .gradle/
 out/
 
+# Maven
+dependency-reduced-pom.xml
+*.pom
+
 # IDE
 *.idea/
 *.iml
