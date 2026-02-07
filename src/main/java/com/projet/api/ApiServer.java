@@ -17,6 +17,10 @@ import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;
 import com.projet.service.SubscriptionOptimizer;
+import com.projet.service.SmartBudgetAdvisor;
+import com.projet.service.DuplicateDetector;
+import com.projet.service.ServiceMailgun;
+import com.projet.service.ServiceTauxChange;
 
 import spark.Request;
 import static spark.Spark.before;
@@ -839,6 +843,276 @@ public class ApiServer {
                 });
                 
             });
+
+            // =================================================
+            // CONSEILLER BUDGET INTELLIGENT - Endpoints
+            // =================================================
+            path("/budget-advisor", () -> {
+                post("/analyze", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
+                    return mapper.writeValueAsString(analyse);
+                });
+
+                get("/recommendations", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
+                    return mapper.writeValueAsString(analyse.recommendations);
+                });
+
+                post("/scenario", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    
+                    Map<String, String> body = mapper.readValue(req.body(), Map.class);
+                    String scenario = body.getOrDefault("scenario", "modere");
+
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    Map<String, Object> resultat = SmartBudgetAdvisor.optimizationScenario(abonnements, scenario);
+                    return mapper.writeValueAsString(resultat);
+                });
+
+                get("/health-score", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    SmartBudgetAdvisor.BudgetAnalysis analyse = SmartBudgetAdvisor.analyzeBudget(abonnements);
+                    return mapper.writeValueAsString(Map.of(
+                        "scoreSante", analyse.healthScore,
+                        "pourcentageEconomies", analyse.savingsPercentage,
+                        "coutMensuelTotal", analyse.totalMonthlyCost
+                    ));
+                });
+            });
+
+            // =================================================
+            // DETECTEUR DOUBLONS INTELLIGENT - Endpoints
+            // =================================================
+            path("/duplicate-detector", () -> {
+                get("/analyze", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    List<DuplicateDetector.DuplicateGroup> groupes = DuplicateDetector.detectDuplicates(abonnements);
+                    return mapper.writeValueAsString(groupes);
+                });
+
+                get("/report", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    Map<String, Object> rapport = DuplicateDetector.advancedDuplicateReport(abonnements);
+                    return mapper.writeValueAsString(rapport);
+                });
+
+                get("/overlaps", (req, res) -> {
+                    String email = req.session().attribute("user_email");
+                    if (email == null) {
+                        res.status(401);
+                        return "{\"error\":\"Authentification requise\"}";
+                    }
+
+                    res.type("application/json");
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    DuplicateDetector.OverlapAnalysis chevauchements = DuplicateDetector.analyzeOverlaps(abonnements);
+                    return mapper.writeValueAsString(chevauchements);
+                });
+            });
+
+        // ===== SERVICES DISTANTS =====
+
+        path("/api/email", () -> {
+            // Envoyer alerte expiration via Mailgun (API distante)
+            post("/send-alert-expiration", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Authentification requise\"}";
+                }
+
+                res.type("application/json");
+                
+                String nomService = req.queryParams("service");
+                String prix = req.queryParams("prix");
+                String dateExp = req.queryParams("dateExpiration");
+
+                ServiceMailgun.ResultatEnvoiEmail resultat = ServiceMailgun.envoyerAlerteExpiration(
+                    email, nomService, Double.parseDouble(prix), dateExp
+                );
+
+                Map<String, Object> response = new java.util.HashMap<>();
+                response.put("success", resultat.success);
+                response.put("messageId", resultat.messageId);
+                response.put("tempsReponse", resultat.tempsReponse + "ms");
+                if (resultat.erreur != null) {
+                    response.put("erreur", resultat.erreur);
+                    res.status(400);
+                }
+
+                return mapper.writeValueAsString(response);
+            });
+
+            // Envoyer rapport mensuel via Mailgun (API distante)
+            post("/send-rapport-mensuel", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Authentification requise\"}";
+                }
+
+                res.type("application/json");
+                
+                String mois = req.queryParams("mois");
+                double coutTotal = Double.parseDouble(req.queryParams("coutTotal"));
+                int nombreAbos = Integer.parseInt(req.queryParams("nombreAbos"));
+
+                ServiceMailgun.ResultatEnvoiEmail resultat = ServiceMailgun.envoyerRapportMensuel(
+                    email, mois, coutTotal, nombreAbos
+                );
+
+                Map<String, Object> response = new java.util.HashMap<>();
+                response.put("success", resultat.success);
+                response.put("messageId", resultat.messageId);
+                response.put("tempsReponse", resultat.tempsReponse + "ms");
+                if (resultat.erreur != null) {
+                    response.put("erreur", resultat.erreur);
+                    res.status(400);
+                }
+
+                return mapper.writeValueAsString(response);
+            });
+
+            // Alerte budget dépassé via Mailgun (API distante)
+            post("/send-alerte-budget", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Authentification requise\"}";
+                }
+
+                res.type("application/json");
+                
+                double budget = Double.parseDouble(req.queryParams("budget"));
+                double depense = Double.parseDouble(req.queryParams("depense"));
+                double depassement = depense - budget;
+
+                ServiceMailgun.ResultatEnvoiEmail resultat = ServiceMailgun.envoyerAlerteDepassementBudget(
+                    email, budget, depense, depassement
+                );
+
+                Map<String, Object> response = new java.util.HashMap<>();
+                response.put("success", resultat.success);
+                response.put("messageId", resultat.messageId);
+                response.put("tempsReponse", resultat.tempsReponse + "ms");
+                if (resultat.erreur != null) {
+                    response.put("erreur", resultat.erreur);
+                    res.status(400);
+                }
+
+                return mapper.writeValueAsString(response);
+            });
+
+            // Status Mailgun (API distante)
+            get("/status", (req, res) -> {
+                res.type("application/json");
+                return mapper.writeValueAsString(ServiceMailgun.obtenirInfos());
+            });
+        });
+
+        path("/api/currency", () -> {
+            // Convertir montant entre devises via ExchangeRate API (API distante)
+            post("/convert", (req, res) -> {
+                res.type("application/json");
+                
+                double montant = Double.parseDouble(req.queryParams("montant"));
+                String deviseSource = req.queryParams("source");
+                String deviseCible = req.queryParams("cible");
+
+                ServiceTauxChange.ResultatConversion resultat = ServiceTauxChange.convertir(
+                    montant, deviseSource, deviseCible
+                );
+
+                return mapper.writeValueAsString(resultat);
+            });
+
+            // Convertir en EUR (cas principal)
+            post("/to-eur", (req, res) -> {
+                res.type("application/json");
+                
+                double montant = Double.parseDouble(req.queryParams("montant"));
+                String devise = req.queryParams("devise");
+
+                ServiceTauxChange.ResultatConversion resultat = ServiceTauxChange.convertirEnEuro(
+                    montant, devise
+                );
+
+                return mapper.writeValueAsString(resultat);
+            });
+
+            // Analyser stabilité des devises (API distante avec test)
+            post("/stabilite", (req, res) -> {
+                res.type("application/json");
+                
+                String devise = req.queryParams("devise");
+                Map<String, Object> resultat = ServiceTauxChange.analyserStabilite(devise);
+
+                return mapper.writeValueAsString(resultat);
+            });
+
+            // Status ExchangeRate API (API distante)
+            get("/status", (req, res) -> {
+                res.type("application/json");
+                return mapper.writeValueAsString(ServiceTauxChange.obtenirInfos());
+            });
+        });
 
         }); // end /api
 
