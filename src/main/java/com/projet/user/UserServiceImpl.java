@@ -2,8 +2,6 @@ package com.projet.user;
 
 import java.util.UUID;
 
-import com.projet.email.EmailServiceImpl;
-
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository = new FileUserRepository();
@@ -138,9 +136,9 @@ public class UserServiceImpl implements UserService {
         </html>
         """.formatted(link, link);
 
-        // Envoi du mail HTML
-        EmailServiceImpl mail = new EmailServiceImpl();
-        mail.sendEmail(email, "Confirmation d'inscription", htmlMessage);
+        // TODO: Remplacer par API distante Mailgun une fois intégrée
+        // EmailServiceImpl mail = new EmailServiceImpl();
+        // mail.sendEmail(email, "Confirmation d'inscription", htmlMessage);
 
         return token;
     }
