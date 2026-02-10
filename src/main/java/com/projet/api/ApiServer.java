@@ -561,7 +561,7 @@ public class ApiServer {
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
-                int healthScore = SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
+                int healthScore = (int) SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
                 
                 return "{\"healthScore\": " + healthScore + "}";
             });

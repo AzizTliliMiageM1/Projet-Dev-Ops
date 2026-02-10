@@ -89,6 +89,8 @@ public class CommandRouter {
                 return handleTopPriority(params);
             case "savingOps":
                 return handleSavingOps(params);
+            case "dashboard":
+                return handleDashboard(params);
             case "help":
             case "--help":
             case "-h":
@@ -196,8 +198,9 @@ public class CommandRouter {
     private List<Abonnement> readAbonnementsFromCsvPath(String path) throws IOException {
         List<String> lines = Files.readAllLines(Path.of(path));
         List<Abonnement> list = new ArrayList<>();
-        for (String l : lines) {
-            if (l == null || l.trim().isEmpty()) continue;
+        for (int i = 0; i < lines.size(); i++) {
+            String l = lines.get(i);
+            if (i == 0 || l == null || l.trim().isEmpty()) continue; // Skip header row
             list.add(AbonnementCsvConverter.fromCsvString(l));
         }
         return list;
@@ -269,11 +272,48 @@ public class CommandRouter {
         }
     }
 
+    /**
+     * Affiche un dashboard complet du portefeuille d'abonnements
+     * 
+     * Optionnel: fichier CSV à analyser. Si absent, affiche un message informatif.
+     */
+    private String handleDashboard(Map<String, String> p) {
+        String file = p.get("file");
+        try {
+            List<Abonnement> abonnements;
+            if (file != null && !file.trim().isEmpty()) {
+                abonnements = readAbonnementsFromCsvPath(file);
+            } else {
+                // Sans fichier, on affiche juste un message d'aide
+                return "Usage: dashboard [file=chemin/vers/abonnements.csv]\n"
+                    + "Affiche un tableau de bord complet avec:\n"
+                    + "  - Résumé financier et score santé\n"
+                    + "  - Composition par catégorie\n"
+                    + "  - Abonnements à haut risque\n"
+                    + "  - Top priorités à conserver\n"
+                    + "  - Opportunités d'économies\n"
+                    + "  - Expirations proches";
+            }
+            return DashboardFormatter.formatPortfolioDashboard(abonnements);
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
     private String helpText() {
-        return "Available commands:\n"
+        return "Available commands:\n\n"
+            + "CORE OPERATIONS\n"
             + "  addSubscription nomService=... user=... prixMensuel=... dateDebut=YYYY-MM-DD dateFin=YYYY-MM-DD [categorie=...]\n"
             + "  createUser email=... password=... pseudo=...\n"
-            + "  help\n"
-            + "Notes: validation errors are reported and no business logic is changed.";
+            + "  roiScore nomService=... user=... prixMensuel=... dateDebut=YYYY-MM-DD dateFin=YYYY-MM-DD\n\n"
+            + "FILE ANALYSIS\n"
+            + "  statsFromCsv file=abonnements.csv\n"
+            + "  expiring file=abonnements.csv\n"
+            + "  filterByCategory file=abonnements.csv categorie=Streaming\n"
+            + "  topPriority file=abonnements.csv\n"
+            + "  savingOps file=abonnements.csv\n\n"
+            + "DASHBOARD\n"
+            + "  dashboard [file=abonnements.csv]\n\n"
+            + "Notes: validation errors are reported; no business logic is changed.";
     }
 }

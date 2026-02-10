@@ -294,6 +294,7 @@ public class SubscriptionService {
 
     /**
      * Calcule le score de santé du portefeuille (0-100).
+     * Délégation vers SubscriptionAnalytics (source officielle)
      * 
      * Prend en compte :
      * - Ratio d'abonnements actifs
@@ -304,30 +305,7 @@ public class SubscriptionService {
      * @return Score de santé (0-100)
      */
     public double calculatePortfolioHealth(List<Abonnement> abonnements) {
-        if (abonnements == null || abonnements.isEmpty()) {
-            return 0.0;
-        }
-
-        // Score de base sur activation
-        LocalDate today = LocalDate.now();
-        long activeCount = abonnements.stream()
-            .filter(a -> a.estActif())
-            .count();
-        double activationScore = (activeCount * 100.0) / abonnements.size() * 0.4; // 40% du score
-
-        // Score de diversification des catégories
-        long categoryCount = abonnements.stream()
-            .map(Abonnement::getCategorie)
-            .distinct()
-            .count();
-        double diversificationScore = Math.min(categoryCount * 10, 100) * 0.3; // 30% du score
-
-        // Score sur l'inactivité (potentiel d'économies)
-        long inactiveCount = abonnements.size() - activeCount;
-        long maxInactive = abonnements.size();
-        double inactivityScore = (1.0 - (inactiveCount * 1.0 / maxInactive)) * 100 * 0.3; // 30% du score
-
-        return Math.min(activationScore + diversificationScore + inactivityScore, 100.0);
+        return com.projet.analytics.SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
     }
 
     /**

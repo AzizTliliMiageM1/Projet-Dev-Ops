@@ -1,10 +1,16 @@
 package com.projet.analytics;
 
-import com.projet.backend.domain.Abonnement;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Classe d'analyse avancée des abonnements avec algorithmes prédictifs
@@ -388,34 +394,34 @@ public class SubscriptionAnalytics {
     
     /**
      * Calcule le score de santé global du portefeuille
+     * SOURCE UNIQUE OFFICIELLE - Correspond exactement à SubscriptionService formule Phase 1
      * @return Score 0-100
      */
-    public static int calculatePortfolioHealthScore(List<Abonnement> abonnements) {
-        if (abonnements.isEmpty()) return 0;
-        
-        int score = 100;
-        
-        // Pénalité pour abonnements non utilisés
-        long unusedCount = abonnements.stream()
-            .filter(abo -> abo.getDerniereUtilisation() == null || 
-                   ChronoUnit.DAYS.between(abo.getDerniereUtilisation(), LocalDate.now()) > 60)
+    public static double calculatePortfolioHealthScore(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return 0.0;
+        }
+
+        // Score de base sur activation
+        LocalDate today = LocalDate.now();
+        long activeCount = abonnements.stream()
+            .filter(a -> a.estActif())
             .count();
-        score -= (int)(unusedCount * 15);
-        
-        // Pénalité pour coûts élevés
-        double avgCost = abonnements.stream()
-            .mapToDouble(Abonnement::getPrixMensuel)
-            .average()
-            .orElse(0);
-        if (avgCost > 50) score -= 10;
-        
-        // Bonus pour bonne diversification
-        Set<String> categories = abonnements.stream()
+        double activationScore = (activeCount * 100.0) / abonnements.size() * 0.4; // 40% du score
+
+        // Score de diversification des catégories
+        long categoryCount = abonnements.stream()
             .map(Abonnement::getCategorie)
-            .collect(Collectors.toSet());
-        if (categories.size() >= 3) score += 5;
-        
-        return Math.max(0, Math.min(100, score));
+            .distinct()
+            .count();
+        double diversificationScore = Math.min(categoryCount * 10, 100) * 0.3; // 30% du score
+
+        // Score sur l'inactivité (potentiel d'économies)
+        long inactiveCount = abonnements.size() - activeCount;
+        long maxInactive = abonnements.size();
+        double inactivityScore = (1.0 - (inactiveCount * 1.0 / maxInactive)) * 100 * 0.3; // 30% du score
+
+        return Math.min(activationScore + diversificationScore + inactivityScore, 100.0);
     }
     
     /**

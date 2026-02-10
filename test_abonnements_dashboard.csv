@@ -1,0 +1,13 @@
+id;nomService;dateDebut;dateFin;prixMensuel;clientName;derniereUtilisation;categorie;tags;groupeAbonnement;priorite;notes;nombreUtilisateurs;partage;joursRappelAvantFin;frequencePaiement
+1;Netflix;2025-01-01;2026-12-31;13.99;john.doe@example.com;2026-02-08;Streaming;Famille|Loisirs;;Important;;2;OUI;14;Mensuel
+2;Spotify;2025-03-15;2026-12-31;9.99;john.doe@example.com;2026-02-09;Streaming;Musique;;Important;;1;NON;14;Mensuel
+3;Microsoft Game Pass;2025-06-01;2026-05-31;16.99;john.doe@example.com;2025-11-15;Jeux;Gaming;;Optionnel;High churn risk;3;OUI;30;Annuel
+4;Adobe Creative Cloud;2025-02-01;2026-01-31;54.99;john.doe@example.com;2025-09-20;Travail;Design|Pro;;Essentiel;Professional tool;1;NON;14;Mensuel
+5;Microsoft 365;2025-01-15;2026-05-15;99.99;john.doe@example.com;2026-02-09;Travail;Productivity;;Essentiel;Business suite;2;OUI;6;Annuel
+6;Apple One;2025-08-01;2026-08-01;16.95;john.doe@example.com;2026-02-07;Streaming;Apple|Premium;;Important;;4;OUI;14;Annuel
+7;AWS Free Tier;2024-01-01;2025-01-01;0.00;john.doe@example.com;2026-02-10;Infrastructure;Cloud|DevOps;;Essentiel;;1;NON;30;Annuel
+8;Dropbox Plus;2024-06-01;2025-06-01;11.99;john.doe@example.com;2024-12-15;Stockage;Cloud|Backup;;Optionnel;Rarely used;1;NON;14;Annuel
+9;Canva Pro;2024-09-01;2025-09-01;14.99;john.doe@example.com;2024-10-20;Design;Design|Creative;;Optionnel;Inactive;1;NON;14;Annuel
+10;Notion Pro;2025-04-01;2026-04-01;14.00;john.doe@example.com;2026-02-05;Productivité;Notes|Planning;;Important;;1;NON;14;Annuel
+11;Figma;2025-05-15;2026-05-15;12.00;john.doe@example.com;2026-02-03;Design;Design|Collaboration;;Important;;2;OUI;14;Annuel
+12;iCloud+ 200GB;2025-09-01;2026-09-01;2.99;john.doe@example.com;2026-02-10;Stockage;Apple|Cloud;;Optionnel;;1;NON;7;Annuel

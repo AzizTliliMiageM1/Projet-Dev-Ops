@@ -368,12 +368,10 @@ public class Abonnement {
     }
     
     /**
-     * Calcule le score de valeur (wrapper pour analytics)
+     * Délégation vers SubscriptionAnalytics (source officielle)
      */
     public double getValueScore() {
-        if (prixMensuel == 0) return 0;
-        double frequence = getUsageFrequency();
-        return Math.round((frequence * 10) / prixMensuel * 100.0) / 100.0;
+        return com.projet.analytics.SubscriptionAnalytics.calculateValueScore(this);
     }
     
     /**
@@ -400,37 +398,11 @@ public class Abonnement {
     }
     
     /**
-     * Calcule le risque de résiliation
+     * Délégation vers SubscriptionAnalytics (source officielle)
      * @return Score 0-100
      */
     public double getChurnRisk() {
-        double riskScore = 0;
-        
-        // Utilisation
-        if (derniereUtilisation != null) {
-            long joursSansUtilisation = ChronoUnit.DAYS.between(derniereUtilisation, LocalDate.now());
-            if (joursSansUtilisation > 60) riskScore += 40;
-            else if (joursSansUtilisation > 30) riskScore += 25;
-            else if (joursSansUtilisation > 14) riskScore += 10;
-        } else {
-            riskScore += 40;
-        }
-        
-        // Ratio coût/valeur
-        double valueScore = getValueScore();
-        if (valueScore < 1) riskScore += 30;
-        else if (valueScore < 2) riskScore += 20;
-        else if (valueScore < 3) riskScore += 10;
-        
-        // Priorité
-        if ("Luxe".equals(priorite)) riskScore += 20;
-        else if ("Optionnel".equals(priorite)) riskScore += 10;
-        
-        // Expiration proche
-        long joursAvantExpiration = getJoursAvantExpiration();
-        if (joursAvantExpiration < 30) riskScore += 10;
-        
-        return Math.min(100, Math.round(riskScore * 100.0) / 100.0);
+        return com.projet.analytics.SubscriptionAnalytics.calculateChurnRisk(this);
     }
 
     @Override
