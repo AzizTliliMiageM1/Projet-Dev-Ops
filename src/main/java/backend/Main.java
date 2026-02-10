@@ -1,6 +1,6 @@
 package backend;
 
-import backend.router.CommandRouter;
+import com.projet.backend.cli.CommandRouter;
 
 /**
  * CLI entry point for the backend router.
@@ -8,7 +8,7 @@ import backend.router.CommandRouter;
  */
 public class Main {
     public static void main(String[] args) {
-        CommandRouter router = new CommandRouter();
+        CommandRouter router = CommandRouter.createDefault();
         String result = router.route(args);
         System.out.println(result);
     }

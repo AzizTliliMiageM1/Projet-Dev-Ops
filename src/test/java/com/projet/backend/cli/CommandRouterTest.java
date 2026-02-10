@@ -1,4 +1,4 @@
-package backend.router;
+package com.projet.backend.cli;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -8,7 +8,7 @@ public class CommandRouterTest {
 
     @Test
     public void addSubscription_shouldCreateSubscription() {
-        CommandRouter router = new CommandRouter();
+        CommandRouter router = CommandRouter.createDefault();
         String[] args = new String[] {
             "addSubscription",
             "nomService=Netflix",
@@ -27,7 +27,7 @@ public class CommandRouterTest {
 
     @Test
     public void createUser_shouldReturnCreatedUser() {
-        CommandRouter router = new CommandRouter();
+        CommandRouter router = CommandRouter.createDefault();
         String[] args = new String[] {
             "createUser",
             "email=aziz@example.com",
