@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 
 /**
@@ -72,7 +73,7 @@ public class MigrationAbonnements {
                 lignesLues++;
                 try {
                     // fromCsvString gère automatiquement les 3 formats (6, 8, 16 colonnes)
-                    Abonnement abonnement = Abonnement.fromCsvString(line);
+                    Abonnement abonnement = AbonnementCsvConverter.fromCsvString(line);
                     abonnements.add(abonnement);
                 } catch (Exception e) {
                     System.err.println("⚠️  Ligne " + lignesLues + " ignorée (format invalide) : " + line);
@@ -94,7 +95,7 @@ public class MigrationAbonnements {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Abonnement abonnement : abonnements) {
                 // toCsvString() génère automatiquement le format 16 colonnes
-                writer.write(abonnement.toCsvString());
+                writer.write(AbonnementCsvConverter.toCsvString(abonnement));
                 writer.newLine();
             }
             System.out.println("\n✅ Migration réussie : " + abonnements.size() + " abonnements migrés");

@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+import com.projet.backend.adapter.AbonnementCsvConverter;
+
 public class AbonnementTest {
 
     @Test
     public void testFromCsvStringOldFormat() {
         String csv = "ServiceX;2025-01-01;2025-12-31;9.99;Alice;2025-06-01";
-        Abonnement a = Abonnement.fromCsvString(csv);
+        Abonnement a = AbonnementCsvConverter.fromCsvString(csv);
         assertEquals("ServiceX", a.getNomService());
         assertEquals(LocalDate.parse("2025-01-01"), a.getDateDebut());
         assertEquals(LocalDate.parse("2025-12-31"), a.getDateFin());
@@ -24,7 +26,7 @@ public class AbonnementTest {
     @Test
     public void testFromCsvStringNewFormat() {
         String csv = "ServiceY;2025-02-01;2025-11-30;4.50;Bob;2025-03-01;Loisir";
-        Abonnement a = Abonnement.fromCsvString(csv);
+        Abonnement a = AbonnementCsvConverter.fromCsvString(csv);
         assertEquals("Loisir", a.getCategorie());
     }
 

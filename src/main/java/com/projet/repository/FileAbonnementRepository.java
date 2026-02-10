@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 
 public class FileAbonnementRepository implements AbonnementRepository {
@@ -38,7 +39,7 @@ public class FileAbonnementRepository implements AbonnementRepository {
             originalLines = reader.lines().filter(line -> !line.trim().isEmpty()).collect(Collectors.toList());
             for (String line : originalLines) {
                 try {
-                    Abonnement a = Abonnement.fromCsvString(line);
+                    Abonnement a = AbonnementCsvConverter.fromCsvString(line);
                     abonnements.add(a);
                     // detect old-format (6 parts) and mark for migration
                     int parts = line.split(";").length;
@@ -72,7 +73,7 @@ public class FileAbonnementRepository implements AbonnementRepository {
     public void saveAll(List<Abonnement> abonnements) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Abonnement abonnement : abonnements) {
-                writer.write(abonnement.toCsvString());
+                writer.write(AbonnementCsvConverter.toCsvString(abonnement));
                 writer.newLine();
             }
             logger.info("{} abonnements sauvegardés dans {}", abonnements.size(), filePath);

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 
 /**
@@ -391,7 +392,7 @@ public class GestionAbonnements {
     public void sauvegarderAbonnements() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FICHIER_ABONNEMENTS))) {
             for (Abonnement abonnement : listeAbonnements) {
-                writer.write(abonnement.toCsvString());
+                writer.write(AbonnementCsvConverter.toCsvString(abonnement));
                 writer.newLine();
             }
             System.out.println("Abonnements sauvegardés dans " + FICHIER_ABONNEMENTS);
@@ -413,7 +414,7 @@ public class GestionAbonnements {
             String line;
             while ((line = reader.readLine()) != null) {
                 try {
-                    listeAbonnements.add(Abonnement.fromCsvString(line));
+                    listeAbonnements.add(AbonnementCsvConverter.fromCsvString(line));
                 } catch (Exception e) { // Catch toutes les exceptions pour une robustesse accrue lors du chargement
                     System.err.println("Erreur lors de la lecture d'une ligne du fichier de sauvegarde, ligne ignorée: " + line + " - " + e.getMessage());
                 }

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 
 /**
@@ -59,7 +60,7 @@ public class UserAbonnementRepository implements AbonnementRepository {
                 
             for (String line : lines) {
                 try {
-                    Abonnement a = Abonnement.fromCsvString(line);
+                    Abonnement a = AbonnementCsvConverter.fromCsvString(line);
                     abonnements.add(a);
                 } catch (IllegalArgumentException ex) {
                     logger.warn("Ligne ignorée pour {} : {}", userEmail, ex.getMessage());
@@ -78,7 +79,7 @@ public class UserAbonnementRepository implements AbonnementRepository {
     public void saveAll(List<Abonnement> abonnements) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath()))) {
             for (Abonnement a : abonnements) {
-                writer.write(a.toCsvString());
+                writer.write(AbonnementCsvConverter.toCsvString(a));
                 writer.newLine();
             }
             logger.info("{} abonnements sauvegardés pour {}", abonnements.size(), userEmail);
