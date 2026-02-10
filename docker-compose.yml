@@ -1,52 +1,40 @@
 version: '3.8'
-services:
-  db:
-    image: mysql:8.0
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: abonnementsdb
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apassword
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./db/init:/docker-entrypoint-initdb.d:ro
-    ports:
-      - "3306:3306"
 
-  app:
-    build: .
-    depends_on:
-      - db
-      - flyway
-    environment:
-      DB_URL: jdbc:mysql://db:3306/abonnementsdb?useSSL=false&serverTimezone=UTC
-      DB_USER: appuser
-      DB_PASSWORD: apassword
-      APP_PORT: "8080"
+services:
+  backend:
+    image: gestion-abonnements:latest
+    container_name: gestion-abonnements
     ports:
-      - "8080:8080"
+      - "4567:4567"
     volumes:
-      - ./:/workspace
+      - ./data:/app/data
+    environment:
+      APP_ENV: production
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "java", "-jar", "/app/app.jar", "help"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+
+  h2-console:
+    image: oscarfonts/h2
+    container_name: h2-console
+    ports:
+      - "8081:8082"
+    environment:
+      H2_OPTIONS: "-webAllowOthers"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
-  db_data:
-
-  flyway:
+  app-data:
     driver: local
-
-  # Flyway service (one-shot) to apply migrations against the db service
-  # Use `docker-compose run --rm flyway migrate` to apply migrations
-services:
-  flyway:
-    image: flyway/flyway:9
-    depends_on:
-      - db
-    volumes:
-      - ./db/migrations:/flyway/sql:ro
-    environment:
-      FLYWAY_URL: jdbc:mysql://db:3306/abonnementsdb
-      FLYWAY_USER: appuser
-      FLYWAY_PASSWORD: apassword
-    entrypoint: ["/bin/sh","-c"]
-    command: ["/flyway/flyway migrate"]

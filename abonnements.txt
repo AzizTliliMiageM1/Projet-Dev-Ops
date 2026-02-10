@@ -1,0 +1,16 @@
+id;nomService;dateDebut;dateFin;prixMensuel;clientName;derniereUtilisation;categorie;tags;groupeAbonnement;priorite;notes;nombreUtilisateurs;partage;joursRappelAvantFin;frequencePaiement
+1;Netflix;2024-06-15;2027-06-15;17.99;utilisateur@email.com;2026-02-09;Streaming;Divertissement|Films;Loisirs;Important;Abonnement familial premium;4;OUI;14;Mensuel
+2;Spotify Premium;2023-12-01;2027-12-01;12.99;utilisateur@email.com;2026-02-10;Streaming;Musique|Audio|Podcasts;Loisirs;Important;Utilisé quotidiennement;1;NON;30;Mensuel
+3;Microsoft 365 Family;2024-01-20;2025-01-20;99.99;utilisateur@email.com;2026-02-08;Travail;Productivité|Document;Travail;Essentiel;Office + Cloud;5;OUI;14;Annuel
+4;Adobe Creative Cloud;2024-03-10;2025-03-10;54.99;utilisateur@email.com;2024-09-15;Design;Design|Pro|Création;Travail;Essentiel;Photoshop + Illustrator;1;NON;14;Mensuel
+5;AWS S3 + Compute;2023-11-01;2099-12-31;145.50;utilisateur@email.com;2026-02-10;Infrastructure;Cloud|DevOps|Storage;Travail;Essentiel;Production infrastructure;3;NON;30;Mensuel
+6;Notion Pro;2024-05-01;2026-05-01;10.00;utilisateur@email.com;2026-02-07;Productivité;Organisation|Notes|Wiki;Travail;Important;Base de connaissance équipe;2;OUI;14;Annuel
+7;Figma Team;2024-04-15;2025-04-15;12.00;utilisateur@email.com;2026-02-05;Design;Design|Prototypage|UX;Travail;Important;Outil de design collaboratif;3;OUI;14;Annuel
+8;Dropbox Plus;2024-02-01;2025-02-01;11.99;utilisateur@email.com;2025-12-20;Stockage;Cloud|Backup|Fichiers;Perso;Optionnel;Rarement utilisé;1;NON;14;Annuel
+9;Canva Pro;2024-08-01;2025-08-01;14.99;utilisateur@email.com;2024-10-10;Design;Design|Graphique|Créatif;Perso;Optionnel;Inactif depuis 4 mois;1;NON;14;Annuel
+10;Apple One;2024-09-01;2026-09-01;16.95;utilisateur@email.com;2026-02-06;Streaming;Apple|Multimedia;Loisirs;Important;Bundle Apple services;6;OUI;14;Annuel
+11;Game Pass Ultimate;2024-07-15;2025-07-15;16.99;utilisateur@email.com;2025-11-20;Jeux;Gaming|Divertissement;Loisirs;Optionnel;Jeux console/PC;2;OUI;30;Annuel
+12;iCloud+ 200GB;2024-10-01;2025-10-01;2.99;utilisateur@email.com;2026-02-10;Stockage;Apple|Cloud|Backup;Perso;Important;Synchronisation iPhone/Mac;1;NON;7;Annuel
+13;ChatGPT Plus;2024-11-15;2026-11-15;20.00;utilisateur@email.com;2026-02-10;IA|Productivité;Réseaux|Texte;Travail;Important;Accès GPT-4 illimité;1;NON;30;Mensuel
+14;LinkedIn Premium;2024-08-20;2025-08-20;39.99;utilisateur@email.com;2025-08-15;Réseautage;Professionnel|Emploi;Travail;Optionnel;Rarement utilisé;1;NON;14;Annuel
+15;Skillshare;2024-06-01;2025-06-01;32.00;utilisateur@email.com;2024-12-01;Éducation;Formation|Apprentissage|Créatif;Perso;Optionnel;Inactif;1;NON;14;Annuel
