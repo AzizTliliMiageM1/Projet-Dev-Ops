@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.projet.repository.AbonnementRepository;
 import com.projet.repository.FileAbonnementRepository;
 import com.projet.user.FileUserRepository;
-import com.projet.user.User;
+import com.projet.backend.domain.User;
 import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;

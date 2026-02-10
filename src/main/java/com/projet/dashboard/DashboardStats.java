@@ -3,7 +3,7 @@ package com.projet.dashboard;
 import java.util.List;
 import java.util.Map;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 public class DashboardStats {
     private double totalMonthlyCost;

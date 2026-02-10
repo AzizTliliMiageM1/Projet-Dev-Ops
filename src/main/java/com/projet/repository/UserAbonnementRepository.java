@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Repository pour gérer les abonnements par utilisateur

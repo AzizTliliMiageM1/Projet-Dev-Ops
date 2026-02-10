@@ -15,7 +15,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Implémentation JDBC simple pour H2 (ou autre via JDBC URL) de AbonnementRepository.

@@ -1,4 +1,4 @@
-package com.projet.user;
+package com.projet.backend.domain;
 
 public class User {
     private String email;

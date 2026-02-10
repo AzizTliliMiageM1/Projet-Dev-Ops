@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Classe principale de l'application. Gère le menu console et les actions.

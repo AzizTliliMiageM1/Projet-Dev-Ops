@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 import com.projet.repository.AbonnementRepository;
 import com.projet.repository.FileAbonnementRepository;
 

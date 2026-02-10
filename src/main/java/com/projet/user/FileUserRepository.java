@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.projet.backend.domain.User;
+
 public class FileUserRepository implements UserRepository {
 
     private final File file = new File("users-db.txt");

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 public class FileAbonnementRepository implements AbonnementRepository {
     private final String filePath;

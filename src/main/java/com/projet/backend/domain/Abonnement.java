@@ -1,4 +1,4 @@
-package com.example.abonnement;
+package com.projet.backend.domain;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -516,20 +516,20 @@ public class Abonnement {
     } 
 
     public void valider() {
-    if (prixMensuel < 0) {
-        throw new IllegalArgumentException("Le prix mensuel ne peut pas être négatif.");
-    }
-    if (dateDebut == null || dateFin == null) {
-        throw new IllegalArgumentException("Les dates de début et de fin doivent être renseignées.");
-    }
-    if (dateDebut.isAfter(dateFin)) {
-        throw new IllegalArgumentException("La date de début ne peut pas être après la date de fin.");
-    }
-    if (nombreUtilisateurs <= 0) {
-        throw new IllegalArgumentException("Le nombre d'utilisateurs doit être supérieur à 0.");
-    }
-    if (joursRappelAvantFin < 0) {
-        throw new IllegalArgumentException("Les jours de rappel ne peuvent pas être négatifs.");
-    }
+        if (prixMensuel < 0) {
+            throw new IllegalArgumentException("Le prix mensuel ne peut pas être négatif.");
+        }
+        if (dateDebut == null || dateFin == null) {
+            throw new IllegalArgumentException("Les dates de début et de fin doivent être renseignées.");
+        }
+        if (dateDebut.isAfter(dateFin)) {
+            throw new IllegalArgumentException("La date de début ne peut pas être après la date de fin.");
+        }
+        if (nombreUtilisateurs <= 0) {
+            throw new IllegalArgumentException("Le nombre d'utilisateurs doit être supérieur à 0.");
+        }
+        if (joursRappelAvantFin < 0) {
+            throw new IllegalArgumentException("Les jours de rappel ne peuvent pas être négatifs.");
+        }
     }
 }

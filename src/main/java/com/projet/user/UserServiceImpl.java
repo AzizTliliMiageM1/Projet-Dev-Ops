@@ -2,6 +2,8 @@ package com.projet.user;
 
 import java.util.UUID;
 
+import com.projet.backend.domain.User;
+
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository = new FileUserRepository();

@@ -1,6 +1,6 @@
 package com.projet.service;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 import com.projet.analytics.SubscriptionAnalytics;
 import com.projet.analytics.SubscriptionAnalytics.*;
 

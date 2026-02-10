@@ -1,6 +1,6 @@
 package com.projet.analytics;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;

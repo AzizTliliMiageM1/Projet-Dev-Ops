@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Classe utilitaire pour migrer les fichiers d'abonnements de l'ancien format (8 colonnes)

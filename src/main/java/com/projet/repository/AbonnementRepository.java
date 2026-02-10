@@ -3,7 +3,7 @@ package com.projet.repository;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Interface de persistance pour les Abonnements.
