@@ -1,0 +1,42 @@
+╔════════════════════════════════════════════════════════════════╗
+║        FRONTEND ACADÉMIQUE - STRUCTURE SIMPLIFIÉE              ║
+╚════════════════════════════════════════════════════════════════╝
+
+📁 FRONTEND FILES (src/main/resources/static/)
+─────────────────────────────────────────────
+✅ api.js                (3.9K) → API fetch vers backend
+✅ ui.js                 (8.3K) → Rendu DOM
+✅ academic.css          (6.4K) → Styles
+✅ dashboard.html        (2.6K) → Dashboard principal
+✅ subscriptions.html    (3.3K) → CRUD abonnements
+✅ stats.html            (4.9K) → Statistiques
+
+📄 DOCUMENTATION
+─────────────────
+✅ README.md             → Principal
+✅ tests/README_TESTS.md → Tests
+
+🎯 HOW TO USE
+─────────────
+1. Backend: java -jar target/gestion-abonnements-1.0-SNAPSHOT.jar api
+2. Frontend: http://localhost:4567/index.html
+
+🔗 API ENDPOINTS
+────────────────
+GET    /api/abonnements       → Lister
+GET    /api/abonnements/:id   → Détail
+POST   /api/abonnements       → Créer
+PUT    /api/abonnements/:id   → Modifier
+DELETE /api/abonnements/:id   → Supprimer
+GET    /api/analytics         → Metrics
+
+✨ FEATURES
+───────────
+✅ Dashboard avec KPIs
+✅ CRUD complet (create/read/update/delete)
+✅ Recherche temps réel
+✅ Statistiques et recommandations
+✅ Zéro mock data - API réelle uniquement
+✅ Code simple et lisible
+
+✨ Frontend prêt pour démonstration académique

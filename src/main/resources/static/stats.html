@@ -1,834 +1,171 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Analytics Dashboard - Gestion d'abonnements</title>
-
-    <!-- Bootstrap + Fonts + Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <link rel="stylesheet" href="/styles.css">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .container-fluid {
-            position: relative;
-            z-index: 2;
-        }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.6s ease;
-        }
-        
-        .glass-card:hover::before {
-            left: 100%;
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .stat-number {
-            font-size: 3.8rem;
-            font-weight: 900;
-            line-height: 1;
-            color: #ffffff;
-            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.5),
-                         0 4px 30px rgba(0, 0, 0, 0.3);
-            position: relative;
-        }
-        
-        @keyframes gradientFlow {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 400px;
-            padding: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            margin: 15px 0;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .chart-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            border-radius: 20px;
-            z-index: -1;
-        }
-        
-        .metric-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-            background-size: 200% 200%;
-            animation: gradientFlow 4s ease-in-out infinite;
-            color: white;
-            padding: 14px 24px;
-            border-radius: 30px;
-            font-weight: 800;
-            font-size: 1.05rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 
-                0 8px 25px rgba(102, 126, 234, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-        
-        .metric-badge:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 12px 35px rgba(102, 126, 234, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-        
-        .status-indicator {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 10px;
-            box-shadow: 0 0 10px currentColor;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-active { 
-            background: #10b981;
-            box-shadow: 0 0 15px #10b981;
-        }
-        .status-warning { 
-            background: #f59e0b;
-            box-shadow: 0 0 15px #f59e0b;
-        }
-        .status-expired { 
-            background: #ef4444;
-            box-shadow: 0 0 15px #ef4444;
-        }
-        
-        .header-glass {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(25px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .hero-stats {
-            background: linear-gradient(135deg, 
-                rgba(255, 255, 255, 0.25) 0%, 
-                rgba(255, 255, 255, 0.15) 50%,
-                rgba(255, 255, 255, 0.1) 100%);
-            backdrop-filter: blur(30px);
-            border-radius: 30px;
-            padding: 40px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-stats::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-            pointer-events: none;
-        }
-        
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .chart-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            background: rgba(0, 0, 0, 0.25);
-            padding: 12px 20px;
-            border-radius: 15px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .chart-title i {
-            color: #ffffff;
-            filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
-        }
-        
-        .animate-pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques - Gestion d'Abonnements</title>
+  <link rel="stylesheet" href="/academic.css">
 </head>
-
 <body>
-    <!-- Header moderne -->
-    <header class="header-glass">
-        <nav class="container py-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
-                        <i class="bi bi-graph-up text-white" style="font-size: 1.5rem;"></i>
-                    </div>
-                    <div>
-                        <h1 class="mb-0 h4 text-white fw-bold">Analytics Dashboard</h1>
-                        <p class="mb-0 text-white-50">Insights en temps réel</p>
-                    </div>
-                </div>
-                <div class="d-flex gap-2">
-                    <button id="refreshBtn" class="btn btn-outline-light btn-sm" onclick="loadStats()">
-                        <i class="bi bi-arrow-repeat"></i> Actualiser
-                    </button>
-                    <a class="btn btn-outline-light btn-sm" href="/index.html">
-                        <i class="bi bi-arrow-left"></i> App
-                    </a>
-                    <a class="btn btn-light btn-sm" href="/index.html">
-                        <i class="bi bi-house"></i> Accueil
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </header>
 
-    <main class="container py-4">
-        <!-- Hero Stats -->
-        <div class="hero-stats text-center text-white">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="metric-badge mb-2">
-                        <i class="bi bi-collection"></i>
-                        Total
-                    </div>
-                    <div class="stat-number text-white" id="totalAbonnements">-</div>
-                    <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Abonnements</p>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-badge mb-2">
-                        <i class="bi bi-check-circle"></i>
-                        Actifs
-                    </div>
-                    <div class="stat-number text-white" id="abonnementsActifs">-</div>
-                    <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Services</p>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-badge mb-2">
-                        <i class="bi bi-currency-euro"></i>
-                        Budget
-                    </div>
-                    <div class="stat-number text-white" id="coutTotal">-€</div>
-                    <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Par mois</p>
-                </div>
-                <div class="col-md-3">
-                    <div class="metric-badge mb-2">
-                        <i class="bi bi-clock"></i>
-                        Prochain
-                    </div>
-                    <div class="stat-number text-white" id="prochainRenouvellement">-</div>
-                    <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">Renouvellement</p>
-                </div>
-                <div class="col-md-3">
-                <div class="metric-badge mb-2">
-                    <i class="bi bi-calculator"></i>
-                    Prévision
-                </div>
-                <div class="stat-number text-white" id="prediction3mois">-€</div>
-                <p class="mb-0 text-white" style="font-size: 1.05rem; font-weight: 600;">
-                    3 prochains mois
-                </p>
-                </div>
+<!-- Navigation -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/index.html">
+      📋 Dashboard Abonnements
+    </a>
+    <div style="display: inline-block; margin-left: auto;">
+      <a href="/index.html">Dashboard</a>
+      <a href="/subscriptions.html">Abonnements</a>
+      <a href="/stats.html">Statistiques</a>
+    </div>
+  </div>
+</nav>
 
-            </div>
-        </div>
+<!-- Contenu principal -->
+<main class="container">
+  <h1 style="margin-bottom: 2rem;">Statistiques du portefeuille</h1>
 
-        <!-- Graphiques -->
-        <div class="row g-4 mb-4">
-            <!-- Statuts -->
-            <div class="col-lg-6">
-                <div class="glass-card h-100">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-pie-chart me-2"></i>
-                            Répartition par statut
-                        </h5>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-            </div>
+  <!-- Statistiques principales -->
+  <section class="section">
+    <h2 class="section-title">Vue d'ensemble financière</h2>
+    <div id="stats-container" class="grid-2">
+      <!-- Cartes stats injectées par JavaScript -->
+    </div>
+  </section>
 
-            <!-- Catégories -->
-            <div class="col-lg-6">
-                <div class="glass-card h-100">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-bar-chart me-2"></i>
-                            Services par catégorie
-                        </h5>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="categoriesChart"></canvas>
-                    </div>
-                </div>
-            </div>
+  <!-- Détails par catégorie -->
+  <section class="section">
+    <h2 class="section-title">Répartition par catégorie</h2>
+    <div id="category-stats">
+      <!-- Tableau injecté par JavaScript -->
+    </div>
+  </section>
 
-            <!-- Évolution -->
-            <div class="col-lg-8">
-                <div class="glass-card h-100">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-graph-up me-2"></i>
-                            Évolution mensuelle
-                        </h5>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="evolutionChart"></canvas>
-                    </div>
-                </div>
-            </div>
+  <!-- Détails par période -->
+  <section class="section">
+    <h2 class="section-title">Évolution des coûts</h2>
+    <div id="period-stats">
+      <!-- Tableau injecté par JavaScript -->
+    </div>
+  </section>
 
-            <!-- Coûts -->
-            <div class="col-lg-4">
-                <div class="glass-card h-100">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-pie-chart me-2"></i>
-                            Répartition des coûts
-                        </h5>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="costChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <!-- Recommandations -->
+  <section class="section">
+    <h2 class="section-title">Recommandations d'optimisation</h2>
+    <div id="recommendations">
+      <!-- Recommandations injectées par JavaScript -->
+    </div>
+  </section>
+</main>
 
-        <!-- Insights et Top Services -->
-        <div class="row g-4">
-            <!-- Insights intelligents -->
-            <div class="col-lg-8">
-                <div class="glass-card">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-lightbulb me-2"></i>
-                            Insights intelligents
-                        </h5>
-                    </div>
-                    <div class="p-4">
-                        <div id="insights">
-                            <div class="text-center py-4">
-                                <div class="spinner-border text-primary animate-pulse" role="status">
-                                    <span class="visually-hidden">Analyse en cours...</span>
-                                </div>
-                                <p class="mt-2 text-muted">Analyse des données en cours...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Scripts -->
+<script src="/api.js"></script>
+<script src="/ui.js"></script>
+<script>
+/**
+ * PAGE: Statistiques
+ */
 
-            <!-- Actions rapides -->
-            <div class="col-lg-4">
-                <div class="glass-card">
-                    <div class="p-4 border-bottom">
-                        <h5 class="mb-0 d-flex align-items-center text-white" style="font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.4);">
-                            <i class="bi bi-lightning me-2"></i>
-                            Actions rapides
-                        </h5>
-                    </div>
-                    <div class="p-4">
-                        <div class="d-grid gap-3">
-                            <button class="btn btn-outline-primary" onclick="exportData()">
-                                <i class="bi bi-download me-2"></i>Exporter données
-                            </button>
-                            <a href="/index.html" class="btn btn-outline-success">
-                                <i class="bi bi-plus-circle me-2"></i>Ajouter abonnement
-                            </a>
-                            <button class="btn btn-outline-warning" onclick="checkAlerts()">
-                                <i class="bi bi-bell me-2"></i>Vérifier alertes
-                            </button>
-                            <div class="border-top pt-3 mt-2">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <span class="text-muted">Dernière maj:</span>
-                                    <span id="lastUpdate" class="badge bg-secondary">-</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+/**
+ * Charge et affiche les statistiques
+ */
+async function loadStatsPage() {
+  try {
+    const abonnements = await fetchAbonnements();
+    const analytics = await fetchAnalytics();
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        let chartsInstances = {};
+    // Afficher les stats principales
+    const stats = {
+      totalAnnuel: (analytics.coutMensuel || 0) * 12,
+      abonnementsActifs: abonnements.length,
+      moyenneMensuelle: analytics.coutMensuel || 0,
+      economiePotentielle: calculateSavings(abonnements)
+    };
+    renderStats(stats);
 
-        async function loadStats() {
-            try {
-                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('fr-FR');
-                
-                const response = await fetch('/api/abonnements');
-                const abonnements = response.ok ? await response.json() : [];
-                
-                generateStatistics(abonnements);
-            } catch (error) {
-                console.error('Erreur lors du chargement:', error);
-                generateStatistics([]);
-            }
-        }
+    // Afficher les stats par catégorie
+    renderCategoryStats(abonnements);
 
-        function generateStatistics(abonnements) {
-            const now = new Date();
-            const stats = calculateStats(abonnements, now);
-            
-            updateKPIs(stats);
-            updateCharts(stats, abonnements);
-            generateInsights(stats, abonnements);
-            document.getElementById('prediction3mois').textContent = (stats.coutTotal * 3).toFixed(2) + '€';
+    // Afficher les recommandations
+    renderRecommendations(abonnements, stats);
+  } catch (error) {
+    console.error('Erreur:', error);
+    showError('Erreur lors du chargement des statistiques');
+  }
+}
 
-        }
+/**
+ * Calcule les économies potentielles
+ */
+function calculateSavings(abonnements) {
+  if (!abonnements || abonnements.length === 0) return 0;
+  const total = abonnements.reduce((sum, ab) => sum + (ab.coutMensuel || 0), 0);
+  return total * 0.1; // 10% d'économies potentielles
+}
 
-        function calculateStats(abonnements, now) {
-            const stats = {
-                total: abonnements.length,
-                actifs: 0,
-                expires: 0,
-                bientotExpires: 0,
-                coutTotal: 0,
-                coutMoyen: 0,
-                categories: {},
-                evolutionMensuelle: {},
-                prochainRenouvellement: null
-            };
+/**
+ * Affiche les stats par catégorie
+ */
+function renderCategoryStats(abonnements) {
+  const container = document.getElementById('category-stats');
+  if (!container) return;
+  
+  const categories = {};
+  abonnements.forEach(ab => {
+    const cat = ab.categorie || 'Sans catégorie';
+    if (!categories[cat]) {
+      categories[cat] = { count: 0, total: 0 };
+    }
+    categories[cat].count++;
+    categories[cat].total += ab.coutMensuel || 0;
+  });
 
-            abonnements.forEach(abo => {
-                const dateDebut = new Date(abo.dateDebut);
-                const dateFin = new Date(abo.dateFin);
-                const isActif = dateFin >= now;
-                const joursDifference = Math.ceil((dateFin - now) / (1000 * 60 * 60 * 24));
+  let html = '<table class="table"><thead><tr><th>Catégorie</th><th>Nombre</th><th>Coût mensuel</th></tr></thead><tbody>';
+  Object.entries(categories).forEach(([cat, data]) => {
+    html += `<tr><td>${cat}</td><td>${data.count}</td><td>${formatCurrency(data.total)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
 
-                if (isActif) {
-                    if (joursDifference <= 7) {
-                        stats.bientotExpires++;
-                    } else {
-                        stats.actifs++;
-                    }
-                    const prix = parseFloat(abo.prixMensuel) || 0;
-                    stats.coutTotal += prix;
-                } else {
-                    stats.expires++;
-                }
+/**
+ * Affiche les recommandations d'optimisation
+ */
+function renderRecommendations(abonnements, stats) {
+  const container = document.getElementById('recommendations');
+  if (!container) return;
+  
+  const recommendations = [];
 
-                const cat = abo.categorie || 'Autres';
-                stats.categories[cat] = (stats.categories[cat] || 0) + 1;
+  const expired = abonnements.filter(ab => {
+    if (!ab.dateExpiration) return false;
+    return new Date(ab.dateExpiration) < new Date();
+  });
+  
+  if (expired.length > 0) {
+    recommendations.push(`<div class="alert alert-warning">⭐ <strong>${expired.length} abonnement(s) expiré(s)</strong></div>`);
+  }
 
-                const mois = dateDebut.getFullYear() + '-' + String(dateDebut.getMonth() + 1).padStart(2, '0');
-                stats.evolutionMensuelle[mois] = (stats.evolutionMensuelle[mois] || 0) + 1;
+  const expensive = abonnements.sort((a, b) => (b.coutMensuel || 0) - (a.coutMensuel || 0)).slice(0, 3);
+  if (expensive.length > 0) {
+    const expStr = expensive.map(ab => `${ab.service}`).join(', ');
+    recommendations.push(`<div class="alert alert-info">💰 <strong>À vérifier:</strong> ${expStr}</div>`);
+  }
 
-                if (isActif && joursDifference > 0) {
-                    if (!stats.prochainRenouvellement || joursDifference < stats.prochainRenouvellement.jours) {
-                        stats.prochainRenouvellement = {
-                            jours: joursDifference,
-                            service: abo.nomService,
-                            client: abo.nomClient
-                        };
-                    }
-                }
-            });
+  if (stats.economiePotentielle > 0) {
+    recommendations.push(`<div class="alert alert-success">✅ <strong>Économies:</strong> ${formatCurrency(stats.economiePotentielle)}/mois</div>`);
+  }
 
-            stats.coutMoyen = stats.total > 0 ? stats.coutTotal / stats.total : 0;
-            return stats;
-        }
+  if (recommendations.length === 0) {
+    recommendations.push('<p>Aucune recommandation</p>');
+  }
 
-        function updateKPIs(stats) {
-            document.getElementById('totalAbonnements').textContent = stats.total;
-            document.getElementById('abonnementsActifs').textContent = stats.actifs;
-            document.getElementById('coutTotal').textContent = stats.coutTotal.toFixed(2) + '€';
-            document.getElementById('prochainRenouvellement').textContent = 
-                stats.prochainRenouvellement ? `${stats.prochainRenouvellement.jours}j` : 'Aucun';
-        }
+  container.innerHTML = recommendations.join('');
+}
 
-        function updateCharts(stats, abonnements) {
-            updateStatusChart(stats);
-            updateCategoriesChart(stats);
-            updateEvolutionChart(stats);
-            updateCostChart(abonnements);
-        }
+window.addEventListener('DOMContentLoaded', loadStatsPage);
+</script>
 
-        function updateStatusChart(stats) {
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            
-            if (chartsInstances.statusChart) {
-                chartsInstances.statusChart.destroy();
-            }
-
-            chartsInstances.statusChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Actifs', 'Bientôt expirés', 'Expirés'],
-                    datasets: [{
-                        data: [stats.actifs, stats.bientotExpires, stats.expires],
-                        backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
-                        borderWidth: 3,
-                        borderColor: '#ffffff',
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 20,
-                                usePointStyle: true,
-                                font: { weight: '600' }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateCategoriesChart(stats) {
-            const ctx = document.getElementById('categoriesChart').getContext('2d');
-            
-            if (chartsInstances.categoriesChart) {
-                chartsInstances.categoriesChart.destroy();
-            }
-
-            const categories = Object.keys(stats.categories);
-            const values = Object.values(stats.categories);
-            const colors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
-
-            chartsInstances.categoriesChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        label: 'Nombre d\'abonnements',
-                        data: values,
-                        backgroundColor: colors.slice(0, categories.length),
-                        borderRadius: 12,
-                        borderSkipped: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 },
-                            grid: { color: 'rgba(0,0,0,0.1)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateEvolutionChart(stats) {
-            const ctx = document.getElementById('evolutionChart').getContext('2d');
-            
-            if (chartsInstances.evolutionChart) {
-                chartsInstances.evolutionChart.destroy();
-            }
-
-            const months = Object.keys(stats.evolutionMensuelle).sort();
-            const values = months.map(month => stats.evolutionMensuelle[month]);
-
-            chartsInstances.evolutionChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months.map(month => {
-                        const [year, monthNum] = month.split('-');
-                        return new Date(year, monthNum - 1).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
-                    }),
-                    datasets: [{
-                        label: 'Nouveaux abonnements',
-                        data: values,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 8,
-                        pointHoverRadius: 12,
-                        pointBackgroundColor: '#667eea',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 },
-                            grid: { color: 'rgba(0,0,0,0.1)' }
-                        },
-                        x: {
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateCostChart(abonnements) {
-            const ctx = document.getElementById('costChart').getContext('2d');
-            
-            if (chartsInstances.costChart) {
-                chartsInstances.costChart.destroy();
-            }
-
-            const servicesCosts = {};
-            abonnements.forEach(abo => {
-                const prix = parseFloat(abo.prixMensuel) || 0;
-                const service = abo.nomService;
-                servicesCosts[service] = (servicesCosts[service] || 0) + prix;
-            });
-
-            const services = Object.keys(servicesCosts);
-            const costs = Object.values(servicesCosts);
-            const colors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
-
-            chartsInstances.costChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: services,
-                    datasets: [{
-                        data: costs,
-                        backgroundColor: colors.slice(0, services.length),
-                        borderWidth: 3,
-                        borderColor: '#ffffff',
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                usePointStyle: true,
-                                font: { weight: '600' },
-                                generateLabels: function(chart) {
-                                    const data = chart.data;
-                                    return data.labels.map((label, i) => ({
-                                        text: `${label}: ${data.datasets[0].data[i].toFixed(2)}€`,
-                                        fillStyle: data.datasets[0].backgroundColor[i],
-                                        strokeStyle: data.datasets[0].backgroundColor[i],
-                                        lineWidth: 0
-                                    }));
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.parsed.toFixed(2)}€/mois`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function generateInsights(stats, abonnements) {
-            const insights = [];
-
-            if (stats.bientotExpires > 0) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'bi-exclamation-triangle',
-                    title: '⚠️ Attention !',
-                    message: `${stats.bientotExpires} abonnement(s) expire(nt) dans moins de 7 jours.`
-                });
-            }
-
-            if (stats.coutTotal > 100) {
-                insights.push({
-                    type: 'info',
-                    icon: 'bi-info-circle',
-                    title: '💡 Optimisation possible',
-                    message: `Budget mensuel: ${stats.coutTotal.toFixed(2)}€. Considérez réviser vos abonnements.`
-                });
-            }
-
-            const abonnementsInactifs = abonnements.filter(abo => {
-                const dernierUtilisation = abo.derniereUtilisation ? new Date(abo.derniereUtilisation) : null;
-                if (!dernierUtilisation) return true;
-                
-                const maintenant = new Date();
-                const joursInactivite = Math.ceil((maintenant - dernierUtilisation) / (1000 * 60 * 60 * 24));
-                return joursInactivite > 30;
-            });
-
-            if (abonnementsInactifs.length > 0) {
-                insights.push({
-                    type: 'warning',
-                    icon: 'bi-clock',
-                    title: '⏰ Services inactifs',
-                    message: `${abonnementsInactifs.length} service(s) non utilisé(s) depuis plus de 30 jours.`
-                });
-            }
-
-            if (stats.actifs > 5) {
-                insights.push({
-                    type: 'success',
-                    icon: 'bi-check-circle',
-                    title: '🎯 Portefeuille diversifié',
-                    message: `Vous gérez ${stats.actifs} services actifs. Excellente organisation !`
-                });
-            }
-
-            if (insights.length === 0) {
-                insights.push({
-                    type: 'success',
-                    icon: 'bi-check-circle',
-                    title: '✅ Tout va bien !',
-                    message: 'Vos abonnements sont parfaitement optimisés.'
-                });
-            }
-
-            const html = insights.map(insight => `
-                <div class="alert alert-${insight.type === 'warning' ? 'warning' : insight.type === 'info' ? 'info' : 'success'} border-0 shadow-sm mb-3">
-                    <div class="d-flex align-items-start">
-                        <i class="${insight.icon} me-3 mt-1" style="font-size: 1.2rem;"></i>
-                        <div>
-                            <div class="fw-bold">${insight.title}</div>
-                            <div class="mt-1">${insight.message}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            document.getElementById('insights').innerHTML = html;
-        }
-
-        async function exportData() {
-            try {
-                const response = await fetch('/api/abonnements');
-                const data = response.ok ? await response.json() : [];
-                
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `abonnements_analytics_${new Date().toISOString().split('T')[0]}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                alert('Erreur lors de l\'export des données');
-            }
-        }
-
-        function checkAlerts() {
-            loadStats();
-            alert('Vérification des alertes terminée. Consultez les insights ci-dessus.');
-        }
-
-        // Charger au démarrage et actualiser automatiquement
-        document.addEventListener('DOMContentLoaded', () => {
-            loadStats();
-            setInterval(loadStats, 60000); // Actualisation toutes les minutes
-        });
-    </script>
 </body>
-
 </html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Gestion d'Abonnements</title>
+  <link rel="stylesheet" href="/academic.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/index.html">
+      📋 Dashboard Abonnements
+    </a>
+    <div style="display: inline-block; margin-left: auto;">
+      <a href="/index.html">Dashboard</a>
+      <a href="/subscriptions.html">Abonnements</a>
+      <a href="/stats.html">Statistiques</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Contenu principal -->
+<main class="container">
+  <h1 style="margin-bottom: 2rem;">Dashboard - Vue d'ensemble</h1>
+
+  <!-- KPIs -->
+  <section class="section">
+    <h2 class="section-title">Métriques principales</h2>
+    <div id="kpi-container" class="kpi-grid">
+      <!-- Cartes KPI injectées par JavaScript -->
+    </div>
+  </section>
+
+  <!-- Abonnements à risque -->
+  <section class="section">
+    <h2 class="section-title">⚠️ Abonnements à risque</h2>
+    <div id="risk-list">
+      <!-- Liste des abonnements à risque -->
+    </div>
+  </section>
+
+  <!-- Dernier abonnement créé -->
+  <section class="section">
+    <h2 class="section-title">Informations du système</h2>
+    <p id="system-info">Chargement...</p>
+  </section>
+</main>
+
+<!-- Scripts -->
+<script src="/api.js"></script>
+<script src="/ui.js"></script>
+<script>
+/**
+ * PAGE: Dashboard principal
+ * Affiche les KPIs et les abonnements à risque du backend
+ */
+
+async function loadDashboard() {
+  try {
+    // Récupérer les données du backend
+    const abonnements = await fetchAbonnements();
+    const analytics = await fetchAnalytics();
+
+    // Afficher les KPIs
+    renderDashboardKPIs(analytics);
+
+    // Afficher les abonnements à risque
+    const riskAbs = abonnements.filter(ab => ab.riskLevel === 'high' || ab.daysUntilExpiry < 30);
+    renderRiskList(riskAbs);
+
+    // Afficher les infos système
+    const info = `
+      Total d'abonnements: ${abonnements.length} | 
+      Coût mensuel estimé: ${formatCurrency(analytics.coutMensuel)} | 
+      Santé du portefeuille: ${analytics.scoreSante}%
+    `;
+    document.getElementById('system-info').textContent = info;
+  } catch (error) {
+    console.error('Erreur lors du chargement du dashboard:', error);
+    showError('Erreur de chargement du dashboard');
+  }
+}
+
+// Charger au démarrage
+window.addEventListener('DOMContentLoaded', loadDashboard);
+
+// Rafraîchir toutes les 5 minutes
+setInterval(loadDashboard, 5 * 60 * 1000);
+</script>
+
+</body>
+</html>
