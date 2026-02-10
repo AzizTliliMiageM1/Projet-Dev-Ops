@@ -1,11 +1,17 @@
 package com.projet.backend.cli;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 import com.projet.backend.domain.User;
 import com.projet.backend.service.SubscriptionService;
@@ -14,12 +20,17 @@ import com.projet.backend.service.UserService;
 /**
  * CLI router for backend commands.
  *
+ * This class is the thin CLI adapter layer: it parses arguments and delegates
+ * to the stable backend services (domain/service). Business logic lives in
+ * the service layer and must not be modified here. The router is kept small
+ * and testable by allowing service injection via constructor.
+ *
  * Responsibilities:
  * - parse CLI key=value arguments
  * - dispatch to backend services (injection-friendly)
- * - return human readable results
+ * - provide helpful user messages and validation feedback
  *
- * Usage: see `backend.Main` which delegates to this router.
+ * Usage: see tests and any `Main` that delegates to this router.
  */
 public class CommandRouter {
 
@@ -42,6 +53,15 @@ public class CommandRouter {
     }
 
     /**
+     * Explicit named factory kept for clarity - delegates to the backward-compatible
+     * `createDefault()` so existing code keeps working while new callers can use
+     * a clearer name.
+     */
+    public static CommandRouter createWithDefaultServices() {
+        return createDefault();
+    }
+
+    /**
      * Route a CLI command (args like args[]). First token is command name.
      */
     public String route(String[] args) {
@@ -57,12 +77,24 @@ public class CommandRouter {
                 return handleAddSubscription(params);
             case "createUser":
                 return handleCreateUser(params);
+            case "roiScore":
+                return handleRoiScore(params);
+            case "statsFromCsv":
+                return handleStatsFromCsv(params);
+            case "expiring":
+                return handleExpiringFromCsv(params);
+            case "filterByCategory":
+                return handleFilterByCategory(params);
+            case "topPriority":
+                return handleTopPriority(params);
+            case "savingOps":
+                return handleSavingOps(params);
             case "help":
             case "--help":
             case "-h":
                 return helpText();
             default:
-                return "Unknown command: " + cmd + ". Use 'help' to list available commands.";
+                return "Unknown command: '" + cmd + "'. Use 'help' to list available commands and examples.";
         }
     }
 
@@ -112,12 +144,8 @@ public class CommandRouter {
         }
 
         // At this point validation passed; create subscription (service may still throw)
-        try {
-            Abonnement created = subscriptionService.createSubscription(nomService, dateDebut, dateFin, prix, clientName, categorie);
-            return "Subscription created: service=" + created.getNomService() + " user=" + created.getClientName() + " price=" + created.getPrixMensuel();
-        } catch (IllegalArgumentException e) {
-            return "Creation failed: " + e.getMessage();
-        }
+        Abonnement created = subscriptionService.createSubscription(nomService, dateDebut, dateFin, prix, clientName, categorie);
+        return "Subscription created: service=" + created.getNomService() + " user=" + created.getClientName() + " price=" + created.getPrixMensuel();
     }
 
     private String handleCreateUser(Map<String, String> p) {
@@ -136,11 +164,108 @@ public class CommandRouter {
             return "Validation failed: " + msg;
         }
 
+        var created = userService.createUser(email, password, pseudo);
+        return "User created: " + created.getEmail() + " (pseudo=" + created.getPseudo() + ")";
+    }
+
+    /* -------- Additional commands mapping to SubscriptionService (non-invasive) -------- */
+
+    private String handleRoiScore(Map<String, String> p) {
+        String nomService = p.get("nomService");
+        String clientName = p.get("user");
+        String prixS = p.get("prixMensuel");
+        String dateDebutS = p.get("dateDebut");
+        String dateFinS = p.get("dateFin");
+
+        if (nomService == null || clientName == null || prixS == null || dateDebutS == null || dateFinS == null) {
+            return "Missing parameters for roiScore. Required: nomService user prixMensuel dateDebut dateFin";
+        }
+
         try {
-            var created = userService.createUser(email, password, pseudo);
-            return "User created: " + created.getEmail() + " (pseudo=" + created.getPseudo() + ")";
-        } catch (IllegalArgumentException e) {
-            return "Creation failed: " + e.getMessage();
+            double prix = Double.parseDouble(prixS);
+            LocalDate dd = LocalDate.parse(dateDebutS);
+            LocalDate df = LocalDate.parse(dateFinS);
+            Abonnement a = new Abonnement(nomService, dd, df, prix, clientName);
+            double score = subscriptionService.calculateRoiScore(a);
+            return String.format("ROI score for %s (user=%s): %.2f", nomService, clientName, score);
+        } catch (NumberFormatException | DateTimeParseException e) {
+            return "Invalid numeric/date parameter: " + e.getMessage();
+        }
+    }
+
+    private List<Abonnement> readAbonnementsFromCsvPath(String path) throws IOException {
+        List<String> lines = Files.readAllLines(Path.of(path));
+        List<Abonnement> list = new ArrayList<>();
+        for (String l : lines) {
+            if (l == null || l.trim().isEmpty()) continue;
+            list.add(AbonnementCsvConverter.fromCsvString(l));
+        }
+        return list;
+    }
+
+    private String handleStatsFromCsv(Map<String, String> p) {
+        String file = p.get("file");
+        if (file == null) return "Missing 'file' parameter pointing to CSV of abonnements.";
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            SubscriptionService.PortfolioStats stats = subscriptionService.calculatePortfolioStats(abonnements);
+            return String.format("Portfolio: total=%d active=%d inactive=%d totalMonthly=%.2f avgMonthly=%.2f health=%.2f",
+                stats.totalSubscriptions, stats.activeSubscriptions, stats.inactiveSubscriptions, stats.totalMonthlyCost, stats.averageMonthlyCost, stats.portfolioHealthScore);
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String handleExpiringFromCsv(Map<String, String> p) {
+        String file = p.get("file");
+        String joursS = p.getOrDefault("jours", "30");
+        if (file == null) return "Missing 'file' parameter pointing to CSV of abonnements.";
+        try {
+            int jours = Integer.parseInt(joursS);
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            List<Abonnement> exp = subscriptionService.getExpiringSubscriptions(abonnements, jours);
+            return "Expiring subscriptions (next " + jours + " days): " + exp.stream().map(Abonnement::getNomService).collect(Collectors.joining(", "));
+        } catch (NumberFormatException e) {
+            return "Invalid 'jours' parameter: " + e.getMessage();
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String handleFilterByCategory(Map<String, String> p) {
+        String file = p.get("file");
+        String categorie = p.get("categorie");
+        if (file == null || categorie == null) return "Missing 'file' and/or 'categorie' parameters.";
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            List<Abonnement> res = subscriptionService.filterByCategory(abonnements, categorie);
+            return "Found: " + res.size() + " abonnements: " + res.stream().map(Abonnement::getNomService).collect(Collectors.joining(", "));
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String handleTopPriority(Map<String, String> p) {
+        String file = p.get("file");
+        if (file == null) return "Missing 'file' parameter pointing to CSV of abonnements.";
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            List<Abonnement> top = subscriptionService.getTopPrioritySubscriptions(abonnements);
+            return "Top priority: " + top.stream().map(Abonnement::getNomService).collect(Collectors.joining(", "));
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String handleSavingOps(Map<String, String> p) {
+        String file = p.get("file");
+        if (file == null) return "Missing 'file' parameter pointing to CSV of abonnements.";
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            List<Abonnement> cand = subscriptionService.identifySavingOpportunities(abonnements);
+            return "Saving opportunities: " + cand.size() + " abonnements: " + cand.stream().map(Abonnement::getNomService).collect(Collectors.joining(", "));
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
         }
     }
 
