@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: abonnementsdb
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: apassword
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "3306:3306"
+
+  app:
+    build: .
+    depends_on:
+      - db
+      - flyway
+    environment:
+      DB_URL: jdbc:mysql://db:3306/abonnementsdb?useSSL=false&serverTimezone=UTC
+      DB_USER: appuser
+      DB_PASSWORD: apassword
+      APP_PORT: "8080"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/workspace
+
+volumes:
+  db_data:
+
+  flyway:
+    driver: local
+
+  # Flyway service (one-shot) to apply migrations against the db service
+  # Use `docker-compose run --rm flyway migrate` to apply migrations
+services:
+  flyway:
+    image: flyway/flyway:9
+    depends_on:
+      - db
+    volumes:
+      - ./db/migrations:/flyway/sql:ro
+    environment:
+      FLYWAY_URL: jdbc:mysql://db:3306/abonnementsdb
+      FLYWAY_USER: appuser
+      FLYWAY_PASSWORD: apassword
+    entrypoint: ["/bin/sh","-c"]
+    command: ["/flyway/flyway migrate"]
