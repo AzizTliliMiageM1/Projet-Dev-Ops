@@ -43,6 +43,26 @@ public class UserService {
         }
     }
 
+    // ========== HELPERS PRIVÉS DE VALIDATION ==========
+
+    /**
+     * Vérifie si une chaîne est nulle ou vide.
+     */
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * Vérifie si la longueur d'une chaîne est dans une plage valide.
+     */
+    private static boolean isValidLength(String str, int min, int max) {
+        if (str == null) return false;
+        int len = str.trim().length();
+        return len >= min && len <= max;
+    }
+
+    // ========== VALIDATIONS MÉTIER ==========
+
     /**
      * Valide une adresse email selon les règles métier basiques.
      * 
@@ -50,7 +70,7 @@ public class UserService {
      * @return true si valide, false sinon
      */
     public boolean isValidEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
+        if (isNullOrEmpty(email)) {
             return false;
         }
 
@@ -93,17 +113,12 @@ public class UserService {
      * @return true si valide, false sinon
      */
     public boolean isValidPseudo(String pseudo) {
-        if (pseudo == null) {
-            return false;
-        }
-
-        String trimmed = pseudo.trim();
-        if (trimmed.isEmpty() || trimmed.length() < 3 || trimmed.length() > 30) {
+        if (!isValidLength(pseudo, 3, 30)) {
             return false;
         }
 
         // Autorise uniquement alphanumériques, tirets et underscores
-        return trimmed.matches("^[a-zA-Z0-9_-]+$");
+        return pseudo.trim().matches("^[a-zA-Z0-9_-]+$");
     }
 
     /**
@@ -117,17 +132,17 @@ public class UserService {
 
         // Validations email
         if (!isValidEmail(user.getEmail())) {
-            errors.add("Email invalide ou vide");
+            errors.add(BackendMessages.USER_EMAIL_INVALID);
         }
 
         // Validations password
         if (!isValidPassword(user.getPassword())) {
-            errors.add("Mot de passe doit avoir au moins 8 caractères, une majuscule et un chiffre");
+            errors.add(BackendMessages.USER_PASSWORD_INVALID);
         }
 
         // Validations pseudo
         if (!isValidPseudo(user.getPseudo())) {
-            errors.add("Pseudo invalide (3-30 caractères, alphanumériques _ et - uniquement)");
+            errors.add(BackendMessages.USER_PSEUDO_INVALID);
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -149,7 +164,7 @@ public class UserService {
 
         ValidationResult validation = validateUser(user);
         if (!validation.valid) {
-            throw new IllegalArgumentException("Création échouée: " + String.join(", ", validation.errors));
+            throw new IllegalArgumentException(BackendMessages.formatValidationError("Création utilisateur échouée", validation.errors));
         }
 
         return user;

@@ -7,35 +7,100 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entité métier représentant un abonnement.
+ * 
+ * Cette classe encapsule toutes les données relatives à un abonnement :
+ * - Identification : id, nomService, clientName
+ * - Durée : dateDebut, dateFin, derniereUtilisation
+ * - Coûts : prixMensuel, coutTotal
+ * - Classification : categorie, priorite, tags
+ * - Utilisation : nombreUtilisateurs, partage
+ * - Suivi : joursRappelAvantFin, prochaineEcheance
+ * - Analyse : valueScore, churnRisk, usageFrequency
+ * 
+ * Les méthodes métier permettent de calculer des indicateurs et scores
+ * pour l'optimisation du portefeuille d'abonnements.
+ */
 public class Abonnement {
-    private String id; // UUID string persistant
+    /** Identifiant unique (UUID) de l'abonnement */
+    private String id;
+    
+    /** Nom du service abonné (ex: Netflix, Spotify) */
     private String nomService;
+    
+    /** Date de début d'abonnement */
     private LocalDate dateDebut;
+    
+    /** Date de fin d'abonnement (date d'expiration) */
     private LocalDate dateFin;
+    
+    /** Prix mensuel de l'abonnement en euros */
     private double prixMensuel;
+    
+    /** Nom du client/personne responsable */
     private String clientName;
+    
+    /** Dernière date d'utilisation connue du service */
     private LocalDate derniereUtilisation;
-    private String categorie; // Nouvelle fonctionnalité: catégorie de l'abonnement
+    
+    /** Catégorie de l'abonnement (ex: Streaming, Travail, Loisirs) */
+    private String categorie;
     
     // ========== NOUVELLES FONCTIONNALITÉS ==========
-    private List<String> tags; // Étiquettes personnalisées (ex: "Famille", "Travail", "Essentiel")
-    private String groupeAbonnement; // ID du groupe auquel appartient cet abonnement (ex: "Pack Streaming")
-    private String priorite; // "Essentiel", "Important", "Optionnel", "Luxe"
-    private String notes; // Notes personnelles sur l'abonnement
-    private int nombreUtilisateurs; // Combien de personnes utilisent cet abonnement
-    private boolean partage; // Est-ce que l'abonnement est partagé avec d'autres
-    private int joursRappelAvantFin; // Nombre de jours avant la fin pour rappel (0 = pas de rappel)
-    private String frequencePaiement; // "Mensuel", "Trimestriel", "Annuel"
-    private LocalDate prochaineEcheance; // Prochaine date de paiement
-    private double coutTotal; // Coût total depuis le début
+    
+    /** Étiquettes personnalisées pour organiser l'abonnement */
+    private List<String> tags;
+    
+    /** Groupe/Pack auquel appartient l'abonnement (ex: "Pack Streaming") */
+    private String groupeAbonnement;
+    
+    /** Priorité de l'abonnement : "Essentiel", "Important", "Optionnel", "Luxe" */
+    private String priorite;
+    
+    /** Notes personnelles sur l'abonnement */
+    private String notes;
+    
+    /** Nombre de personnes utilisant cet abonnement */
+    private int nombreUtilisateurs;
+    
+    /** Indique si l'abonnement est partagé avec d'autres utilisateurs */
+    private boolean partage;
+    
+    /** Nombre de jours avant expiration pour envoyer un rappel (0 = pas de rappel) */
+    private int joursRappelAvantFin;
+    
+    /** Fréquence de paiement : "Mensuel", "Trimestriel", "Annuel" */
+    private String frequencePaiement;
+    
+    /** Prochaine date de paiement prévue */
+    private LocalDate prochaineEcheance;
+    
+    /** Coût total cumulé depuis le début de l'abonnement */
+    private double coutTotal;
 
+    // ========== CONSTRUCTEURS ==========
+
+    /**
+     * Constructeur minimal pour créer un abonnement simple.
+     * Initialise les champs optionnels avec des valeurs par défaut.
+     * 
+     * @param nomService Nom du service
+     * @param dateDebut Date de début d'abonnement
+     * @param dateFin Date de fin d'abonnement
+     * @param prixMensuel Prix mensuel en euros
+     * @param clientName Nom du client
+     */
     // Constructeur original mis à jour
     public Abonnement(String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName) {
         this(UUID.randomUUID().toString(), nomService, dateDebut, dateFin, prixMensuel, clientName, LocalDate.now(), "Non classé",
              new ArrayList<>(), null, "Important", "", 1, false, 7, "Mensuel");
     }
 
-    // Constructeur sans-argument nécessaire pour Jackson
+    /**
+     * Constructeur sans argument requis pour Jackson (sérialisation/désérialisation JSON).
+     * Initialise tous les champs avec des valeurs par défaut.
+     */
     public Abonnement() {
         this.id = UUID.randomUUID().toString();
         this.nomService = "";
@@ -57,12 +122,45 @@ public class Abonnement {
         this.coutTotal = 0.0;
     }
 
+    /**
+     * Constructeur de compatibilité avec version précédente.
+     * Complète les champs optionnels avec des valeurs par défaut.
+     * 
+     * @param id Identifiant unique
+     * @param nomService Nom du service
+     * @param dateDebut Date de début
+     * @param dateFin Date de fin
+     * @param prixMensuel Prix mensuel
+     * @param clientName Nom du client
+     * @param derniereUtilisation Dernière utilisation connue
+     */
     // Compatibilité
     public Abonnement(String id, String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, String clientName, LocalDate derniereUtilisation) {
         this(id, nomService, dateDebut, dateFin, prixMensuel, clientName, derniereUtilisation, "Non classé",
              new ArrayList<>(), null, "Important", "", 1, false, 7, "Mensuel");
     }
 
+    /**
+     * Constructeur complet avec tous les paramètres.
+     * Valide et initialise tous les champs de l'abonnement.
+     * 
+     * @param id Identifiant unique (généré si null)
+     * @param nomService Nom du service
+     * @param dateDebut Date de début d'abonnement
+     * @param dateFin Date de fin d'abonnement
+     * @param prixMensuel Prix mensuel en euros
+     * @param clientName Nom du client
+     * @param derniereUtilisation Dernière date d'utilisation
+     * @param categorie Catégorie de l'abonnement
+     * @param tags Liste des étiquettes
+     * @param groupeAbonnement Groupe/Pack parent
+     * @param priorite Priorité (Essentiel, Important, Optionnel, Luxe)
+     * @param notes Notes personnelles
+     * @param nombreUtilisateurs Nombre d'utilisateurs
+     * @param partage Indique si l'abonnement est partagé
+     * @param joursRappelAvantFin Jours avant expiration pour rappel
+     * @param frequencePaiement Fréquence de paiement
+     */
     // Nouveau constructeur complet
     public Abonnement(String id, String nomService, LocalDate dateDebut, LocalDate dateFin, double prixMensuel, 
                      String clientName, LocalDate derniereUtilisation, String categorie,

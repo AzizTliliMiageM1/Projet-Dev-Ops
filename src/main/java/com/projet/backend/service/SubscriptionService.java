@@ -76,6 +76,31 @@ public class SubscriptionService {
         }
     }
 
+    // ========== HELPERS PRIVÉS DE VALIDATION ==========
+
+    /**
+     * Vérifie si une chaîne est nulle ou vide.
+     */
+    private static boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * Vérifie si un nombre est dans une plage valide.
+     */
+    private static boolean isInRange(double value, double min, double max) {
+        return value >= min && value <= max;
+    }
+
+    /**
+     * Vérifie si un entier est positif et supérieur à zéro.
+     */
+    private static boolean isPositive(int value) {
+        return value > 0;
+    }
+
+    // ========== VALIDATIONS MÉTIER ==========
+
     /**
      * Valide un abonnement selon les règles métier.
      * 
@@ -87,25 +112,25 @@ public class SubscriptionService {
 
         // Validations métier
         if (abonnement.getPrixMensuel() < 0) {
-            errors.add("Le prix mensuel ne peut pas être négatif");
+            errors.add(BackendMessages.SUBSCRIPTION_PRICE_NEGATIVE);
         }
 
         if (abonnement.getDateDebut() == null || abonnement.getDateFin() == null) {
-            errors.add("Les dates de début et de fin doivent être renseignées");
+            errors.add(BackendMessages.SUBSCRIPTION_DATES_MISSING);
         } else if (abonnement.getDateDebut().isAfter(abonnement.getDateFin())) {
-            errors.add("La date de début doit être avant ou égale à la date de fin");
+            errors.add(BackendMessages.SUBSCRIPTION_DATE_ORDER_INVALID);
         }
 
-        if (abonnement.getNomService() == null || abonnement.getNomService().trim().isEmpty()) {
-            errors.add("Le nom du service est obligatoire");
+        if (isNullOrEmpty(abonnement.getNomService())) {
+            errors.add(BackendMessages.SUBSCRIPTION_NAME_MISSING);
         }
 
-        if (abonnement.getClientName() == null || abonnement.getClientName().trim().isEmpty()) {
-            errors.add("Le nom du client est obligatoire");
+        if (isNullOrEmpty(abonnement.getClientName())) {
+            errors.add(BackendMessages.SUBSCRIPTION_CLIENT_MISSING);
         }
 
-        if (abonnement.getNombreUtilisateurs() <= 0) {
-            errors.add("Le nombre d'utilisateurs doit être supérieur à 0");
+        if (!isPositive(abonnement.getNombreUtilisateurs())) {
+            errors.add(BackendMessages.SUBSCRIPTION_USERS_INVALID);
         }
 
         return errors.isEmpty() ? ValidationResult.success() : ValidationResult.failure(errors);
@@ -132,7 +157,7 @@ public class SubscriptionService {
 
         ValidationResult validation = validateSubscription(abonnement);
         if (!validation.valid) {
-            throw new IllegalArgumentException("Création échouée: " + String.join(", ", validation.errors));
+            throw new IllegalArgumentException(BackendMessages.formatValidationError("Création abonnement échouée", validation.errors));
         }
 
         return abonnement;
@@ -146,6 +171,9 @@ public class SubscriptionService {
      * @return Abonnements correspondant à la catégorie
      */
     public List<Abonnement> filterByCategory(List<Abonnement> abonnements, String categorie) {
+        if (abonnements == null || abonnements.isEmpty() || categorie == null) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .filter(a -> categorie.equalsIgnoreCase(a.getCategorie()))
             .collect(Collectors.toList());
@@ -159,6 +187,9 @@ public class SubscriptionService {
      * @return Abonnements actifs à la date donnée
      */
     public List<Abonnement> getActiveSubscriptions(List<Abonnement> abonnements, LocalDate date) {
+        if (abonnements == null || abonnements.isEmpty() || date == null) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .filter(a -> !a.getDateDebut().isAfter(date) && !a.getDateFin().isBefore(date))
             .collect(Collectors.toList());
@@ -171,6 +202,9 @@ public class SubscriptionService {
      * @return Abonnements actifs aujourd'hui
      */
     public List<Abonnement> getActiveSubscriptions(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return getActiveSubscriptions(abonnements, LocalDate.now());
     }
 
@@ -182,6 +216,9 @@ public class SubscriptionService {
      * @return Abonnements expirant dans le délai spécifié
      */
     public List<Abonnement> getExpiringSubscriptions(List<Abonnement> abonnements, int joursAvant) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         LocalDate today = LocalDate.now();
         LocalDate threshold = today.plusDays(joursAvant);
 
@@ -202,6 +239,9 @@ public class SubscriptionService {
      * @return Abonnements à risque de churn
      */
     public List<Abonnement> getHighChurnRiskSubscriptions(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .filter(a -> a.getChurnRisk() > 70)
             .collect(Collectors.toList());
@@ -317,8 +357,11 @@ public class SubscriptionService {
      * @return Abonnements du client
      */
     public List<Abonnement> getSubscriptionsByClient(List<Abonnement> abonnements, String clientName) {
+        if (abonnements == null || abonnements.isEmpty() || clientName == null) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
-            .filter(a -> clientName != null && clientName.equalsIgnoreCase(a.getClientName()))
+            .filter(a -> clientName.equalsIgnoreCase(a.getClientName()))
             .collect(Collectors.toList());
     }
 
@@ -329,6 +372,9 @@ public class SubscriptionService {
      * @return Abonnements triés par coût
      */
     public List<Abonnement> sortByMonthlyCost(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .sorted((a, b) -> Double.compare(b.getPrixMensuel(), a.getPrixMensuel()))
             .collect(Collectors.toList());
@@ -343,6 +389,9 @@ public class SubscriptionService {
      * @return Abonnements triés par score de valeur
      */
     public List<Abonnement> sortByValueScore(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .sorted((a, b) -> Double.compare(b.getValueScore(), a.getValueScore()))
             .collect(Collectors.toList());
@@ -357,6 +406,9 @@ public class SubscriptionService {
      * @return Coût total cumulé
      */
     public double calculateTotalCost(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return 0.0;
+        }
         return abonnements.stream()
             .mapToDouble(Abonnement::getCoutTotal)
             .sum();
@@ -374,6 +426,9 @@ public class SubscriptionService {
      * @return Top 5 abonnements à conserver
      */
     public List<Abonnement> getTopPrioritySubscriptions(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .sorted((a, b) -> {
                 // Critères: valeur score, puis ROI numérique, puis activité récente
@@ -403,6 +458,9 @@ public class SubscriptionService {
      * @return Abonnements candidats à annulation
      */
     public List<Abonnement> identifySavingOpportunities(List<Abonnement> abonnements) {
+        if (abonnements == null || abonnements.isEmpty()) {
+            return new ArrayList<>();
+        }
         return abonnements.stream()
             .filter(a -> a.getChurnRisk() > 70 || 
                          (a.getDerniereUtilisation() != null && 
