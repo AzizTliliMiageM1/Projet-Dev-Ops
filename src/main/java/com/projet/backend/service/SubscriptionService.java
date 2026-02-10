@@ -1,12 +1,11 @@
 package com.projet.backend.service;
 
-import com.projet.backend.domain.Abonnement;
-import com.projet.backend.domain.User;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.projet.backend.domain.Abonnement;
 
 /**
  * Service d'orchestration pour les opérations métier sur les abonnements.

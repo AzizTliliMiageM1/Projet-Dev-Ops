@@ -1,9 +1,9 @@
 package com.projet.backend.service;
 
-import com.projet.backend.domain.User;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.projet.backend.domain.User;
 
 /**
  * Service d'orchestration pour les opérations métier sur les utilisateurs.
