@@ -11,6 +11,7 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.test.skip>false</maven.test.skip>
     </properties>
 
     <dependencies>
@@ -138,7 +139,7 @@
                 <version>3.2.5</version>
                 <configuration>
                     <useSystemClassLoader>false</useSystemClassLoader>
-                    <skipTests>true</skipTests>
+                    <skipTests>${maven.test.skip}</skipTests>
                 </configuration>
             </plugin>
 

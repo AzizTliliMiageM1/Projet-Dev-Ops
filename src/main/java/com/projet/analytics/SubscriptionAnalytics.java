@@ -362,6 +362,75 @@ public class SubscriptionAnalytics {
         
         return predictions;
     }
+
+    /**
+     * Construit un plan de réduction budgétaire en identifiant les abonnements à résilier
+     * pour atteindre un budget mensuel cible.
+     *
+     * @param abonnements Liste des abonnements actuels
+     * @param targetMonthlyBudget Budget mensuel souhaité (>= 0)
+     * @return Plan contenant les suppressions recommandées et le gain estimé
+     */
+    public static BudgetReductionPlan planBudgetReduction(List<Abonnement> abonnements, double targetMonthlyBudget) {
+        if (targetMonthlyBudget < 0) {
+            throw new IllegalArgumentException("Le budget cible doit être positif");
+        }
+
+        double currentMonthlyCost = abonnements == null ? 0.0 : abonnements.stream()
+            .mapToDouble(Abonnement::getPrixMensuel)
+            .sum();
+
+        double requiredSavings = Math.max(0.0, currentMonthlyCost - targetMonthlyBudget);
+
+        if (requiredSavings == 0.0 || abonnements == null || abonnements.isEmpty()) {
+            return new BudgetReductionPlan(currentMonthlyCost, targetMonthlyBudget, requiredSavings, 0.0,
+                List.of(), List.of(), true);
+        }
+
+        List<Abonnement> sortedCandidates = new ArrayList<>(abonnements);
+        sortedCandidates.sort((a, b) -> {
+            // Priorité aux abonnements à forte économie et faible valeur
+            int churnCompare = Double.compare(b.getChurnRisk(), a.getChurnRisk());
+            if (churnCompare != 0) {
+                return churnCompare;
+            }
+            int valueCompare = Double.compare(a.getValueScore(), b.getValueScore());
+            if (valueCompare != 0) {
+                return valueCompare;
+            }
+            return Double.compare(b.getPrixMensuel(), a.getPrixMensuel());
+        });
+
+        List<Abonnement> recommended = new ArrayList<>();
+        double accumulatedSavings = 0.0;
+
+        for (Abonnement abo : sortedCandidates) {
+            if (abo.getPrixMensuel() <= 0) {
+                continue;
+            }
+            recommended.add(abo);
+            accumulatedSavings += abo.getPrixMensuel();
+            if (accumulatedSavings >= requiredSavings) {
+                break;
+            }
+        }
+
+        List<Abonnement> optionalPool = sortedCandidates.stream()
+            .filter(abo -> !recommended.contains(abo))
+            .toList();
+
+        boolean targetReachable = accumulatedSavings >= requiredSavings;
+
+        return new BudgetReductionPlan(
+            currentMonthlyCost,
+            targetMonthlyBudget,
+            requiredSavings,
+            accumulatedSavings,
+            recommended,
+            optionalPool,
+            targetReachable
+        );
+    }
     
     /**
      * Détecte les patterns d'utilisation saisonniers
@@ -549,5 +618,43 @@ public class SubscriptionAnalytics {
             
             return sb.toString();
         }
+    }
+
+    public static class BudgetReductionPlan {
+        private final double currentMonthlyCost;
+        private final double targetMonthlyBudget;
+        private final double requiredSavings;
+        private final double achievedSavings;
+        private final List<Abonnement> recommendedCancellations;
+        private final List<Abonnement> optionalCandidates;
+        private final boolean targetFeasible;
+
+        public BudgetReductionPlan(
+            double currentMonthlyCost,
+            double targetMonthlyBudget,
+            double requiredSavings,
+            double achievedSavings,
+            List<Abonnement> recommendedCancellations,
+            List<Abonnement> optionalCandidates,
+            boolean targetFeasible
+        ) {
+            this.currentMonthlyCost = currentMonthlyCost;
+            this.targetMonthlyBudget = targetMonthlyBudget;
+            this.requiredSavings = requiredSavings;
+            this.achievedSavings = achievedSavings;
+            this.recommendedCancellations = recommendedCancellations;
+            this.optionalCandidates = optionalCandidates;
+            this.targetFeasible = targetFeasible;
+        }
+
+        public double getCurrentMonthlyCost() { return currentMonthlyCost; }
+        public double getTargetMonthlyBudget() { return targetMonthlyBudget; }
+        public double getRequiredSavings() { return requiredSavings; }
+        public double getAchievedSavings() { return achievedSavings; }
+        public List<Abonnement> getRecommendedCancellations() { return recommendedCancellations; }
+        public List<Abonnement> getOptionalCandidates() { return optionalCandidates; }
+        public boolean isTargetFeasible() { return targetFeasible; }
+        public double getRemainingMonthlyCost() { return Math.max(0.0, currentMonthlyCost - achievedSavings); }
+        public double getShortfall() { return requiredSavings <= achievedSavings ? 0.0 : requiredSavings - achievedSavings; }
     }
 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.projet.backend.domain.Abonnement;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -25,6 +26,7 @@ import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
 
 import spark.Request;
+import spark.Response;
 import static spark.Spark.before;
 import static spark.Spark.delete;
 import static spark.Spark.get;
@@ -365,15 +367,19 @@ public class ApiServer {
             // =================================================
             // 🔵  USER - VÉRIFIER SESSION
             // =================================================
-            get("/api/user/current", (req, res) -> {
+            get("/user/current", (req, res) -> {
                 String email = req.session().attribute("user_email");
                 if (email == null) {
                     res.status(401);
-                    return "{\"error\":\"Non connecté\"}";
+                    return writeJson(res, mapper, "/api/user/current", Map.of("error", "Non connecté"));
                 }
-                
-                res.type("application/json");
-                return "{\"email\":\"" + email + "\", \"connected\": true}";
+
+                Map<String, Object> payload = Map.of(
+                    "email", email,
+                    "connected", Boolean.TRUE
+                );
+
+                return writeJson(res, mapper, "/api/user/current", payload);
             });
 
             // =================================================
@@ -386,13 +392,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var report = SubscriptionOptimizer.generateOptimizationReport(abonnements);
                 
-                return mapper.writeValueAsString(report);
+                return writeJson(res, mapper, "/api/analytics/optimize", report);
             });
 
             // =================================================
@@ -405,13 +410,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var forecast = SubscriptionAnalytics.forecastCashflow(abonnements, 6);
                 
-                return mapper.writeValueAsString(forecast);
+                return writeJson(res, mapper, "/api/analytics/forecast", forecast);
             });
 
             // =================================================
@@ -424,13 +428,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var metrics = SubscriptionAnalytics.calculateAdvancedMetrics(abonnements);
                 
-                return mapper.writeValueAsString(metrics);
+                return writeJson(res, mapper, "/api/analytics/metrics", metrics);
             });
 
             // =================================================
@@ -443,7 +446,6 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
@@ -461,7 +463,7 @@ public class ApiServer {
                     }
                 }
                 
-                return mapper.writeValueAsString(anomalies);
+                return writeJson(res, mapper, "/api/analytics/anomalies", anomalies);
             });
 
             // =================================================
@@ -474,13 +476,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var duplicates = SubscriptionAnalytics.detectDuplicates(abonnements);
                 
-                return mapper.writeValueAsString(duplicates);
+                return writeJson(res, mapper, "/api/analytics/duplicates", duplicates);
             });
 
             // =================================================
@@ -493,13 +494,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var report = SubscriptionAnalytics.generateMonthlyReport(abonnements);
                 
-                return mapper.writeValueAsString(report);
+                return writeJson(res, mapper, "/api/analytics/monthly-report", report);
             });
 
             // =================================================
@@ -512,7 +512,6 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
 
@@ -548,7 +547,7 @@ public class ApiServer {
                 payload.put("savings", savingsBlock);
                 payload.put("upcomingExpirations", expiring);
 
-                return mapper.writeValueAsString(payload);
+                return writeJson(res, mapper, "/api/recommendations", payload);
             });
 
             // Endpoint: Clustering des abonnements
@@ -559,13 +558,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var clusters = SubscriptionAnalytics.clusterSubscriptions(abonnements);
                 
-                return mapper.writeValueAsString(clusters);
+                return writeJson(res, mapper, "/api/analytics/clusters", clusters);
             });
 
             // Endpoint: Prédiction des dépenses
@@ -576,13 +574,59 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var predictions = SubscriptionAnalytics.predictSpendingTrend(abonnements);
                 
-                return mapper.writeValueAsString(predictions);
+                return writeJson(res, mapper, "/api/analytics/predict-spending", predictions);
+            });
+
+            get("/analytics/budget-plan", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+
+                String targetParam = req.queryParams("target");
+                if (targetParam == null || targetParam.isBlank()) {
+                    res.status(400);
+                    return writeJson(res, mapper, "/api/analytics/budget-plan", Map.of("error", "Paramètre 'target' requis"));
+                }
+
+                double target;
+                try {
+                    target = Double.parseDouble(targetParam);
+                } catch (NumberFormatException e) {
+                    res.status(400);
+                    return writeJson(res, mapper, "/api/analytics/budget-plan", Map.of("error", "Paramètre 'target' invalide"));
+                }
+
+                if (target < 0) {
+                    res.status(400);
+                    return writeJson(res, mapper, "/api/analytics/budget-plan", Map.of("error", "Le budget cible doit être positif"));
+                }
+
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+                var plan = SubscriptionAnalytics.planBudgetReduction(abonnements, target);
+
+                Map<String, Object> debug = new HashMap<>();
+                debug.put("currentMonthlyCost", plan.getCurrentMonthlyCost());
+                debug.put("targetMonthlyBudget", plan.getTargetMonthlyBudget());
+                debug.put("requiredSavings", plan.getRequiredSavings());
+                debug.put("achievedSavings", plan.getAchievedSavings());
+                debug.put("targetFeasible", plan.isTargetFeasible());
+                debug.put("recommendedCancellations", plan.getRecommendedCancellations().stream()
+                    .map(Abonnement::getNomService)
+                    .collect(Collectors.toList()));
+                debug.put("optionalCandidates", plan.getOptionalCandidates().stream()
+                    .map(Abonnement::getNomService)
+                    .collect(Collectors.toList()));
+                logJsonResponse("/api/analytics/budget-plan:debug", debug, null);
+
+                return writeJson(res, mapper, "/api/analytics/budget-plan", plan);
             });
 
             // Endpoint: Détection patterns saisonniers
@@ -593,13 +637,12 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 var patterns = SubscriptionAnalytics.detectSeasonalPatterns(abonnements);
                 
-                return mapper.writeValueAsString(patterns);
+                return writeJson(res, mapper, "/api/analytics/seasonal-patterns", patterns);
             });
 
             // Endpoint: Score santé du portefeuille
@@ -610,35 +653,39 @@ public class ApiServer {
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
                 
-                res.type("application/json");
                 AbonnementRepository repo = getOrCreateRepo(req);
                 List<Abonnement> abonnements = repo.findAll();
                 
                 int healthScore = (int) SubscriptionAnalytics.calculatePortfolioHealthScore(abonnements);
                 
-                return "{\"healthScore\": " + healthScore + "}";
+                Map<String, Object> payload = Map.of("healthScore", healthScore);
+                return writeJson(res, mapper, "/api/analytics/portfolio-health", payload);
             });
 
             // =================================================
             // 🔵  STATUS SESSION (pour navbar)
             // =================================================
             get("/session", (req, res) -> {
-                res.type("application/json");
                 String email = req.session().attribute("user_email");
                 
                 if (email == null) {
-                    return "{\"authenticated\":false}";
+                    Map<String, Object> payload = Map.of("authenticated", Boolean.FALSE);
+                    return writeJson(res, mapper, "/api/session", payload);
                 }
                 
                 FileUserRepository userRepo = new FileUserRepository();
                 User user = userRepo.findByEmail(email);
                 
                 if (user == null) {
-                    return "{\"authenticated\":false}";
+                    Map<String, Object> payload = Map.of("authenticated", Boolean.FALSE);
+                    return writeJson(res, mapper, "/api/session", payload);
                 }
                 
-                return String.format("{\"authenticated\":true,\"email\":\"%s\",\"pseudo\":\"%s\"}", 
-                    email, user.getPseudo());
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("authenticated", Boolean.TRUE);
+                payload.put("email", email);
+                payload.put("pseudo", user.getPseudo());
+                return writeJson(res, mapper, "/api/session", payload);
             });
 
             // =================================================
@@ -911,6 +958,56 @@ public class ApiServer {
 
 
         System.out.println("API server démarré sur http://localhost:" + httpPort);
+    }
+
+    private static String writeJson(Response res, ObjectMapper mapper, String route, Object payload) {
+        res.type("application/json");
+        try {
+            String json = mapper.writeValueAsString(payload);
+            logJsonResponse(route, payload, json);
+            return json;
+        } catch (JsonProcessingException e) {
+            logJsonSerializationError(route, e);
+            res.status(500);
+            String fallback = "{\"error\":\"JSON serialization failure\"}";
+            logRawJson(route, fallback);
+            return fallback;
+        }
+    }
+
+    private static void logJsonResponse(String route, Object payload, String rawJson) {
+        try {
+            String summary;
+            if (payload == null) {
+                summary = "null";
+            } else if (payload instanceof String s) {
+                summary = "String(len=" + s.length() + ")";
+            } else if (payload instanceof java.util.Collection<?> collection) {
+                summary = payload.getClass().getSimpleName() + "(size=" + collection.size() + ")";
+            } else if (payload instanceof java.util.Map<?, ?> map) {
+                summary = payload.getClass().getSimpleName() + "(keys=" + map.keySet() + ")";
+            } else {
+                summary = payload.getClass().getSimpleName();
+            }
+            System.out.println("[ApiServer] " + route + " payload=" + summary + " raw=" + truncateRawJson(rawJson));
+        } catch (Exception e) {
+            System.out.println("[ApiServer] " + route + " payload=<log-error:" + e.getMessage() + ">");
+        }
+    }
+
+    private static void logJsonSerializationError(String route, Exception e) {
+        System.out.println("[ApiServer] " + route + " <serialization-error> " + e.getMessage());
+    }
+
+    private static void logRawJson(String route, String rawJson) {
+        System.out.println("[ApiServer] " + route + " raw=" + truncateRawJson(rawJson));
+    }
+
+    private static String truncateRawJson(String rawJson) {
+        if (rawJson == null) {
+            return "null";
+        }
+        return rawJson.length() > 200 ? rawJson.substring(0, 200) + "..." : rawJson;
     }
 
         private static String safeCsv(String s) {

@@ -145,3 +145,21 @@ async function fetchRecommendations() {
     throw error;
   }
 }
+
+/**
+ * Récupère un plan de réduction budgétaire
+ * GET /api/analytics/budget-plan?target=...
+ */
+async function fetchBudgetPlan(target) {
+  try {
+    const url = `${API_BASE}/analytics/budget-plan?target=${encodeURIComponent(target)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Erreur fetchBudgetPlan:', error);
+    throw error;
+  }
+}

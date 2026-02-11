@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.projet.analytics.SubscriptionAnalytics;
 import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 import com.projet.backend.domain.User;
@@ -33,6 +36,8 @@ import com.projet.backend.service.UserService;
  * Usage: see tests and any `Main` that delegates to this router.
  */
 public class CommandRouter {
+
+    private static final DateTimeFormatter DISPLAY_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final SubscriptionService subscriptionService;
     private final UserService userService;
@@ -91,6 +96,12 @@ public class CommandRouter {
                 return handleSavingOps(params);
             case "dashboard":
                 return handleDashboard(params);
+            case "budgetPlan":
+                return handleBudgetPlan(params);
+            case "portfolioHealth":
+                return handlePortfolioHealth(params);
+            case "recommendations":
+                return handleRecommendations(params);
             case "help":
             case "--help":
             case "-h":
@@ -272,6 +283,242 @@ public class CommandRouter {
         }
     }
 
+    private String handleBudgetPlan(Map<String, String> p) {
+        String targetParam = p.get("target");
+        if (targetParam == null || targetParam.isBlank()) {
+            return "Missing 'target' parameter indicating the desired monthly budget.";
+        }
+
+        double target;
+        try {
+            target = Double.parseDouble(targetParam);
+        } catch (NumberFormatException e) {
+            return "Invalid 'target' parameter: " + e.getMessage();
+        }
+
+        String file = p.get("file");
+        if (file == null || file.isBlank()) {
+            return "Missing 'file' parameter pointing to CSV of abonnements.";
+        }
+
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            SubscriptionAnalytics.BudgetReductionPlan plan = SubscriptionAnalytics.planBudgetReduction(abonnements, target);
+            return formatBudgetPlan(plan);
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        } catch (IllegalArgumentException e) {
+            return "Invalid target budget: " + e.getMessage();
+        }
+    }
+
+    private String formatBudgetPlan(SubscriptionAnalytics.BudgetReductionPlan plan) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n📉 PLAN DE RÉDUCTION BUDGÉTAIRE\n");
+        sb.append("──────────────────────────────\n");
+        sb.append(String.format("Budget actuel  : %.2f€%n", plan.getCurrentMonthlyCost()));
+        sb.append(String.format("Budget cible   : %.2f€%n", plan.getTargetMonthlyBudget()));
+        sb.append(String.format("Économies à réaliser : %.2f€%n", plan.getRequiredSavings()));
+        sb.append(String.format("Économies planifiées : %.2f€%n", plan.getAchievedSavings()));
+        sb.append(String.format("Faisable : %s%n", plan.isTargetFeasible() ? "Oui" : "Non"));
+        sb.append(String.format("Écart restant : %.2f€%n", plan.getShortfall()));
+
+        sb.append("\nPriorités de résiliation :\n");
+        List<Abonnement> recommended = plan.getRecommendedCancellations();
+        if (recommended.isEmpty()) {
+            sb.append("  - Aucune suppression nécessaire\n");
+        } else {
+            int rank = 1;
+            for (Abonnement abo : recommended) {
+                sb.append(String.format(
+                    "  %d. %s (%.2f€/mois) - Risque %.0f%% | Valeur %.2f%n",
+                    rank++,
+                    abo.getNomService(),
+                    abo.getPrixMensuel(),
+                    abo.getChurnRisk(),
+                    abo.getValueScore()
+                ));
+            }
+        }
+
+        sb.append("\nOptions additionnelles :\n");
+        List<Abonnement> optional = plan.getOptionalCandidates();
+        if (optional.isEmpty()) {
+            sb.append("  - Aucun autre abonnement proposé\n");
+        } else {
+            int displayed = 0;
+            for (Abonnement abo : optional) {
+                if (displayed >= 3) {
+                    break;
+                }
+                sb.append(String.format("  • %s (%.2f€/mois)%n", abo.getNomService(), abo.getPrixMensuel()));
+                displayed++;
+            }
+            if (optional.size() > displayed) {
+                sb.append(String.format("  • ... (%d autres)%n", optional.size() - displayed));
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private String handlePortfolioHealth(Map<String, String> p) {
+        String file = p.get("file");
+        if (file == null || file.isBlank()) {
+            return "Missing 'file' parameter pointing to CSV of abonnements.";
+        }
+
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            if (abonnements.isEmpty()) {
+                return "No subscriptions found in the provided file.";
+            }
+            SubscriptionService.PortfolioStats stats = subscriptionService.calculatePortfolioStats(abonnements);
+            return formatPortfolioHealth(stats);
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String formatPortfolioHealth(SubscriptionService.PortfolioStats stats) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n🩺 SANTÉ DU PORTEFEUILLE\n");
+        sb.append("────────────────────────────\n");
+        int score = (int) Math.round(stats.portfolioHealthScore);
+        sb.append(String.format("Score global       : %d/100%n", score));
+        sb.append(String.format("Abonnements actifs : %d / %d%n", stats.activeSubscriptions, stats.totalSubscriptions));
+        sb.append(String.format("Dépense mensuelle  : %.2f€ (moyenne %.2f€)%n", stats.totalMonthlyCost, stats.averageMonthlyCost));
+        String categories = stats.categoriesDistribution.isEmpty()
+            ? "Aucune catégorie détectée"
+            : String.join(", ", stats.categoriesDistribution);
+        sb.append(String.format("Catégories couvertes : %s%n", categories));
+        sb.append(String.format("Churn élevé         : %d abonnement(s)%n", stats.highChurnRiskCount));
+
+        sb.append("\n" + healthAdvice(score) + "\n");
+        return sb.toString();
+    }
+
+    private String healthAdvice(int score) {
+        if (score >= 80) {
+            return "✅ Portefeuille très sain : poursuivez le suivi mensuel pour conserver ce niveau.";
+        }
+        if (score >= 60) {
+            return "🟡 Portefeuille équilibré : ciblez les abonnements à faible valeur pour gagner quelques points.";
+        }
+        if (score >= 40) {
+            return "🟠 Portefeuille fragile : identifiez 1 à 2 abonnements à optimiser rapidement.";
+        }
+        return "🔴 Portefeuille sous tension : priorisez un plan de réduction et revalidez chaque abonnement.";
+    }
+
+    private String handleRecommendations(Map<String, String> p) {
+        String file = p.get("file");
+        if (file == null || file.isBlank()) {
+            return "Missing 'file' parameter pointing to CSV of abonnements.";
+        }
+
+        try {
+            List<Abonnement> abonnements = readAbonnementsFromCsvPath(file);
+            if (abonnements.isEmpty()) {
+                return "No subscriptions found in the provided file.";
+            }
+
+            List<Abonnement> highRisk = subscriptionService.getHighChurnRiskSubscriptions(abonnements);
+            List<Abonnement> savings = subscriptionService.identifySavingOpportunities(abonnements);
+            double totalSavings = savings.stream().mapToDouble(Abonnement::getPrixMensuel).sum();
+            List<Abonnement> expiring = subscriptionService.getExpiringSubscriptions(abonnements, 30).stream()
+                .sorted(Comparator.comparing(Abonnement::getDateFin))
+                .limit(5)
+                .collect(Collectors.toList());
+
+            List<Abonnement> lowValue = new ArrayList<>();
+            List<Abonnement> sortedByValue = subscriptionService.sortByValueScore(abonnements);
+            if (!sortedByValue.isEmpty()) {
+                int start = Math.max(0, sortedByValue.size() - 5);
+                lowValue = new ArrayList<>(sortedByValue.subList(start, sortedByValue.size()));
+                lowValue.sort(Comparator.comparingDouble(Abonnement::getValueScore));
+            }
+
+            return formatRecommendations(highRisk, lowValue, savings, totalSavings, expiring);
+        } catch (IOException e) {
+            return "Cannot read file '" + file + "': " + e.getMessage();
+        }
+    }
+
+    private String formatRecommendations(
+        List<Abonnement> highRisk,
+        List<Abonnement> lowValue,
+        List<Abonnement> savings,
+        double totalSavings,
+        List<Abonnement> expiring
+    ) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n💡 RECOMMANDATIONS PERSONNALISÉES\n");
+        sb.append("─────────────────────────────────\n");
+
+        if (totalSavings > 0) {
+            sb.append(String.format("💰 Gains potentiels : %.2f€/mois%n", Math.round(totalSavings * 100.0) / 100.0));
+            savings.stream().limit(5).forEach(abo ->
+                sb.append(String.format(
+                    "  • %s (%.2f€/mois, risque %.0f%%)%n",
+                    abo.getNomService(),
+                    abo.getPrixMensuel(),
+                    abo.getChurnRisk()
+                ))
+            );
+            if (savings.size() > 5) {
+                sb.append(String.format("  • ... (%d autres)%n", savings.size() - 5));
+            }
+        } else {
+            sb.append("💰 Aucun gain immédiat détecté sur la base actuelle.%n".formatted());
+        }
+
+        sb.append("\n⚠️ Haut risque de churn\n");
+        if (highRisk.isEmpty()) {
+            sb.append("  ✅ Aucun abonnement critique identifié.%n");
+        } else {
+            highRisk.stream().limit(5).forEach(abo ->
+                sb.append(String.format(
+                    "  • %s (%s) – %.0f%%%n",
+                    abo.getNomService(),
+                    abo.getCategorie(),
+                    abo.getChurnRisk()
+                ))
+            );
+            if (highRisk.size() > 5) {
+                sb.append(String.format("  • ... (%d autres)%n", highRisk.size() - 5));
+            }
+        }
+
+        sb.append("\n📉 Faible valeur perçue\n");
+        if (lowValue.isEmpty()) {
+            sb.append("  ✅ Tous les abonnements affichent une valeur correcte.%n");
+        } else {
+            lowValue.forEach(abo ->
+                sb.append(String.format(
+                    "  • %s – score %.2f%n",
+                    abo.getNomService(),
+                    abo.getValueScore()
+                ))
+            );
+        }
+
+        sb.append("\n⏰ Expirations proches (30j)\n");
+        if (expiring.isEmpty()) {
+            sb.append("  ✅ Aucun renouvellement urgent.%n");
+        } else {
+            expiring.forEach(abo ->
+                sb.append(String.format(
+                    "  • %s – fin le %s%n",
+                    abo.getNomService(),
+                    abo.getDateFin().format(DISPLAY_DATE)
+                ))
+            );
+        }
+
+        return sb.toString();
+    }
+
     /**
      * Affiche un dashboard complet du portefeuille d'abonnements
      * 
@@ -314,6 +561,11 @@ public class CommandRouter {
             + "  savingOps file=abonnements.csv\n\n"
             + "DASHBOARD\n"
             + "  dashboard [file=abonnements.csv]\n\n"
+            + "BUDGET\n"
+            + "  budgetPlan target=150 file=abonnements.csv\n\n"
+            + "ANALYTICS\n"
+            + "  portfolioHealth file=abonnements.csv\n"
+            + "  recommendations file=abonnements.csv\n\n"
             + "Notes: validation errors are reported; no business logic is changed.";
     }
 }

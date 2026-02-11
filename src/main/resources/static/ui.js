@@ -217,6 +217,94 @@ function renderRiskList(abonnements) {
   container.appendChild(table);
 }
 
+// ==================== BUDGET PLAN ====================
+
+function renderBudgetPlanLoading() {
+  const container = document.getElementById('budget-plan-result');
+  if (!container) return;
+  container.innerHTML = '<p class="text-muted">Calcul du plan budgétaire...</p>';
+}
+
+function renderBudgetPlanError(message) {
+  const container = document.getElementById('budget-plan-result');
+  if (!container) return;
+  clearElement(container);
+  const p = createElement('p', 'text-danger', message);
+  container.appendChild(p);
+}
+
+function renderBudgetPlanPanel(plan) {
+  const container = document.getElementById('budget-plan-result');
+  if (!container) return;
+
+  if (!plan) {
+    renderBudgetPlanError('Plan budgétaire indisponible.');
+    return;
+  }
+
+  clearElement(container);
+
+  const summaryValues = [
+    { label: 'Budget actuel', value: formatCurrency(plan.currentMonthlyCost || 0) },
+    { label: 'Budget cible', value: formatCurrency(plan.targetMonthlyBudget || 0) },
+    { label: 'Économies à réaliser', value: formatCurrency(plan.requiredSavings || 0) },
+    { label: 'Économies planifiées', value: formatCurrency(plan.achievedSavings || 0) },
+    { label: 'Écart restant', value: formatCurrency(plan.shortfall || 0) }
+  ];
+
+  const summaryGrid = createElement('div', 'budget-summary-grid');
+  summaryValues.forEach((item) => {
+    const card = createElement('div', 'budget-summary-item');
+    card.appendChild(createElement('div', 'budget-summary-label', item.label));
+    card.appendChild(createElement('div', 'budget-summary-value', item.value));
+    summaryGrid.appendChild(card);
+  });
+  container.appendChild(summaryGrid);
+
+  const status = createElement('div', 'budget-status');
+  status.classList.add(plan.targetFeasible ? 'budget-status-success' : 'budget-status-warning');
+  status.textContent = plan.targetFeasible
+    ? 'Plan atteignable : la cible peut être atteinte avec ces résiliations.'
+    : 'Plan incomplet : la cible n\'est pas atteinte, ajustez le budget ou ajoutez des résiliations.';
+  container.appendChild(status);
+
+  const prioritySection = createElement('div', 'budget-section');
+  prioritySection.appendChild(createElement('h4', 'budget-subtitle', 'Priorités de résiliation'));
+  const priorityList = createElement('ul', 'budget-list');
+  const priorities = Array.isArray(plan.recommendedCancellations) ? plan.recommendedCancellations : [];
+  if (!priorities.length) {
+    priorityList.appendChild(createElement('li', 'text-muted', 'Aucun abonnement à résilier pour atteindre la cible.'));
+  } else {
+    priorities.forEach((abo) => {
+      const monthly = formatCurrency(Number(abo.prixMensuel) || 0);
+      const risk = typeof abo.churnRisk === 'number' ? Math.round(abo.churnRisk) : 0;
+      const valueScore = typeof abo.valueScore === 'number' ? abo.valueScore.toFixed(2) : 'N/A';
+      const li = createElement('li', 'budget-list-item');
+      li.textContent = `${abo.nomService || 'Service'} · ${monthly}/mois · Risque ${risk}% · Valeur ${valueScore}`;
+      priorityList.appendChild(li);
+    });
+  }
+  prioritySection.appendChild(priorityList);
+  container.appendChild(prioritySection);
+
+  const optionalSection = createElement('div', 'budget-section');
+  optionalSection.appendChild(createElement('h4', 'budget-subtitle', 'Options supplémentaires'));
+  const optionalList = createElement('ul', 'budget-list');
+  const optionals = Array.isArray(plan.optionalCandidates) ? plan.optionalCandidates : [];
+  if (!optionals.length) {
+    optionalList.appendChild(createElement('li', 'text-muted', 'Aucun autre abonnement proposé.'));
+  } else {
+    optionals.forEach((abo, index) => {
+      const monthly = formatCurrency(Number(abo.prixMensuel) || 0);
+      const li = createElement('li', 'budget-list-item');
+      li.textContent = `${index + 1}. ${abo.nomService || 'Service'} · ${monthly}/mois`;
+      optionalList.appendChild(li);
+    });
+  }
+  optionalSection.appendChild(optionalList);
+  container.appendChild(optionalSection);
+}
+
 // ==================== SUBSCRIPTIONS CRUD ====================
 
 /**
