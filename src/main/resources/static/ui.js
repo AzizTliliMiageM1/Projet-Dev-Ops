@@ -44,6 +44,88 @@ function formatCurrency(amount) {
   }).format(amount);
 }
 
+// ==================== RECOMMANDATIONS ====================
+
+function renderRecommendations(data) {
+  const container = document.getElementById('recommendations-content');
+  if (!container) return;
+
+  clearElement(container);
+
+  if (!data) {
+    container.appendChild(createElement('p', 'text-muted', 'Aucune recommandation disponible.'));
+    return;
+  }
+
+  const sections = [
+    {
+      title: 'Abonnements à risque élevé',
+      icon: '⚠️',
+      items: data.highRisk || [],
+      renderItem: (abo) => {
+        const risk = typeof abo.churnRisk === 'number' ? Math.round(abo.churnRisk) : 0;
+        return `${abo.nomService || 'Service'} · ${risk}% de risque`;
+      }
+    },
+    {
+      title: 'Abonnements peu rentables',
+      icon: '📉',
+      items: data.lowValue || [],
+      renderItem: (abo) => {
+        const score = typeof abo.valueScore === 'number' ? abo.valueScore : null;
+        return `${abo.nomService || 'Service'} · Score valeur ${score !== null ? score.toFixed(2) : 'N/A'}`;
+      }
+    },
+    {
+      title: 'Expirations proches (<30 jours)',
+      icon: '⏰',
+      items: data.upcomingExpirations || [],
+      renderItem: (abo) => `${abo.nomService || 'Service'} · se termine le ${formatDate(abo.dateFin)}`
+    }
+  ];
+
+  const savingsWrapper = createElement('div', 'recommendation-block savings-block');
+  const savingsTitle = createElement('h4', '', '💡 Économies potentielles');
+  savingsWrapper.appendChild(savingsTitle);
+
+  const totalSavings = data.savings?.totalMonthly ? formatCurrency(data.savings.totalMonthly) : '0,00 €';
+  savingsWrapper.appendChild(createElement('p', 'text-highlight', `Total estimé : ${totalSavings}/mois`));
+
+  const savingsList = createElement('ul', 'recommendation-list');
+  (data.savings?.candidates || []).forEach((abo) => {
+    const li = createElement('li');
+    li.textContent = `${abo.nomService || 'Service'} · ${formatCurrency(abo.prixMensuel)} - Dernière utilisation : ${formatDate(abo.derniereUtilisation)}`;
+    savingsList.appendChild(li);
+  });
+  if (savingsList.childElementCount === 0) {
+    savingsList.appendChild(createElement('li', 'text-muted', 'Aucun abonnement à supprimer pour le moment.'));
+  }
+  savingsWrapper.appendChild(savingsList);
+
+  sections.forEach((section) => {
+    const block = createElement('div', 'recommendation-block');
+    const title = createElement('h4');
+    title.textContent = `${section.icon} ${section.title}`;
+    block.appendChild(title);
+
+    if (!section.items.length) {
+      block.appendChild(createElement('p', 'text-muted', 'Rien à signaler.'));
+    } else {
+      const list = createElement('ul', 'recommendation-list');
+      section.items.forEach((item) => {
+        const li = createElement('li');
+        li.textContent = section.renderItem(item);
+        list.appendChild(li);
+      });
+      block.appendChild(list);
+    }
+
+    container.appendChild(block);
+  });
+
+  container.prepend(savingsWrapper);
+}
+
 // ==================== DASHBOARD ====================
 
 /**
@@ -123,10 +205,10 @@ function renderRiskList(abonnements) {
   abonnements.forEach(ab => {
     const tr = createElement('tr');
     tr.innerHTML = `
-      <td>${ab.client || 'N/A'}</td>
-      <td>${ab.service || 'N/A'}</td>
-      <td>${formatDate(ab.dateExpiration)}</td>
-      <td><span class="badge bg-danger">Élevé</span></td>
+      <td>${ab.clientName || 'N/A'}</td>
+      <td>${ab.nomService || 'N/A'}</td>
+      <td>${formatDate(ab.dateFin)}</td>
+      <td><span class="badge bg-danger">${typeof ab.churnRisk === 'number' ? Math.round(ab.churnRisk) : 0}%</span></td>
     `;
     tbody.appendChild(tr);
   });
@@ -171,10 +253,10 @@ function renderSubscriptionsTable(abonnements) {
     const tr = createElement('tr');
     tr.innerHTML = `
       <td>${idx + 1}</td>
-      <td>${ab.client || 'N/A'}</td>
-      <td>${ab.service || 'N/A'}</td>
-      <td>${formatCurrency(ab.coutMensuel)}</td>
-      <td>${formatDate(ab.dateExpiration)}</td>
+      <td>${ab.clientName || 'N/A'}</td>
+      <td>${ab.nomService || 'N/A'}</td>
+      <td>${formatCurrency(Number(ab.prixMensuel) || 0)}</td>
+      <td>${formatDate(ab.dateFin)}</td>
       <td>
         <button class="btn btn-sm btn-primary" onclick="editSubscriptionId('${ab.id}')">
           ✏️ Modifier
@@ -205,22 +287,32 @@ function renderSubscriptionForm(abonnement = null) {
   form.innerHTML = `
     <div class="form-group">
       <label>Client</label>
-      <input type="text" name="client" class="form-control" value="${abonnement?.client || ''}" required>
+      <input type="text" name="clientName" class="form-control" value="${abonnement?.clientName || ''}" required>
     </div>
     
     <div class="form-group">
       <label>Service</label>
-      <input type="text" name="service" class="form-control" value="${abonnement?.service || ''}" required>
+      <input type="text" name="nomService" class="form-control" value="${abonnement?.nomService || ''}" required>
     </div>
     
+    <div class="form-group">
+      <label>Date de début</label>
+      <input type="date" name="dateDebut" class="form-control" value="${abonnement?.dateDebut || ''}" required>
+    </div>
+    
+    <div class="form-group">
+      <label>Date de fin</label>
+      <input type="date" name="dateFin" class="form-control" value="${abonnement?.dateFin || ''}" required>
+    </div>
+
     <div class="form-group">
       <label>Coût mensuel (€)</label>
-      <input type="number" name="coutMensuel" class="form-control" step="0.01" value="${abonnement?.coutMensuel || ''}" required>
+      <input type="number" name="prixMensuel" class="form-control" step="0.01" value="${abonnement?.prixMensuel || ''}" required>
     </div>
-    
+
     <div class="form-group">
-      <label>Date d'expiration</label>
-      <input type="date" name="dateExpiration" class="form-control" value="${abonnement?.dateExpiration || ''}" required>
+      <label>Catégorie</label>
+      <input type="text" name="categorie" class="form-control" value="${abonnement?.categorie || ''}">
     </div>
     
     <div class="form-group">
@@ -233,21 +325,38 @@ function renderSubscriptionForm(abonnement = null) {
   form.onsubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(form);
-    const data = {
-      client: formData.get('client'),
-      service: formData.get('service'),
-      coutMensuel: parseFloat(formData.get('coutMensuel')),
-      dateExpiration: formData.get('dateExpiration')
+    const payload = {
+      clientName: formData.get('clientName'),
+      nomService: formData.get('nomService'),
+      dateDebut: formData.get('dateDebut'),
+      dateFin: formData.get('dateFin'),
+      prixMensuel: parseFloat(formData.get('prixMensuel')) || 0,
+      categorie: formData.get('categorie') || 'Non classé'
     };
-    
     if (abonnement) {
-      const result = await updateAbonnement(abonnement.id, data);
-    } else {
-      const result = await createAbonnement(data);
+      payload.id = abonnement.id;
+      payload.notes = abonnement.notes || '';
+      payload.derniereUtilisation = abonnement.derniereUtilisation || null;
+      payload.tags = abonnement.tags || [];
+      payload.nombreUtilisateurs = abonnement.nombreUtilisateurs || 1;
+      payload.partage = abonnement.partage || false;
+      payload.joursRappelAvantFin = abonnement.joursRappelAvantFin || 0;
+      payload.frequencePaiement = abonnement.frequencePaiement || 'Mensuel';
     }
-    
-    // Recharger la liste
-    loadSubscriptionsPage();
+
+    try {
+      if (abonnement) {
+        await updateAbonnement(abonnement.id, payload);
+        showSuccess('Abonnement mis à jour');
+      } else {
+        await createAbonnement(payload);
+        showSuccess('Abonnement créé');
+      }
+      await loadSubscriptionsPage();
+    } catch (error) {
+      console.error('Erreur formulaire abonnement:', error);
+      showError(`Impossible d'enregistrer l'abonnement: ${error.message}`);
+    }
   };
   
   container.appendChild(form);
@@ -300,13 +409,4 @@ function showError(message) {
   alertDiv.textContent = message;
   document.body.insertBefore(alertDiv, document.body.firstChild);
   setTimeout(() => alertDiv.remove(), 5000);
-}
-
-/**
- * Affiche un message de chargement
- */
-function showLoading(message = 'Chargement...') {
-  const loadDiv = createElement('div', 'alert alert-info');
-  loadDiv.textContent = message;
-  return document.body.insertBefore(loadDiv, document.body.firstChild);
 }

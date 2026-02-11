@@ -1,4 +1,3 @@
-id;nomService;dateDebut;dateFin;prixMensuel;clientName;derniereUtilisation;categorie;tags;groupeAbonnement;priorite;notes;nombreUtilisateurs;partage;joursRappelAvantFin;frequencePaiement
 1;Netflix;2024-06-15;2027-06-15;17.99;utilisateur@email.com;2026-02-09;Streaming;Divertissement|Films;Loisirs;Important;Abonnement familial premium;4;OUI;14;Mensuel
 2;Spotify Premium;2023-12-01;2027-12-01;12.99;utilisateur@email.com;2026-02-10;Streaming;Musique|Audio|Podcasts;Loisirs;Important;Utilisé quotidiennement;1;NON;30;Mensuel
 3;Microsoft 365 Family;2024-01-20;2025-01-20;99.99;utilisateur@email.com;2026-02-08;Travail;Productivité|Document;Travail;Essentiel;Office + Cloud;5;OUI;14;Annuel

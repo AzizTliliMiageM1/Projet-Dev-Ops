@@ -2,8 +2,11 @@ package com.projet.api;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.projet.backend.domain.Abonnement;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +19,7 @@ import com.projet.backend.domain.User;
 import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;
+import com.projet.backend.service.SubscriptionService;
 import com.projet.service.SubscriptionOptimizer;
 import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
@@ -496,6 +500,55 @@ public class ApiServer {
                 var report = SubscriptionAnalytics.generateMonthlyReport(abonnements);
                 
                 return mapper.writeValueAsString(report);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - RECOMMANDATIONS INTELLIGENTES
+            // =================================================
+            get("/recommendations", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+
+                res.type("application/json");
+                AbonnementRepository repo = getOrCreateRepo(req);
+                List<Abonnement> abonnements = repo.findAll();
+
+                SubscriptionService service = new SubscriptionService();
+
+                List<Abonnement> highRisk = service.getHighChurnRiskSubscriptions(abonnements);
+
+                List<Abonnement> savings = service.identifySavingOpportunities(abonnements);
+                double totalSavings = savings.stream()
+                    .mapToDouble(Abonnement::getPrixMensuel)
+                    .sum();
+
+                List<Abonnement> expiring = service.getExpiringSubscriptions(abonnements, 30).stream()
+                    .sorted(Comparator.comparing(Abonnement::getDateFin))
+                    .limit(5)
+                    .collect(Collectors.toList());
+
+                List<Abonnement> lowValue = new ArrayList<>();
+                List<Abonnement> sortedByValue = service.sortByValueScore(abonnements);
+                if (!sortedByValue.isEmpty()) {
+                    int start = Math.max(0, sortedByValue.size() - 5);
+                    lowValue = new ArrayList<>(sortedByValue.subList(start, sortedByValue.size()));
+                    lowValue.sort(Comparator.comparingDouble(Abonnement::getValueScore));
+                }
+
+                Map<String, Object> savingsBlock = new HashMap<>();
+                savingsBlock.put("totalMonthly", Math.round(totalSavings * 100.0) / 100.0);
+                savingsBlock.put("candidates", savings);
+
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("highRisk", highRisk);
+                payload.put("lowValue", lowValue);
+                payload.put("savings", savingsBlock);
+                payload.put("upcomingExpirations", expiring);
+
+                return mapper.writeValueAsString(payload);
             });
 
             // Endpoint: Clustering des abonnements

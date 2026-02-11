@@ -5,6 +5,27 @@
 
 const API_BASE = '/api';
 
+async function buildErrorMessage(response) {
+  try {
+    const data = await response.clone().json();
+    if (data && typeof data === 'object') {
+      if (data.error) return data.error;
+      if (data.message) return data.message;
+    }
+  } catch (_) {
+    // ignore JSON parse errors and fall back to text
+  }
+
+  try {
+    const text = await response.text();
+    if (text) return text;
+  } catch (_) {
+    // ignore text read errors
+  }
+
+  return `HTTP ${response.status}`;
+}
+
 // ==================== ABONNEMENTS ====================
 
 /**
@@ -14,11 +35,13 @@ const API_BASE = '/api';
 async function fetchAbonnements() {
   try {
     const response = await fetch(`${API_BASE}/abonnements`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return await response.json();
   } catch (error) {
     console.error('Erreur fetchAbonnements:', error);
-    return [];
+    throw error;
   }
 }
 
@@ -29,11 +52,13 @@ async function fetchAbonnements() {
 async function fetchAbonnement(id) {
   try {
     const response = await fetch(`${API_BASE}/abonnements/${id}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return await response.json();
   } catch (error) {
     console.error('Erreur fetchAbonnement:', error);
-    return null;
+    throw error;
   }
 }
 
@@ -49,11 +74,13 @@ async function createAbonnement(data) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return await response.json();
   } catch (error) {
     console.error('Erreur createAbonnement:', error);
-    return null;
+    throw error;
   }
 }
 
@@ -70,11 +97,13 @@ async function updateAbonnement(id, data) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return await response.json();
   } catch (error) {
     console.error('Erreur updateAbonnement:', error);
-    return null;
+    throw error;
   }
 }
 
@@ -88,63 +117,31 @@ async function deleteAbonnement(id) {
     const response = await fetch(`${API_BASE}/abonnements/${id}`, {
       method: 'DELETE'
     });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return true;
   } catch (error) {
     console.error('Erreur deleteAbonnement:', error);
-    return false;
+    throw error;
   }
 }
 
-// ==================== ANALYTICS ====================
+// ==================== RECOMMANDATIONS ====================
 
 /**
- * Récupère les statistiques générales
- * GET /api/analytics (ou endpoint similaire)
+ * Récupère les recommandations intelligentes
+ * GET /api/recommendations
  */
-async function fetchAnalytics() {
+async function fetchRecommendations() {
   try {
-    // Endpoint à adapter selon ton backend
-    const response = await fetch(`${API_BASE}/analytics`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const response = await fetch(`${API_BASE}/recommendations`);
+    if (!response.ok) {
+      throw new Error(await buildErrorMessage(response));
+    }
     return await response.json();
   } catch (error) {
-    console.error('Erreur fetchAnalytics:', error);
-    return {
-      totalAbonnements: 0,
-      coutMensuel: 0,
-      scoreSante: 0,
-      abonnementsAuRisque: 0
-    };
-  }
-}
-
-/**
- * Récupère les abonnements à risque (expiration proche, etc)
- * GET /api/abonnements/risk ou endpoint adapté
- */
-async function fetchRiskAbonnements() {
-  try {
-    const abonnements = await fetchAbonnements();
-    // Filtrer les abonnements à risque côté client
-    // (si le backend n'a pas d'endpoint spécifique)
-    return abonnements.filter(ab => ab.riskLevel === 'high' || ab.daysUntilExpiry < 30);
-  } catch (error) {
-    console.error('Erreur fetchRiskAbonnements:', error);
-    return [];
-  }
-}
-
-// ==================== UTILITAIRES ====================
-
-/**
- * Teste la connexion au backend
- */
-async function healthCheck() {
-  try {
-    const response = await fetch(`${API_BASE}/health`);
-    return response.ok;
-  } catch {
-    return false;
+    console.error('Erreur fetchRecommendations:', error);
+    throw error;
   }
 }

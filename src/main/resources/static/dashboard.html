@@ -59,28 +59,66 @@
  */
 
 async function loadDashboard() {
+  const kpiContainer = document.getElementById('kpi-container');
+  if (kpiContainer) {
+    kpiContainer.innerHTML = '<p class="text-muted">Chargement des métriques...</p>';
+  }
+  const riskContainer = document.getElementById('risk-list');
+  if (riskContainer) {
+    riskContainer.innerHTML = '<p class="text-muted">Analyse des risques...</p>';
+  }
+  const systemInfo = document.getElementById('system-info');
+  if (systemInfo) {
+    systemInfo.textContent = 'Chargement...';
+  }
+
   try {
-    // Récupérer les données du backend
     const abonnements = await fetchAbonnements();
-    const analytics = await fetchAnalytics();
 
-    // Afficher les KPIs
-    renderDashboardKPIs(analytics);
+    const now = new Date();
+    const total = abonnements.length;
+    const active = abonnements.filter(ab => {
+      if (!ab.dateDebut || !ab.dateFin) return false;
+      const start = new Date(ab.dateDebut);
+      const end = new Date(ab.dateFin);
+      return start <= now && end >= now;
+    }).length;
+    const monthlyCost = abonnements.reduce((sum, ab) => sum + (Number(ab.prixMensuel) || 0), 0);
+    const highRisk = abonnements.filter(ab => (Number(ab.churnRisk) || 0) > 70);
+    const healthScore = total === 0 ? 0 : Math.round((active / total) * 100);
 
-    // Afficher les abonnements à risque
-    const riskAbs = abonnements.filter(ab => ab.riskLevel === 'high' || ab.daysUntilExpiry < 30);
-    renderRiskList(riskAbs);
+    renderDashboardKPIs({
+      totalAbonnements: total,
+      coutMensuel: monthlyCost,
+      scoreSante: healthScore,
+      abonnementsAuRisque: highRisk.length
+    });
 
-    // Afficher les infos système
-    const info = `
-      Total d'abonnements: ${abonnements.length} | 
-      Coût mensuel estimé: ${formatCurrency(analytics.coutMensuel)} | 
-      Santé du portefeuille: ${analytics.scoreSante}%
-    `;
-    document.getElementById('system-info').textContent = info;
+    renderRiskList(highRisk);
+
+    const info = [
+      `Total: ${total}`,
+      `Actifs: ${active}`,
+      `Dépense mensuelle: ${formatCurrency(monthlyCost)}`,
+      `Santé estimée: ${healthScore}%`,
+      `À risque: ${highRisk.length}`
+    ].join(' | ');
+    if (systemInfo) {
+      systemInfo.textContent = info;
+    }
   } catch (error) {
     console.error('Erreur lors du chargement du dashboard:', error);
-    showError('Erreur de chargement du dashboard');
+    showError(`Erreur de chargement du dashboard: ${error.message}`);
+    renderDashboardKPIs({
+      totalAbonnements: 0,
+      coutMensuel: 0,
+      scoreSante: 0,
+      abonnementsAuRisque: 0
+    });
+    renderRiskList([]);
+    if (systemInfo) {
+      systemInfo.textContent = 'Impossible de charger les données du dashboard.';
+    }
   }
 }
 

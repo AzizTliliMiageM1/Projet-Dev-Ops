@@ -71,15 +71,27 @@
  * Charge et affiche les statistiques
  */
 async function loadStatsPage() {
+  const statsContainer = document.getElementById('stats-container');
+  if (statsContainer) {
+    statsContainer.innerHTML = '<p class="text-muted">Chargement des statistiques...</p>';
+  }
+  const categoryContainer = document.getElementById('category-stats');
+  if (categoryContainer) {
+    categoryContainer.innerHTML = '<p class="text-muted">Analyse des catégories...</p>';
+  }
+  const recommendationsContainer = document.getElementById('recommendations');
+  if (recommendationsContainer) {
+    recommendationsContainer.innerHTML = '<p class="text-muted">Calcul des recommandations...</p>';
+  }
+
   try {
     const abonnements = await fetchAbonnements();
-    const analytics = await fetchAnalytics();
-
-    // Afficher les stats principales
+    const monthlyCost = abonnements.reduce((sum, ab) => sum + (Number(ab.prixMensuel) || 0), 0);
+    const activeCount = abonnements.filter(isActiveSubscription).length;
     const stats = {
-      totalAnnuel: (analytics.coutMensuel || 0) * 12,
-      abonnementsActifs: abonnements.length,
-      moyenneMensuelle: analytics.coutMensuel || 0,
+      totalAnnuel: monthlyCost * 12,
+      abonnementsActifs: activeCount,
+      moyenneMensuelle: abonnements.length === 0 ? 0 : monthlyCost / abonnements.length,
       economiePotentielle: calculateSavings(abonnements)
     };
     renderStats(stats);
@@ -88,11 +100,28 @@ async function loadStatsPage() {
     renderCategoryStats(abonnements);
 
     // Afficher les recommandations
-    renderRecommendations(abonnements, stats);
+    renderStatsRecommendations(abonnements, stats);
   } catch (error) {
     console.error('Erreur:', error);
-    showError('Erreur lors du chargement des statistiques');
+    showError(`Erreur lors du chargement des statistiques: ${error.message}`);
+    if (statsContainer) {
+      statsContainer.innerHTML = '<p class="text-muted">Aucune donnée disponible.</p>';
+    }
+    if (categoryContainer) {
+      categoryContainer.innerHTML = '';
+    }
+    if (recommendationsContainer) {
+      recommendationsContainer.innerHTML = '<p class="text-muted">Aucune recommandation générée.</p>';
+    }
   }
+}
+
+function isActiveSubscription(abonnement) {
+  if (!abonnement || !abonnement.dateDebut || !abonnement.dateFin) return false;
+  const now = new Date();
+  const start = new Date(abonnement.dateDebut);
+  const end = new Date(abonnement.dateFin);
+  return start <= now && end >= now;
 }
 
 /**
@@ -100,8 +129,8 @@ async function loadStatsPage() {
  */
 function calculateSavings(abonnements) {
   if (!abonnements || abonnements.length === 0) return 0;
-  const total = abonnements.reduce((sum, ab) => sum + (ab.coutMensuel || 0), 0);
-  return total * 0.1; // 10% d'économies potentielles
+  const total = abonnements.reduce((sum, ab) => sum + (Number(ab.prixMensuel) || 0), 0);
+  return total * 0.1;
 }
 
 /**
@@ -118,7 +147,7 @@ function renderCategoryStats(abonnements) {
       categories[cat] = { count: 0, total: 0 };
     }
     categories[cat].count++;
-    categories[cat].total += ab.coutMensuel || 0;
+    categories[cat].total += Number(ab.prixMensuel) || 0;
   });
 
   let html = '<table class="table"><thead><tr><th>Catégorie</th><th>Nombre</th><th>Coût mensuel</th></tr></thead><tbody>';
@@ -132,24 +161,26 @@ function renderCategoryStats(abonnements) {
 /**
  * Affiche les recommandations d'optimisation
  */
-function renderRecommendations(abonnements, stats) {
+function renderStatsRecommendations(abonnements, stats) {
   const container = document.getElementById('recommendations');
   if (!container) return;
   
   const recommendations = [];
 
   const expired = abonnements.filter(ab => {
-    if (!ab.dateExpiration) return false;
-    return new Date(ab.dateExpiration) < new Date();
+    if (!ab.dateFin) return false;
+    return new Date(ab.dateFin) < new Date();
   });
   
   if (expired.length > 0) {
     recommendations.push(`<div class="alert alert-warning">⭐ <strong>${expired.length} abonnement(s) expiré(s)</strong></div>`);
   }
 
-  const expensive = abonnements.sort((a, b) => (b.coutMensuel || 0) - (a.coutMensuel || 0)).slice(0, 3);
+  const expensive = [...abonnements]
+    .sort((a, b) => (Number(b.prixMensuel) || 0) - (Number(a.prixMensuel) || 0))
+    .slice(0, 3);
   if (expensive.length > 0) {
-    const expStr = expensive.map(ab => `${ab.service}`).join(', ');
+    const expStr = expensive.map(ab => ab.nomService || 'Service').join(', ');
     recommendations.push(`<div class="alert alert-info">💰 <strong>À vérifier:</strong> ${expStr}</div>`);
   }
 

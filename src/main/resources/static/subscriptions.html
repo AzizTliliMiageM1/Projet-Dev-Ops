@@ -60,12 +60,21 @@
  */
 
 let allAbonnements = [];
-let editingId = null;
 
 /**
  * Charge la page et affiche tous les abonnements
  */
 async function loadSubscriptionsPage() {
+  const formContainer = document.getElementById('subscription-form');
+  const tableContainer = document.getElementById('subscriptions-table');
+
+  if (formContainer && formContainer.childElementCount === 0) {
+    formContainer.innerHTML = '<p class="text-muted">Préparation du formulaire...</p>';
+  }
+  if (tableContainer) {
+    tableContainer.innerHTML = '<p class="text-muted">Chargement des abonnements...</p>';
+  }
+
   try {
     allAbonnements = await fetchAbonnements();
     
@@ -76,7 +85,12 @@ async function loadSubscriptionsPage() {
     renderSubscriptionsTable(allAbonnements);
   } catch (error) {
     console.error('Erreur:', error);
-    showError('Erreur lors du chargement des abonnements');
+    showError(`Erreur lors du chargement des abonnements: ${error.message}`);
+    allAbonnements = [];
+    if (tableContainer) {
+      tableContainer.innerHTML = '<p class="text-muted">Impossible de récupérer les abonnements.</p>';
+    }
+    renderSubscriptionForm(null);
   }
 }
 
@@ -86,7 +100,6 @@ async function loadSubscriptionsPage() {
 async function editSubscriptionId(id) {
   const ab = allAbonnements.find(a => a.id === id);
   if (ab) {
-    editingId = id;
     renderSubscriptionForm(ab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -99,13 +112,13 @@ async function deleteSubscriptionId(id) {
   if (!confirm('Êtes-vous sûr de vouloir supprimer cet abonnement?')) {
     return;
   }
-  
-  const success = await deleteAbonnement(id);
-  if (success) {
+  try {
+    await deleteAbonnement(id);
     showSuccess('✅ Abonnement supprimé');
-    loadSubscriptionsPage();
-  } else {
-    showError('❌ Erreur lors de la suppression');
+    await loadSubscriptionsPage();
+  } catch (error) {
+    console.error('Erreur suppression abonnement:', error);
+    showError(`❌ Erreur lors de la suppression: ${error.message}`);
   }
 }
 
@@ -120,8 +133,9 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.addEventListener('input', (e) => {
       const query = e.target.value.toLowerCase();
       const filtered = allAbonnements.filter(ab =>
-        (ab.client && ab.client.toLowerCase().includes(query)) ||
-        (ab.service && ab.service.toLowerCase().includes(query))
+        (ab.clientName && ab.clientName.toLowerCase().includes(query)) ||
+        (ab.nomService && ab.nomService.toLowerCase().includes(query)) ||
+        (ab.categorie && ab.categorie.toLowerCase().includes(query))
       );
       renderSubscriptionsTable(filtered);
     });

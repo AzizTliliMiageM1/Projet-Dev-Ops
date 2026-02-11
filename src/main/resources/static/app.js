@@ -49,6 +49,8 @@ function isFavoriteId(id) {
   return getFavorites().includes(id);
 }
 
+let currentEditAbonnement = null;
+
 /* ---------- helpers ---------- */
 function escapeHtml(s){
   return String(s ?? "")
@@ -60,9 +62,16 @@ function escapeHtml(s){
 }
 
 async function fetchAll(){
-  const r = await fetch(apiBase);
-  if (!r.ok) return [];
-  return await r.json();
+  try {
+    const r = await fetch(apiBase);
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}`);
+    }
+    return await r.json();
+  } catch (error) {
+    console.error('Erreur lors de la récupération des abonnements:', error);
+    throw error;
+  }
 }
 
 function isActive(a){
@@ -212,19 +221,19 @@ function render(list){
         </div>
         
         <div class="card-actions">
-          <button class="btn btn-action" onclick="markAsUsed(${index})" title="Marquer comme utilisé">
+          <button class="btn btn-action" onclick="markAsUsedId('${a.id}')" title="Marquer comme utilisé">
             <i class="bi bi-check2"></i> Utilisé
           </button>
-          <button class="btn btn-action" onclick="editAbonnement(${index})" title="Modifier">
+          <button class="btn btn-action" onclick="editAbonnementId('${a.id}')" title="Modifier">
             <i class="bi bi-pencil"></i> Modifier
           </button>
-          <button class="btn btn-action" onclick="deleteAbonnement(${index})" title="Supprimer">
+          <button class="btn btn-action" onclick="deleteAbonnementId('${a.id}')" title="Supprimer">
             <i class="bi bi-trash"></i> Supprimer
           </button>
-          <button class="btn btn-action" onclick="toggleFavorite(${index})" title="Ajouter aux favoris / retirer">
+          <button class="btn btn-action" onclick="toggleFavoriteId('${a.id}')" title="Ajouter aux favoris / retirer">
             <i class="bi ${favIcon}"></i> Favori
           </button>
-          <button class="btn btn-action" onclick="duplicateAbonnement(${index})" title="Dupliquer cet abonnement">
+          <button class="btn btn-action" onclick="duplicateAbonnementId('${a.id}')" title="Dupliquer cet abonnement">
             <i class="bi bi-files"></i> Dupliquer
           </button>
         </div>
@@ -236,15 +245,18 @@ function render(list){
 }
 
 /* ---------- fonctions d'action ---------- */
-async function markAsUsed(index) {
+async function markAsUsedId(id) {
   try {
     const abonnements = await fetchAll();
-    const abo = abonnements[index];
-    if (!abo) return;
+    const abo = abonnements.find(item => item.id === id);
+    if (!abo) {
+      showFlash('Abonnement introuvable', 'error');
+      return;
+    }
     
     abo.derniereUtilisation = new Date().toISOString().split('T')[0];
     
-    const response = await fetch(`${apiBase}/${index}`, {
+    const response = await fetch(`${apiBase}/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(abo)
@@ -264,11 +276,11 @@ async function markAsUsed(index) {
   }
 }
 
-async function deleteAbonnement(index) {
+async function deleteAbonnementId(id) {
   if (!confirm('Êtes-vous sûr de vouloir supprimer cet abonnement ?')) return;
   
   try {
-    const response = await fetch(`${apiBase}/${index}`, { method: 'DELETE' });
+    const response = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
     
     if (response.ok) {
       showFlash('Abonnement supprimé avec succès', 'success');
@@ -284,35 +296,118 @@ async function deleteAbonnement(index) {
   }
 }
 
-async function editAbonnement(index) {
+async function editAbonnementId(id) {
   try {
     const abonnements = await fetchAll();
-    const abo = abonnements[index];
-    if (!abo) return;
+    const abo = abonnements.find(item => item.id === id);
+    if (!abo) {
+      showFlash('Abonnement introuvable', 'error');
+      return;
+    }
     
-    // Remplir le modal d'édition
-    document.getElementById('editIndex').value = index;
+    currentEditAbonnement = { ...abo };
+
+    const editIdInput = document.getElementById('editId');
+    if (!editIdInput) {
+      showFlash('Impossible de préparer le formulaire d\'édition', 'error');
+      return;
+    }
+
+    editIdInput.value = abo.id || '';
     document.getElementById('editClient').value = abo.clientName || '';
     document.getElementById('editService').value = abo.nomService || '';
     document.getElementById('editDebut').value = abo.dateDebut || '';
     document.getElementById('editFin').value = abo.dateFin || '';
     document.getElementById('editCategorie').value = abo.categorie || '';
     document.getElementById('editPrix').value = abo.prixMensuel || '';
-    
-    // Afficher le modal
-    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+
+    const modalElement = document.getElementById('editModal');
+    if (!modalElement) {
+      showFlash('Modal d\'édition introuvable', 'error');
+      return;
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
     modal.show();
   } catch (error) {
     showFlash('Erreur: ' + error.message, 'error');
   }
 }
 
+async function saveEdit() {
+  const editIdInput = document.getElementById('editId');
+  if (!editIdInput) {
+    showFlash('Formulaire d\'édition introuvable', 'error');
+    return;
+  }
+
+  const id = editIdInput.value;
+  if (!id) {
+    showFlash('Abonnement introuvable', 'error');
+    return;
+  }
+
+  const payload = currentEditAbonnement ? { ...currentEditAbonnement } : { id };
+  payload.clientName = document.getElementById('editClient').value.trim();
+  payload.nomService = document.getElementById('editService').value.trim();
+  payload.dateDebut = document.getElementById('editDebut').value;
+  payload.dateFin = document.getElementById('editFin').value;
+  payload.categorie = document.getElementById('editCategorie').value.trim() || 'Autres';
+  payload.prixMensuel = parseFloat(document.getElementById('editPrix').value) || 0;
+
+  const btn = document.getElementById('saveEditBtn');
+  const originalLabel = btn ? btn.innerHTML : '';
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat spinner-border spinner-border-sm me-1"></i>Enregistrement...';
+  }
+
+  try {
+    const response = await fetch(`${apiBase}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      showFlash('Abonnement mis à jour avec succès !', 'success');
+      const modalElement = document.getElementById('editModal');
+      const modal = modalElement ? bootstrap.Modal.getInstance(modalElement) : null;
+      if (modal) modal.hide();
+      currentEditAbonnement = null;
+      await loadAndRender();
+    } else if (response.status === 401) {
+      showFlash('Vous devez être connecté pour modifier un abonnement', 'error');
+      setTimeout(() => window.location.href = '/login.html', 2000);
+    } else {
+      let msg = 'Erreur lors de la mise à jour';
+      try {
+        const err = await response.json();
+        if (err?.error) msg = err.error;
+        if (err?.message) msg = err.message;
+      } catch (_) {}
+      showFlash(msg, 'error');
+    }
+  } catch (error) {
+    showFlash('Erreur: ' + error.message, 'error');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalLabel;
+    }
+  }
+}
+
 // 📄 Dupliquer un abonnement
-async function duplicateAbonnement(index) {
+async function duplicateAbonnementId(id) {
   try {
     const abonnements = await fetchAll();
-    const source = abonnements[index];
-    if (!source) return;
+    const source = abonnements.find(item => item.id === id);
+    if (!source) {
+      showFlash('Abonnement introuvable', 'error');
+      return;
+    }
 
     const payload = {
       clientName: source.clientName,
@@ -345,23 +440,23 @@ async function duplicateAbonnement(index) {
 }
 
 // ⭐ Toggle favori
-async function toggleFavorite(index) {
+async function toggleFavoriteId(subscriptionId) {
   try {
     const abonnements = await fetchAll();
-    const abo = abonnements[index];
+    const abo = abonnements.find(item => item.id === subscriptionId);
     if (!abo || !abo.id) {
       showFlash('Impossible de gérer le favori (id manquant)', 'error');
       return;
     }
 
-    const id = abo.id;
+    const targetId = abo.id;
     let favs = getFavorites();
 
-    if (favs.includes(id)) {
-      favs = favs.filter(x => x !== id);
+    if (favs.includes(targetId)) {
+      favs = favs.filter(x => x !== targetId);
       showFlash('Retiré des favoris', 'info');
     } else {
-      favs.push(id);
+      favs.push(targetId);
       showFlash('Ajouté aux favoris', 'success');
     }
 
@@ -398,8 +493,49 @@ function showFlash(message, type = 'info') {
 
 /* ---------- chargement + filtres ---------- */
 async function loadAndRender(){
-  const all = await fetchAll();
+  const cards = document.getElementById('cards');
+  if (cards) {
+    cards.innerHTML = '<div class="empty-state" data-empty-hint><div class="empty-icon"><i class="bi bi-arrow-repeat"></i></div><p class="empty-text">Chargement des abonnements...</p></div>';
+  }
+
+  const dash = document.getElementById('dashboard');
+  if (dash) {
+    dash.innerHTML = '<div class="metric-card"><div class="metric-icon"><i class="bi bi-arrow-repeat"></i></div><div class="metric-value">...</div><div class="metric-label">Chargement</div></div>';
+  }
+
+  const recommendationContainer = document.getElementById('recommendations-content');
+  if (recommendationContainer) {
+    recommendationContainer.textContent = 'Chargement des recommandations...';
+  }
+
+  let all;
+  try {
+    all = await fetchAll();
+  } catch (error) {
+    showFlash(`Erreur lors du chargement des abonnements: ${error.message}`, 'error');
+    if (cards) {
+      cards.innerHTML = '<div class="empty-state" data-empty-hint><div class="empty-icon"><i class="bi bi-exclamation-triangle"></i></div><p class="empty-text">Impossible de charger les abonnements.</p></div>';
+    }
+    if (dash) {
+      dash.innerHTML = '';
+    }
+    if (recommendationContainer) {
+      recommendationContainer.textContent = 'Impossible de charger les recommandations.';
+    }
+    return;
+  }
+
   renderDashboard(all);
+
+  if (recommendationContainer && typeof fetchRecommendations === 'function' && typeof renderRecommendations === 'function') {
+    try {
+      const recommendations = await fetchRecommendations();
+      renderRecommendations(recommendations);
+    } catch (error) {
+      console.error('Erreur recommandations:', error);
+      recommendationContainer.textContent = 'Impossible de charger les recommandations.';
+    }
+  }
 
   // apply search/filter/sort
   const q = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
@@ -653,8 +789,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
       try {
         const abonnements = await fetchAll();
-        for (let i = abonnements.length - 1; i >= 0; i--) {
-          await fetch(`${apiBase}/${i}`, { method: 'DELETE' });
+        for (const abo of abonnements) {
+          if (!abo?.id) continue;
+          const response = await fetch(`${apiBase}/${abo.id}`, { method: 'DELETE' });
+          if (response.status === 401) {
+            showFlash('Vous devez être connecté pour supprimer un abonnement', 'error');
+            setTimeout(() => window.location.href = '/login.html', 2000);
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(`Suppression impossible (${response.status})`);
+          }
         }
         showFlash('Tous les abonnements ont été supprimés', 'success');
         await loadAndRender();
@@ -709,6 +854,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const sortSelect = document.getElementById('sortSelect');
   if (sortSelect) sortSelect.addEventListener('change', loadAndRender);
+
+  const saveEditBtn = document.getElementById('saveEditBtn');
+  if (saveEditBtn) {
+    saveEditBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await saveEdit();
+    });
+  }
+
+  const editModalElement = document.getElementById('editModal');
+  if (editModalElement) {
+    editModalElement.addEventListener('hidden.bs.modal', () => {
+      currentEditAbonnement = null;
+      const form = document.getElementById('editForm');
+      if (form) form.reset();
+      const idField = document.getElementById('editId');
+      if (idField) idField.value = '';
+    });
+  }
 
   // CSS pour l'animation de rotation
   const style = document.createElement('style');
