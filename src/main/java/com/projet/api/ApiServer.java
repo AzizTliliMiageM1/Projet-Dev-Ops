@@ -23,6 +23,8 @@ import com.projet.analytics.forecast.ForecastServiceImpl;
 import com.projet.service.SubscriptionOptimizer;
 import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
+import com.projet.analytics.optimization.SubscriptionOptimizationService;
+import com.projet.analytics.optimization.SubscriptionOptimizationServiceImpl;
 
 import spark.Request;
 import static spark.Spark.before;
@@ -38,6 +40,7 @@ public class ApiServer {
 
     private static final ForecastService forecastService = new ForecastServiceImpl();
     private static final AnomalyDetector anomalyDetector = new AnomalyDetectorImpl();
+    private static final SubscriptionOptimizationService optimizationService = new SubscriptionOptimizationServiceImpl();
 
     private static AbonnementRepository getOrCreateRepo(Request req) {
         AbonnementRepository repo = req.attribute("userRepo");
@@ -427,6 +430,38 @@ public class ApiServer {
                 var forecast = forecastService.projectCosts(abonnements, months);
                 
                 return mapper.writeValueAsString(forecast);
+            });
+
+            // =================================================
+            // 🔵  ANALYTICS - MOTEUR D'OPTIMISATION
+            // =================================================
+            get("/analytics/optimization", (req, res) -> {
+                String user = req.session().attribute("user_email");
+                boolean isAuthDisabled = Boolean.parseBoolean(System.getenv("DISABLE_AUTH_FOR_TESTS"));
+                if (user == null && !isAuthDisabled) {
+                    res.status(401);
+                    res.type("application/json");
+                    return mapper.writeValueAsString(Map.of("error", "Authentification requise pour accéder à l'optimisation."));
+                }
+
+                res.type("application/json");
+                try {
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    if (abonnements == null || abonnements.isEmpty()) {
+                        return mapper.writeValueAsString(new com.projet.analytics.optimization.OptimizationResult(new ArrayList<>()));
+                    }
+
+                    var optimizationResult = optimizationService.analyze(abonnements);
+                    return mapper.writeValueAsString(optimizationResult);
+
+                } catch (Exception e) {
+                    res.status(500);
+                    // Log l'erreur côté serveur pour le débogage
+                    e.printStackTrace(); 
+                    return mapper.writeValueAsString(Map.of("error", "Une erreur interne est survenue lors de l'analyse d'optimisation."));
+                }
             });
 
             // =================================================

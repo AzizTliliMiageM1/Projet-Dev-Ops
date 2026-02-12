@@ -13,6 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.projet.analytics.optimization.OptimizationResult;
+
 import spark.Spark;
 
 /**
@@ -21,9 +25,15 @@ import spark.Spark;
 public class ApiServerIntegrationTest {
     private static Thread serverThread;
     private static final HttpClient client = HttpClient.newHttpClient();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeAll
     public static void startServer() throws Exception {
+        // Désactiver l'authentification pour les tests d'intégration
+        System.setProperty("DISABLE_AUTH_FOR_TESTS", "true");
+        
+        objectMapper.registerModule(new JavaTimeModule());
+
         serverThread = new Thread(() -> ApiServer.main(new String[0]));
         serverThread.setDaemon(true);
         serverThread.start();
@@ -59,7 +69,36 @@ public class ApiServerIntegrationTest {
             Spark.stop();
             Thread.sleep(300);
         } finally {
-            // nothing
+            System.clearProperty("DISABLE_AUTH_FOR_TESTS");
+        }
+    }
+
+    @Test
+    public void testGetOptimizationAnalytics() throws Exception {
+        // Given: une requête vers l'endpoint d'optimisation
+        HttpRequest getReq = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:4567/api/analytics/optimization"))
+                .GET()
+                .build();
+
+        // When: on exécute la requête
+        HttpResponse<String> getResp = client.send(getReq, HttpResponse.BodyHandlers.ofString());
+
+        // Then: la réponse doit être un succès (200) et le JSON valide
+        assertEquals(200, getResp.statusCode());
+
+        String jsonBody = getResp.body();
+        OptimizationResult result = objectMapper.readValue(jsonBody, OptimizationResult.class);
+
+        // Et: le résultat doit contenir des suggestions et une économie potentielle
+        assertTrue(result.getSuggestions() != null, "La liste des suggestions ne doit pas être nulle.");
+        assertTrue(result.getTotalEconomiePotentielle() >= 0, "L'économie potentielle totale doit être positive ou nulle.");
+        
+        // Vérification plus fine si des données de test existent
+        if (!result.getSuggestions().isEmpty()) {
+            var firstSuggestion = result.getSuggestions().get(0);
+            assertTrue(firstSuggestion.getAbonnement() != null);
+            assertTrue(firstSuggestion.getAction() != null);
         }
     }
 
