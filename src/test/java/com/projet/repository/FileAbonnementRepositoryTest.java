@@ -8,7 +8,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
-import com.example.abonnement.Abonnement;
+import com.projet.backend.domain.Abonnement;
 
 public class FileAbonnementRepositoryTest {
 
@@ -25,11 +25,11 @@ public class FileAbonnementRepositoryTest {
         List<Abonnement> all = repo.findAll();
         assertEquals(2, all.size());
 
-        // After findAll(), the file should have been migrated to include id + category (8 fields)
+        // After findAll(), the file should have been migrated to include id + all new fields (16 fields)
         List<String> lines = Files.readAllLines(tempFile);
         for (String line : lines) {
             String[] parts = line.split(";");
-            assertEquals(8, parts.length, "Line should have 8 parts after migration (id + 7 fields)");
+            assertEquals(16, parts.length, "Line should have 16 parts after migration");
         }
 
         // cleanup

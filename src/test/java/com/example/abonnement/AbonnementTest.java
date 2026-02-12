@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import com.projet.backend.adapter.AbonnementCsvConverter;
+import com.projet.backend.domain.Abonnement;
 
 public class AbonnementTest {
 
