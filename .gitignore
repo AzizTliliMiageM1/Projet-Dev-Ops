@@ -22,3 +22,12 @@ dependency-reduced-pom.xml
 .DS_Store
 *.log
 *.tmp
+
+# Build artifacts
+target/
+# Maven generated helper
+dependency-reduced-pom.xml
+# Temp logs
+*.log
+# Git backup dirs
+.git.bak_*
