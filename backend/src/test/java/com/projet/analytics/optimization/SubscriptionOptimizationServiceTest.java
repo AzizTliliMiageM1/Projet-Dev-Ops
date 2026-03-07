@@ -1,11 +1,14 @@
 package com.projet.analytics.optimization;
 
-import com.projet.backend.domain.Abonnement;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.List;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.projet.backend.domain.Abonnement;
 
 class SubscriptionOptimizationServiceImplTest {
 
@@ -46,16 +49,15 @@ class SubscriptionOptimizationServiceImplTest {
     @Test
     void testCasLimiteAbonnementGratuitJamaisUtilise() {
         Abonnement sub = new Abonnement("Service Gratuit", LocalDate.now().minusYears(1), LocalDate.now().plusYears(1), 0.0, "UserA", null, "Utilitaire");
-        sub.setDerniereUtilisation(null); // Explicitement null
+        sub.setDerniereUtilisation(null);
         OptimizationResult result = service.analyze(List.of(sub));
-        
-        // Doit être conservé car gratuit, même si jamais utilisé. Le coût est le facteur dominant.
+
         assertEquals(OptimizationAction.CONSERVER, result.getSuggestions().get(0).getAction());
-        assertTrue(result.getSuggestions().get(0).getScore() > SEUIL_OPTIMISER, "Le score doit être élevé pour un service gratuit");
+        assertTrue(result.getSuggestions().get(0).getScore() > SEUIL_OPTIMISER);
     }
-    
+
     private static final double SEUIL_OPTIMISER = 60;
-    
+
     private OptimizationSuggestion findSuggestionFor(OptimizationResult result, String serviceName) {
         return result.getSuggestions().stream()
                 .filter(s -> s.getAbonnement().getNomService().equals(serviceName))
