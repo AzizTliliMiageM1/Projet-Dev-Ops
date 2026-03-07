@@ -20,6 +20,8 @@ import com.projet.backend.domain.User;
 import com.projet.user.UserService;
 import com.projet.user.UserServiceImpl;
 import com.projet.analytics.SubscriptionAnalytics;
+import com.projet.analytics.lifecycle.LifecyclePlanner;
+import com.projet.analytics.lifecycle.LifecyclePlanResult;
 import com.projet.backend.service.SubscriptionService;
 import com.projet.service.SubscriptionOptimizer;
 import com.projet.service.ServiceMailgun;
@@ -660,6 +662,73 @@ public class ApiServer {
                 
                 Map<String, Object> payload = Map.of("healthScore", healthScore);
                 return writeJson(res, mapper, "/api/analytics/portfolio-health", payload);
+            });
+
+            // =================================================
+            // 🔵  LIFECYCLE PLANNER (Planification multi-mois)
+            // =================================================
+            post("/portfolio/lifecycle-plan", (req, res) -> {
+                String email = req.session().attribute("user_email");
+                if (email == null) {
+                    res.status(401);
+                    return "{\"error\":\"Vous devez être connecté\"}";
+                }
+
+                try {
+                    Map<String, Object> request = mapper.readValue(req.body(), Map.class);
+
+                    // Extraction des paramètres
+                    int months = ((Number) request.getOrDefault("months", 6)).intValue();
+                    double budget = ((Number) request.getOrDefault("budget", 40.0)).doubleValue();
+
+                    if (months <= 0 || months > 24) {
+                        res.status(400);
+                        return "{\"error\":\"months must be between 1 and 24\"}";
+                    }
+                    if (budget < 0) {
+                        res.status(400);
+                        return "{\"error\":\"budget cannot be negative\"}";
+                    }
+
+                    // Récupérer les abonnements de l'utilisateur
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    if (abonnements.isEmpty()) {
+                        res.status(400);
+                        return "{\"error\":\"No subscriptions found\"}";
+                    }
+
+                    // Générer le plan
+                    LifecyclePlanner planner = new LifecyclePlanner();
+                    LifecyclePlanResult result = planner.generatePlan(abonnements, months, budget);
+
+                    if (!result.isSuccess()) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", result.getMessage()));
+                    }
+
+                    // Préparer la réponse
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("plan", result.getPlan().getMonthlyPlans().stream()
+                        .map(mp -> Map.of(
+                            "month", mp.getMonth(),
+                            "active", mp.getActiveSubscriptions(),
+                            "cost", mp.getMonthlyCost(),
+                            "score", mp.getMonthlyScore()
+                        ))
+                        .collect(Collectors.toList())
+                    );
+                    response.put("totalCost", result.getPlan().getTotalCost());
+                    response.put("objectiveScore", result.getPlan().getGlobalObjectiveScore());
+                    response.put("executionTimeMs", result.getExecutionTimeMs());
+
+                    return writeJson(res, mapper, "/api/portfolio/lifecycle-plan", response);
+
+                } catch (Exception e) {
+                    res.status(400);
+                    return "{\"error\":\"Invalid request: " + e.getMessage() + "\"}";
+                }
             });
 
             // =================================================
