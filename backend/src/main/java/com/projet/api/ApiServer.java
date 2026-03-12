@@ -20,6 +20,10 @@ import com.projet.analytics.anomaly.AnomalyDetector;
 import com.projet.analytics.anomaly.AnomalyDetectorImpl;
 import com.projet.analytics.forecast.ForecastService;
 import com.projet.analytics.forecast.ForecastServiceImpl;
+import com.projet.analytics.PortfolioRebalancer;
+import com.projet.analytics.PortfolioRebalancer.RebalanceResult;
+import com.projet.analytics.lifecycle.LifecyclePlanner;
+import com.projet.analytics.lifecycle.LifecyclePlanResult;
 import com.projet.service.SubscriptionOptimizer;
 import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
@@ -609,6 +613,79 @@ public class ApiServer {
             });
 
             // =================================================
+            // 🔵  PORTFOLIO - REBALANCE (Optimisation Portfolio)
+            // =================================================
+            post("/portfolio/rebalance", (req, res) -> {
+                String user = req.session().attribute("user_email");
+                boolean isAuthDisabled = Boolean.parseBoolean(System.getenv("DISABLE_AUTH_FOR_TESTS"));
+                if (user == null && !isAuthDisabled) {
+                    res.status(401);
+                    res.type("application/json");
+                    return mapper.writeValueAsString(Map.of("error", "Authentification requise"));
+                }
+
+                res.type("application/json");
+                try {
+                    Map<String, Object> requestBody = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    
+                    double budgetTarget = ((Number) requestBody.getOrDefault("budgetTarget", 100)).doubleValue();
+                    double valueWeight = ((Number) requestBody.getOrDefault("valueWeight", 0.4)).doubleValue();
+                    double riskWeight = ((Number) requestBody.getOrDefault("riskWeight", 0.3)).doubleValue();
+                    double comfortWeight = ((Number) requestBody.getOrDefault("comfortWeight", 0.3)).doubleValue();
+
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    RebalanceResult result = PortfolioRebalancer.rebalance(
+                        abonnements,
+                        budgetTarget,
+                        valueWeight,
+                        riskWeight,
+                        comfortWeight
+                    );
+
+                    return mapper.writeValueAsString(result);
+
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(Map.of("error", "Erreur lors du rééquilibrage: " + e.getMessage()));
+                }
+            });
+
+            // =================================================
+            // 🔵  PORTFOLIO - LIFECYCLE PLAN (Planification Cycle de Vie)
+            // =================================================
+            post("/portfolio/lifecycle-plan", (req, res) -> {
+                String user = req.session().attribute("user_email");
+                boolean isAuthDisabled = Boolean.parseBoolean(System.getenv("DISABLE_AUTH_FOR_TESTS"));
+                if (user == null && !isAuthDisabled) {
+                    res.status(401);
+                    res.type("application/json");
+                    return mapper.writeValueAsString(Map.of("error", "Authentification requise"));
+                }
+
+                res.type("application/json");
+                try {
+                    Map<String, Object> requestBody = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+                    
+                    int months = ((Number) requestBody.getOrDefault("months", 12)).intValue();
+                    double budget = ((Number) requestBody.getOrDefault("budget", 100)).doubleValue();
+
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    LifecyclePlanner planner = new LifecyclePlanner();
+                    LifecyclePlanResult result = planner.generatePlan(abonnements, months, budget);
+
+                    return mapper.writeValueAsString(result);
+
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(Map.of("error", "Erreur lors de la planification: " + e.getMessage()));
+                }
+            });
+
+            // =================================================
             // 🔵  STATUS SESSION (pour navbar)
             // =================================================
             get("/session", (req, res) -> {
@@ -684,6 +761,25 @@ public class ApiServer {
                 // 🔵 Redirection vers index.html
                 res.redirect("/index.html");
                 return null;
+            });
+
+            // =================================================
+            //     🔵  CONFIRMATION PAR EMAIL (DEV MODE)
+            // =================================================
+            post("/confirm-dev", (req, res) -> {
+                String email = req.queryParams("email");
+                FileUserRepository repoUser = new FileUserRepository();
+                User user = repoUser.findByEmail(email);
+
+                if (user == null) {
+                    res.status(400);
+                    return "Utilisateur non trouvé.";
+                }
+
+                user.setConfirmed(true);
+                repoUser.update(user);
+
+                return "Email confirmé ! Vous pouvez maintenant vous connecter.";
             });
 
 

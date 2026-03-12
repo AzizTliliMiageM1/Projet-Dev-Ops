@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Portfolio & Lifecycle</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .endpoint-test {
+            border-left: 4px solid #0d6efd;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        .response-box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .loading::after {
+            content: "...";
+            animation: ellipsis 1.5s steps(4, end) infinite;
+        }
+        @keyframes ellipsis {
+            0%, 20% { content: ""; }
+            40% { content: "."; }
+            60% { content: ".."; }
+            80%, 100% { content: "..."; }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-white mb-4">🧪 Tests API - Portfolio & Lifecycle</h1>
+        
+        <!-- Test Portfolio Rebalance -->
+        <div class="test-card">
+            <h3>📊 Test 1: Portfolio Rebalance</h3>
+            <p class="text-muted">Optimise le portefeuille d'abonnements selon des critères pondérés</p>
+            
+            <div class="endpoint-test">
+                <strong>Endpoint:</strong> <code>POST /api/portfolio/rebalance</code>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <form id="portfolio-form">
+                        <div class="mb-3">
+                            <label for="bt" class="form-label">Budget Target (€)</label>
+                            <input type="number" id="bt" class="form-control" value="100" step="0.01">
+                        </div>
+                        <div class="mb-3">
+                            <label for="vw" class="form-label">Value Weight (0-1)</label>
+                            <input type="number" id="vw" class="form-control" value="0.4" min="0" max="1" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rw" class="form-label">Risk Weight (0-1)</label>
+                            <input type="number" id="rw" class="form-control" value="0.3" min="0" max="1" step="0.1">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cw" class="form-label">Comfort Weight (0-1)</label>
+                            <input type="number" id="cw" class="form-control" value="0.3" min="0" max="1" step="0.1">
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="testPortfolio()">
+                            Test Rebalance
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <div>
+                        <strong>Réponse:</strong>
+                        <div id="portfolio-response" class="response-box"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Lifecycle Plan -->
+        <div class="test-card">
+            <h3>📅 Test 2: Lifecycle Plan</h3>
+            <p class="text-muted">Génère un plan de cycle de vie sur plusieurs mois</p>
+            
+            <div class="endpoint-test">
+                <strong>Endpoint:</strong> <code>POST /api/portfolio/lifecycle-plan</code>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <form id="lifecycle-form">
+                        <div class="mb-3">
+                            <label for="months" class="form-label">Months</label>
+                            <input type="number" id="months" class="form-control" value="12" min="1" max="24">
+                        </div>
+                        <div class="mb-3">
+                            <label for="budget" class="form-label">Budget Total (€)</label>
+                            <input type="number" id="budget" class="form-control" value="1200" step="0.01">
+                        </div>
+                        <button type="button" class="btn btn-primary w-100" onclick="testLifecycle()">
+                            Test Lifecycle Plan
+                        </button>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <div>
+                        <strong>Réponse:</strong>
+                        <div id="lifecycle-response" class="response-box"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Session Info -->
+        <div class="test-card">
+            <h3>🔐 Session Info</h3>
+            <button type="button" class="btn btn-info" onclick="checkSession()">
+                Check Session
+            </button>
+            <div id="session-response" class="response-box" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:4567/api';
+
+        async function testPortfolio() {
+            const resp = document.getElementById('portfolio-response');
+            resp.innerHTML = '<div class="loading">Chargement</div>';
+            
+            try {
+                const payload = {
+                    budgetTarget: parseFloat(document.getElementById('bt').value),
+                    valueWeight: parseFloat(document.getElementById('vw').value),
+                    riskWeight: parseFloat(document.getElementById('rw').value),
+                    comfortWeight: parseFloat(document.getElementById('cw').value)
+                };
+                
+                const response = await fetch(`${API_BASE}/portfolio/rebalance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                resp.innerHTML = `<strong>Status:</strong> ${response.status}<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resp.innerHTML = `<div class="alert alert-danger">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+
+        async function testLifecycle() {
+            const resp = document.getElementById('lifecycle-response');
+            resp.innerHTML = '<div class="loading">Chargement</div>';
+            
+            try {
+                const payload = {
+                    months: parseInt(document.getElementById('months').value),
+                    budget: parseFloat(document.getElementById('budget').value)
+                };
+                
+                const response = await fetch(`${API_BASE}/portfolio/lifecycle-plan`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                resp.innerHTML = `<strong>Status:</strong> ${response.status}<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resp.innerHTML = `<div class="alert alert-danger">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+
+        async function checkSession() {
+            const resp = document.getElementById('session-response');
+            resp.innerHTML = '<div class="loading">Chargement</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/session`, {
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                resp.innerHTML = `<strong>Status:</strong> ${response.status}<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resp.innerHTML = `<div class="alert alert-danger">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-check session on page load
+        window.addEventListener('load', () => {
+            checkSession();
+        });
+    </script>
+</body>
+</html>

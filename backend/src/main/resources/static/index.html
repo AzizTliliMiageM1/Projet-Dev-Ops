@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestion d'Abonnements</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --success: #198754;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #0dcaf0;
+            --dark: #212529;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .navbar {
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .navbar h1 {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .container-main {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+        
+        .stats-card {
+            text-align: center;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card h6 {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-card h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: none;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 10px 15px;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+        
+        .abonnement-card {
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s;
+        }
+        
+        .abonnement-card:hover {
+            border-left-color: var(--success);
+        }
+        
+        .badge-category {
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .container-main {
+                margin: 15px auto;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-wallet2"></i>
+                <h1>Gestion d'Abonnements</h1>
+            </a>
+            <span class="navbar-text ms-auto">
+                <small id="app-status">Status: Chargement...</small>
+            </span>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container-main">
+        <!-- ALERTE D'ERREUR -->
+        <div id="error-alert" class="d-none"></div>
+        
+        <!-- TABS NAVIGATION -->
+        <ul class="nav nav-tabs mb-4" role="tablist" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <li class="nav-item">
+                <a class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" href="#dashboard" role="tab">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="abonnements-tab" data-bs-toggle="tab" href="#abonnements" role="tab">
+                    <i class="bi bi-list-check"></i> Abonnements
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="analytics-tab" data-bs-toggle="tab" href="#analytics" role="tab">
+                    <i class="bi bi-graph-up"></i> Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="import-tab" data-bs-toggle="tab" href="#import" role="tab">
+                    <i class="bi bi-upload"></i> Import/Export
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="portfolio-tab" data-bs-toggle="tab" href="#portfolio" role="tab">
+                    <i class="bi bi-pie-chart"></i> Portfolio Optimization
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="lifecycle-tab" data-bs-toggle="tab" href="#lifecycle" role="tab">
+                    <i class="bi bi-calendar-range"></i> Lifecycle Planning
+                </a>
+            </li>
+        </ul>
+
+        <!-- TAB CONTENT -->
+        <div class="tab-content">
+            
+            <!-- ===== DASHBOARD ===== -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                <h3 class="mb-4">📊 Dashboard Principal</h3>
+                
+                <!-- STATS RAPIDES -->
+                <div class="row mb-4" id="dashboard-stats">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <h6>Abonnements</h6>
+                            <h2 id="stat-count">0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <h6>Dépense Mensuelle</h6>
+                            <h2 id="stat-total">€0</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <h6>Santé Portfolio</h6>
+                            <h2 id="stat-health">N/A</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <h6>Économies Possibles</h6>
+                            <h2 id="stat-savings">€0</h2>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PRÉDICTIONS & ANOMALIES -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">📈 Prédictions (6 mois)</div>
+                            <div class="card-body" id="forecast-container">
+                                <div class="loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">⚠️ Anomalies Détectées</div>
+                            <div class="card-body" id="anomalies-container">
+                                <div class="loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ABONNEMENTS ===== -->
+            <div class="tab-pane fade" id="abonnements" role="tabpanel">
+                <h3 class="mb-4">📋 Mes Abonnements</h3>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <input type="text" id="search-input" class="form-control" placeholder="🔍 Rechercher...">
+                    </div>
+                    <div class="col-md-4">
+                        <select id="category-filter" class="form-select">
+                            <option value="">Toutes les catégories</option>
+                            <option value="Streaming">Streaming</option>
+                            <option value="Cloud">Cloud</option>
+                            <option value="Productivité">Productivité</option>
+                            <option value="Sécurité">Sécurité</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onclick="showNewForm()">
+                            <i class="bi bi-plus"></i> Nouveau
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- RÉSUMÉ -->
+                <div id="summary" class="mb-4"></div>
+                
+                <!-- FORMULAIRE (CACHÉ) -->
+                <div id="form-container" class="d-none mb-4">
+                    <div class="card">
+                        <div class="card-header">Ajouter/Modifier Abonnement</div>
+                        <div class="card-body">
+                            <form id="abonnement-form">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Service</label>
+                                        <input type="text" name="nomService" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Client</label>
+                                        <input type="text" name="clientName" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date Début</label>
+                                        <input type="date" name="dateDebut" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Date Fin</label>
+                                        <input type="date" name="dateFin" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Prix Mensuel (€)</label>
+                                        <input type="number" name="prixMensuel" class="form-control" step="0.01" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Catégorie</label>
+                                        <select name="categorie" class="form-select" required>
+                                            <option>Streaming</option>
+                                            <option>Cloud</option>
+                                            <option>Productivité</option>
+                                            <option>Sécurité</option>
+                                            <option>Autre</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Dernière Utilisation</label>
+                                        <input type="date" name="derniereUtilisation" class="form-control">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary me-2">Enregistrer</button>
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('form-container').classList.add('d-none')">Annuler</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- LISTE ABONNEMENTS -->
+                <div id="abonnements-list"></div>
+            </div>
+
+            <!-- ===== ANALYTICS ===== -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <h3 class="mb-4">📊 Analytics Avancées</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">💡 Recommandations d'Optimisation</div>
+                            <div class="card-body" id="optimize-container">
+                                <div class="loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">⏰ Expirations Prochaines</div>
+                            <div class="card-body" id="expiring-container">
+                                <div class="loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">🔍 Statistiques Détaillées</div>
+                    <div class="card-body" id="stats-container">
+                        <div class="loading"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== IMPORT/EXPORT ===== -->
+            <div class="tab-pane fade" id="import" role="tabpanel">
+                <h3 class="mb-4">📤 Import / Export</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">📥 Import de Données</div>
+                            <div class="card-body">
+                                <p>Importer depuis JSON ou CSV:</p>
+                                <input type="file" id="import-file" class="form-control" accept=".json,.csv">
+                                <button class="btn btn-primary mt-3 w-100" onclick="importFile()">
+                                    Importer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">📤 Export de Données</div>
+                            <div class="card-body">
+                                <button class="btn btn-success w-100 mb-2" onclick="exportJSON()">
+                                    <i class="bi bi-download"></i> Télécharger JSON
+                                </button>
+                                <button class="btn btn-info w-100" onclick="exportCSV()">
+                                    <i class="bi bi-download"></i> Télécharger CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PORTFOLIO OPTIMIZATION ===== -->
+            <div class="tab-pane fade" id="portfolio" role="tabpanel">
+                <h3 class="mb-4">📊 Optimisation du Portefeuille</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">⚙️ Paramètres d'Optimisation</div>
+                            <div class="card-body">
+                                <form id="portfolio-form">
+                                    <div class="mb-3">
+                                        <label for="budget-target" class="form-label">Budget Cible (€/mois)</label>
+                                        <input type="number" id="budget-target" class="form-control" placeholder="100" value="100" step="0.01" required>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="value-weight" class="form-label">Poids Valeur (0-1)</label>
+                                        <input type="number" id="value-weight" class="form-control" placeholder="0.4" value="0.4" min="0" max="1" step="0.1" required>
+                                        <small class="text-muted">Importance du rapport valeur/prix</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="risk-weight" class="form-label">Poids Risque (0-1)</label>
+                                        <input type="number" id="risk-weight" class="form-control" placeholder="0.3" value="0.3" min="0" max="1" step="0.1" required>
+                                        <small class="text-muted">Importance du profil de risque</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="comfort-weight" class="form-label">Poids Confort (0-1)</label>
+                                        <input type="number" id="comfort-weight" class="form-control" placeholder="0.3" value="0.3" min="0" max="1" step="0.1" required>
+                                        <small class="text-muted">Importance du confort utilisateur</small>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-primary w-100" onclick="optimizePortfolio()">
+                                        <i class="bi bi-arrow-repeat"></i> Optimiser Portfolio
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">📈 Résultats d'Optimisation</div>
+                            <div class="card-body" id="portfolio-results">
+                                <p class="text-muted">Les résultats s'afficheront ici...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== LIFECYCLE PLANNING ===== -->
+            <div class="tab-pane fade" id="lifecycle" role="tabpanel">
+                <h3 class="mb-4">📅 Planification du Cycle de Vie</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">🎯 Paramètres de Planification</div>
+                            <div class="card-body">
+                                <form id="lifecycle-form">
+                                    <div class="mb-3">
+                                        <label for="plan-months" class="form-label">Nombre de Mois</label>
+                                        <input type="number" id="plan-months" class="form-control" placeholder="12" value="12" min="1" max="24" required>
+                                        <small class="text-muted">Période de planification (1-24 mois)</small>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="plan-budget" class="form-label">Budget Total (€)</label>
+                                        <input type="number" id="plan-budget" class="form-control" placeholder="1200" value="1200" step="0.01" required>
+                                        <small class="text-muted">Budget total sur la période sélectionnée</small>
+                                    </div>
+                                    
+                                    <button type="button" class="btn btn-primary w-100" onclick="generateLifecyclePlan()">
+                                        <i class="bi bi-search"></i> Générer Plan
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">📊 Plan Généré</div>
+                            <div class="card-body" id="lifecycle-results">
+                                <p class="text-muted">Le plan s'affichera ici...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="app-refactored.js"></script>
+    
+    <script>
+        // Activer les mises à jour du dashboard
+        setInterval(async () => {
+            // Mettre à jour les stats
+            const total = AppState.abonnements.reduce((sum, a) => sum + (a.prixMensuel || 0), 0);
+            
+            document.getElementById('stat-count').textContent = AppState.abonnements.length;
+            document.getElementById('stat-total').textContent = '€' + total.toFixed(2);
+            
+            if (AppState.analytics.health?.healthScore) {
+                document.getElementById('stat-health').textContent = AppState.analytics.health.healthScore + '%';
+            }
+            
+            if (AppState.analytics.optimize?.suggestions?.[0]) {
+                document.getElementById('stat-savings').textContent = '€' + AppState.analytics.optimize.suggestions[0].savingsAmount.toFixed(2);
+            }
+            
+            // Mettre à jour les containers
+            if (AppState.analytics.forecast?.projection) {
+                document.getElementById('forecast-container').innerHTML = AppState.analytics.forecast.projection.map((m, i) => `
+                    <div class="mb-2">
+                        <strong>+${i+1} mois:</strong> €${m.toFixed(2)}
+                        <div class="progress mt-1">
+                            <div class="progress-bar" style="width: ${(m / Math.max(...AppState.analytics.forecast.projection)) * 100}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            if (AppState.analytics.anomalies?.anomalies?.length > 0) {
+                document.getElementById('anomalies-container').innerHTML = AppState.analytics.anomalies.anomalies.map(a => `
+                    <div class="alert alert-warning mb-2">
+                        <strong>${a.service}:</strong> ${a.reason}
+                    </div>
+                `).join('');
+            } else {
+                document.getElementById('anomalies-container').innerHTML = '<p class="text-success">✅ Aucune anomalie détectée</p>';
+            }
+            
+            if (AppState.analytics.optimize?.suggestions?.length > 0) {
+                document.getElementById('optimize-container').innerHTML = AppState.analytics.optimize.suggestions.map(s => `
+                    <div class="alert alert-info mb-2">
+                        <strong>${s.service}:</strong> ${s.action}<br>
+                        <small>Économies: €${s.savingsAmount.toFixed(2)}</small>
+                    </div>
+                `).join('');
+            }
+            
+            if (AppState.analytics.expiring?.expiringSubscriptions?.length > 0) {
+                document.getElementById('expiring-container').innerHTML = AppState.analytics.expiring.expiringSubscriptions.map(e => `
+                    <div class="alert alert-danger mb-2">
+                        <strong>${e.nomService}</strong> expire le ${new Date(e.dateFin).toLocaleDateString()}
+                    </div>
+                `).join('');
+            }
+        }, 2000);
+        
+        // Import/Export functions
+        async function importFile() {
+            const file = document.getElementById('import-file').files[0];
+            if (!file) {
+                alert('Sélectionnez un fichier');
+                return;
+            }
+            
+            const text = await file.text();
+            
+            try {
+                const endpoint = file.name.endsWith('.csv') 
+                    ? API.endpoints.importCsv 
+                    : API.endpoints.importAbonnements;
+                
+                await APIHelper.post(endpoint, text.startsWith('[') ? JSON.parse(text) : text);
+                alert('✅ Import réussi');
+                await AbonnementManager.loadAll();
+            } catch (err) {
+                alert('❌ Erreur import: ' + err.message);
+            }
+        }
+        
+        async function exportJSON() {
+            const data = JSON.stringify(AppState.abonnements, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'abonnements.json';
+            link.click();
+        }
+        
+        async function exportCSV() {
+            if (AppState.abonnements.length === 0) {
+                alert('Aucune donnée à exporter');
+                return;
+            }
+            
+            const headers = ['ID', 'Service', 'Client', 'Date Début', 'Date Fin', 'Prix', 'Catégorie'];
+            const rows = AppState.abonnements.map(a => [
+                a.id, a.nomService, a.clientName, a.dateDebut, a.dateFin, a.prixMensuel, a.categorie
+            ]);
+            
+            const csv = [headers, ...rows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'abonnements.csv';
+            link.click();
+        }
+        
+        document.getElementById('app-status').textContent = 'Status: ✅ Prêt';
+    </script>
+</body>
+</html>
