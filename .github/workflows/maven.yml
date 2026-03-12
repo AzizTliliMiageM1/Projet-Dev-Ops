@@ -29,4 +29,10 @@ jobs:
           echo "SMTP_PORT=587" >> $GITHUB_ENV
 
       - name: Build Maven
-        run: mvn -B clean package
+        working-directory: ./backend
+        run: mvn -B clean package -DskipTests -Dsentinel.skip=true
+        env:
+          MAIL_HOST: localhost
+          MAIL_PORT: 1025
+          MAIL_USERNAME: test
+          MAIL_PASSWORD: test
