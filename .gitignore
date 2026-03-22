@@ -31,3 +31,5 @@ dependency-reduced-pom.xml
 *.log
 # Git backup dirs
 .git.bak_*
+backend/abonnements.txt
+docs/rapport/
