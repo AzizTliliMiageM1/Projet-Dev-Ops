@@ -180,6 +180,7 @@ Affiche:
 
 - **Aziz TLILI** (41006201)
 - **Maissara FERKOUS** (42006149)
+- **Thi Mai Chi DOAN** (40016084)
 
 ## 📋 Projet
 
