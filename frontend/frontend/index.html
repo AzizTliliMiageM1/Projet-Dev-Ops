@@ -142,38 +142,37 @@
           <i class="bi bi-search"></i>
           Recherche & Filtres
         </h2>
-        
-        <div class="row g-3">
-          <div class="col-md-5">
-            <label class="form-label-modern">
+
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-5">
+            <label for="searchInput" class="form-label-modern">
               <i class="bi bi-search me-2"></i>Recherche globale
             </label>
-            <input 
-              type="text" 
-              id="searchInput" 
-              class="form-control form-control-modern" 
-              placeholder="Rechercher par client, service, catégorie...">
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control form-control-modern"
+              placeholder="Rechercher par client, service, catégorie..." />
           </div>
-          
-          <div class="col-md-2">
-            <label class="form-label-modern">
+
+          <div class="col-12 col-sm-6 col-lg-2">
+            <label for="statusFilter" class="form-label-modern">
               <i class="bi bi-funnel me-2"></i>Statut
             </label>
-            <select id="statusFilter" class="form-control form-control-modern">
+            <select id="statusFilter" class="form-select form-control-modern filter-select">
               <option value="">Tous</option>
               <option value="actif">Actifs</option>
               <option value="expire">Expirés</option>
               <option value="bientot-expire">Expire bientôt</option>
-              <!-- ⭐ nouveau filtre favoris -->
               <option value="favoris">Favoris ⭐</option>
             </select>
           </div>
-          
-          <div class="col-md-3">
-            <label class="form-label-modern">
+
+          <div class="col-12 col-sm-6 col-lg-3">
+            <label for="sortSelect" class="form-label-modern">
               <i class="bi bi-sort-down me-2"></i>Trier par
             </label>
-            <select id="sortSelect" class="form-control form-control-modern">
+            <select id="sortSelect" class="form-select form-control-modern filter-select">
               <option value="date-desc">Plus récent</option>
               <option value="date-asc">Plus ancien</option>
               <option value="client-asc">Client A-Z</option>
@@ -182,11 +181,10 @@
               <option value="prix-asc">Prix croissant</option>
             </select>
           </div>
-          
-          <div class="col-md-2">
-            <label class="form-label-modern" style="opacity: 0;">.</label>
-            <button id="alertesBtn" class="btn btn-warning w-100">
-              <i class="bi bi-bell me-1"></i> Alertes
+
+          <div class="col-12 col-lg-2">
+            <button id="alertesBtn" class="btn btn-warning w-100 filter-btn">
+              <i class="bi bi-bell me-1"></i>Alertes
             </button>
           </div>
         </div>
