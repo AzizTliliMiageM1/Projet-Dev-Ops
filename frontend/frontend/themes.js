@@ -38,33 +38,90 @@ const THEMES = {
     }
 };
 
+const STORAGE_KEYS = {
+    USER_THEME: 'userTheme',
+    GLOBAL_THEME: 'globalTheme'
+};
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+function isValidHexColor(value) {
+    return /^#[0-9A-Fa-f]{6}$/.test(value);
+}
+
+function isValidTheme(theme) {
+    return theme
+        && isValidHexColor(theme.primary)
+        && isValidHexColor(theme.secondary)
+        && isValidHexColor(theme.accent);
+}
+
+function getDefaultTheme() {
+    return THEMES.violet;
+}
+
+function getCurrentThemeFromInputs() {
+    return {
+        primary: $('primaryColor')?.value || getDefaultTheme().primary,
+        secondary: $('secondaryColor')?.value || getDefaultTheme().secondary,
+        accent: $('accentColor')?.value || getDefaultTheme().accent
+    };
+}
+
 // Charger le thème sauvegardé
 function loadSavedTheme() {
-    const savedTheme = localStorage.getItem('userTheme');
-    if (savedTheme) {
-        const theme = JSON.parse(savedTheme);
-        applyThemeColors(theme.primary, theme.secondary, theme.accent);
-        updateColorPickers(theme.primary, theme.secondary, theme.accent);
+    try {
+        const raw = localStorage.getItem(STORAGE_KEYS.USER_THEME);
+        if (!raw) {
+            const fallback = getDefaultTheme();
+            applyThemeColors(fallback.primary, fallback.secondary, fallback.accent, false);
+            updateColorPickers(fallback.primary, fallback.secondary, fallback.accent);
+            setActiveThemeCard('violet');
+            return;
+        }
+
+        const savedTheme = JSON.parse(raw);
+
+        if (!isValidTheme(savedTheme)) {
+            throw new Error('Theme invalide dans le localStorage');
+        }
+
+        applyThemeColors(savedTheme.primary, savedTheme.secondary, savedTheme.accent, false);
+        updateColorPickers(savedTheme.primary, savedTheme.secondary, savedTheme.accent);
+        setActiveCardFromTheme(savedTheme);
+    } catch (error) {
+        console.warn('Impossible de charger le thème sauvegardé :', error);
+        const fallback = getDefaultTheme();
+        applyThemeColors(fallback.primary, fallback.secondary, fallback.accent, true);
+        updateColorPickers(fallback.primary, fallback.secondary, fallback.accent);
+        setActiveThemeCard('violet');
     }
 }
 
 // Appliquer les couleurs du thème
-function applyThemeColors(primary, secondary, accent) {
+function applyThemeColors(primary, secondary, accent, persist = true) {
+    if (![primary, secondary, accent].every(isValidHexColor)) {
+        console.warn('Couleurs du thème invalides:', { primary, secondary, accent });
+        return;
+    }
+
     document.documentElement.style.setProperty('--primary-color', primary);
     document.documentElement.style.setProperty('--secondary-color', secondary);
     document.documentElement.style.setProperty('--accent-color', accent);
-    
-    // Mettre à jour le gradient de fond
-    const bgGradient = `radial-gradient(circle at 20% 50%, ${hexToRgba(primary, 0.3)}, transparent 50%),
-                        radial-gradient(circle at 80% 80%, ${hexToRgba(secondary, 0.2)}, transparent 50%),
-                        linear-gradient(135deg, #1e1e2e 0%, #2d1b4e 100%)`;
+
+    const bgGradient = `
+        radial-gradient(circle at 20% 50%, ${hexToRgba(primary, 0.3)}, transparent 50%),
+        radial-gradient(circle at 80% 80%, ${hexToRgba(secondary, 0.2)}, transparent 50%),
+        linear-gradient(135deg, #1e1e2e 0%, #2d1b4e 100%)
+    `.trim();
+
     document.documentElement.style.setProperty('--bg-gradient', bgGradient);
-    
-    // Sauvegarder le thème
-    saveTheme(primary, secondary, accent);
-    
-    // Appliquer aussi aux autres pages
-    applyThemeGlobally(primary, secondary, accent);
+
+    if (persist) {
+        saveTheme(primary, secondary, accent);
+    }
 }
 
 // Sauvegarder le thème
@@ -75,13 +132,9 @@ function saveTheme(primary, secondary, accent) {
         accent,
         timestamp: new Date().toISOString()
     };
-    localStorage.setItem('userTheme', JSON.stringify(theme));
-}
 
-// Appliquer le thème globalement
-function applyThemeGlobally(primary, secondary, accent) {
-    // Enregistrer dans localStorage pour que toutes les pages l'utilisent
-    localStorage.setItem('globalTheme', JSON.stringify({
+    localStorage.setItem(STORAGE_KEYS.USER_THEME, JSON.stringify(theme));
+    localStorage.setItem(STORAGE_KEYS.GLOBAL_THEME, JSON.stringify({
         primary,
         secondary,
         accent
@@ -90,106 +143,151 @@ function applyThemeGlobally(primary, secondary, accent) {
 
 // Convertir hex en rgba
 function hexToRgba(hex, alpha) {
+    if (!isValidHexColor(hex)) {
+        return `rgba(255, 255, 255, ${alpha})`;
+    }
+
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
+
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
 // Mettre à jour les color pickers
 function updateColorPickers(primary, secondary, accent) {
-    document.getElementById('primaryColor').value = primary;
-    document.getElementById('secondaryColor').value = secondary;
-    document.getElementById('accentColor').value = accent;
-    
-    document.getElementById('primaryHex').textContent = primary;
-    document.getElementById('secondaryHex').textContent = secondary;
-    document.getElementById('accentHex').textContent = accent;
+    if ($('primaryColor')) $('primaryColor').value = primary;
+    if ($('secondaryColor')) $('secondaryColor').value = secondary;
+    if ($('accentColor')) $('accentColor').value = accent;
+
+    if ($('primaryHex')) $('primaryHex').textContent = primary;
+    if ($('secondaryHex')) $('secondaryHex').textContent = secondary;
+    if ($('accentHex')) $('accentHex').textContent = accent;
+}
+
+function setActiveThemeCard(themeName) {
+    document.querySelectorAll('.theme-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.theme === themeName);
+    });
+}
+
+function setActiveCardFromTheme(theme) {
+    const matchedThemeName = Object.keys(THEMES).find(key => {
+        const preset = THEMES[key];
+        return (
+            preset.primary === theme.primary &&
+            preset.secondary === theme.secondary &&
+            preset.accent === theme.accent
+        );
+    });
+
+    if (matchedThemeName) {
+        setActiveThemeCard(matchedThemeName);
+    } else {
+        document.querySelectorAll('.theme-card').forEach(card => card.classList.remove('active'));
+    }
 }
 
 // Appliquer un thème prédéfini
 function applyPresetTheme(themeName) {
     const theme = THEMES[themeName];
-    if (theme) {
-        applyThemeColors(theme.primary, theme.secondary, theme.accent);
-        updateColorPickers(theme.primary, theme.secondary, theme.accent);
-        
-        // Mettre à jour l'état actif des cartes
-        document.querySelectorAll('.theme-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        document.querySelector(`[data-theme="${themeName}"]`).classList.add('active');
+    if (!theme) return;
+
+    applyThemeColors(theme.primary, theme.secondary, theme.accent, true);
+    updateColorPickers(theme.primary, theme.secondary, theme.accent);
+    setActiveThemeCard(themeName);
+}
+
+// Animation de confirmation
+function animateButtonFeedback(button, successText, resetDelay = 2000, customBackground = '') {
+    if (!button) return;
+
+    const originalText = button.innerHTML;
+    const originalBackground = button.style.background;
+
+    button.innerHTML = successText;
+    if (customBackground) {
+        button.style.background = customBackground;
     }
+
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.background = originalBackground;
+    }, resetDelay);
 }
 
 // Appliquer le thème personnalisé
-function applyCustomTheme() {
-    const primary = document.getElementById('primaryColor').value;
-    const secondary = document.getElementById('secondaryColor').value;
-    const accent = document.getElementById('accentColor').value;
-    
-    applyThemeColors(primary, secondary, accent);
-    
-    // Animation de confirmation
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Thème Appliqué !';
-    btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-    
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.style.background = '';
-    }, 2000);
+function applyCustomTheme(button = null) {
+    const { primary, secondary, accent } = getCurrentThemeFromInputs();
+
+    applyThemeColors(primary, secondary, accent, true);
+    setActiveCardFromTheme({ primary, secondary, accent });
+
+    animateButtonFeedback(
+        button,
+        '<i class="bi bi-check-circle-fill me-2"></i> Thème appliqué !',
+        2000,
+        'linear-gradient(135deg, #10b981, #059669)'
+    );
 }
 
 // Réinitialiser au thème par défaut
-function resetTheme() {
-    const defaultTheme = THEMES.violet;
-    applyThemeColors(defaultTheme.primary, defaultTheme.secondary, defaultTheme.accent);
+function resetTheme(button = null) {
+    const defaultTheme = getDefaultTheme();
+
+    applyThemeColors(defaultTheme.primary, defaultTheme.secondary, defaultTheme.accent, true);
     updateColorPickers(defaultTheme.primary, defaultTheme.secondary, defaultTheme.accent);
-    
-    // Réactiver la carte du thème violet
-    document.querySelectorAll('.theme-card').forEach(card => {
-        card.classList.remove('active');
-    });
-    document.querySelector('[data-theme="violet"]').classList.add('active');
-    
-    // Animation
-    const btn = event.target;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i> Réinitialisé !';
-    
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-    }, 2000);
+    setActiveThemeCard('violet');
+
+    animateButtonFeedback(
+        button,
+        '<i class="bi bi-check-circle-fill me-2"></i> Réinitialisé !'
+    );
 }
 
-// Event listeners pour les color pickers
+// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-    // Charger le thème sauvegardé
     loadSavedTheme();
-    
-    // Color pickers
-    const primaryPicker = document.getElementById('primaryColor');
-    const secondaryPicker = document.getElementById('secondaryColor');
-    const accentPicker = document.getElementById('accentColor');
-    
-    primaryPicker.addEventListener('input', (e) => {
-        document.getElementById('primaryHex').textContent = e.target.value;
-        applyThemeColors(e.target.value, secondaryPicker.value, accentPicker.value);
-    });
-    
-    secondaryPicker.addEventListener('input', (e) => {
-        document.getElementById('secondaryHex').textContent = e.target.value;
-        applyThemeColors(primaryPicker.value, e.target.value, accentPicker.value);
-    });
-    
-    accentPicker.addEventListener('input', (e) => {
-        document.getElementById('accentHex').textContent = e.target.value;
-        applyThemeColors(primaryPicker.value, secondaryPicker.value, e.target.value);
-    });
-    
-    // Cartes de thèmes prédéfinis
+
+    const primaryPicker = $('primaryColor');
+    const secondaryPicker = $('secondaryColor');
+    const accentPicker = $('accentColor');
+
+    if (primaryPicker && secondaryPicker && accentPicker) {
+        primaryPicker.addEventListener('input', e => {
+            $('primaryHex').textContent = e.target.value;
+            applyThemeColors(e.target.value, secondaryPicker.value, accentPicker.value, false);
+        });
+
+        secondaryPicker.addEventListener('input', e => {
+            $('secondaryHex').textContent = e.target.value;
+            applyThemeColors(primaryPicker.value, e.target.value, accentPicker.value, false);
+        });
+
+        accentPicker.addEventListener('input', e => {
+            $('accentHex').textContent = e.target.value;
+            applyThemeColors(primaryPicker.value, secondaryPicker.value, e.target.value, false);
+        });
+
+        primaryPicker.addEventListener('change', () => {
+            const { primary, secondary, accent } = getCurrentThemeFromInputs();
+            saveTheme(primary, secondary, accent);
+            setActiveCardFromTheme({ primary, secondary, accent });
+        });
+
+        secondaryPicker.addEventListener('change', () => {
+            const { primary, secondary, accent } = getCurrentThemeFromInputs();
+            saveTheme(primary, secondary, accent);
+            setActiveCardFromTheme({ primary, secondary, accent });
+        });
+
+        accentPicker.addEventListener('change', () => {
+            const { primary, secondary, accent } = getCurrentThemeFromInputs();
+            saveTheme(primary, secondary, accent);
+            setActiveCardFromTheme({ primary, secondary, accent });
+        });
+    }
+
     document.querySelectorAll('.theme-card').forEach(card => {
         card.addEventListener('click', () => {
             const themeName = card.dataset.theme;
@@ -198,9 +296,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Export pour utilisation globale
+// Export global
 window.ThemeManager = {
+    THEMES,
     loadSavedTheme,
     applyThemeColors,
-    THEMES
+    applyPresetTheme,
+    applyCustomTheme,
+    resetTheme
 };
