@@ -1,7 +1,7 @@
 // Vérifie la session et met à jour la navbar
 async function checkSessionAndUpdateNavbar() {
     try {
-        const response = await fetch('/api/session');
+        const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.session));
         const data = await response.json();
         
 if (data.authenticated) {
@@ -59,7 +59,7 @@ if (data.authenticated) {
         registerBtn.href = '#';
         registerBtn.onclick = async (e) => {
             e.preventDefault();
-            await fetch('/api/logout', { method: 'POST' });
+            await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.logout), { method: 'POST' });
             window.location.href = '/home.html';
         };
     }
