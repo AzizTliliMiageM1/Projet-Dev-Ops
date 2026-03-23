@@ -147,7 +147,7 @@ GET    /api/abonnements/export/csv  → Exporter CSV
 
 ---
 
-## DIAPOSITIVE 3: FEATURE #2 - "Analytics & Optimisations" (2 min)
+## DIAPOSITIVE 3: FEATURES #2, #3, #4 - "Analytics, Emails & Devises" (2 min)
 
 **C'est le "moteur" intelligente du projet. La vraie valeur.**
 
@@ -276,6 +276,179 @@ GET  /analytics/anomalies        → Services suspects/anomalies
 GET  /analytics/monthly-report   → Bilan mensuel
 POST /portfolio/rebalance        → Analyse réduction coûts
 POST /portfolio/lifecycle-plan   → Calendrier de renouvellement
+```
+
+---
+
+### 🔹 FEATURE #3: AUTHENTIFICATION
+
+**Pourquoi?** Multi-user: Chaque personne voit QUE ses données, pas celles des autres
+
+**Comment?**
+
+1. **Registration (Inscription)**
+   ```
+   Email: toi@example.com
+   Password: monMotDePasse123
+   Pseudo: Mon Nom
+   
+   → App crée un compte
+   → Envoie un email de confirmation
+   ```
+
+2. **Email Confirmation**
+   ```
+   Email: "Clique ici pour confirmer: [lien unique]"
+   → Une fois cliqué: Compte activé
+   ```
+
+3. **Login (Connexion)**
+   ```
+   Email + Password → Session créée
+   → Accès à tes données personnelles
+   ```
+
+4. **Session Check**
+   ```
+   GET /api/session
+   → Response: {"authenticated": true, "email": "toi@example.com"}
+   ```
+
+**API ENDPOINTS:**
+```
+POST /api/register          → Créer compte
+GET  /api/confirm           → Valider email
+POST /api/login             → Se connecter
+GET  /api/session           → Vérifie si connecté
+POST /api/logout            → Se déconnecter
+```
+
+---
+
+### 🔹 FEATURE #4: ALERTES EMAIL (via Mailgun API)
+
+**Pourquoi?** Te notifier automatiquement des trucs importants
+
+**3 types d'alertes:**
+
+**1. Alerte Expiration**
+```
+Email reçu: "Ton abonnement Slack expire dans 7 jours!"
+Contenu: Service, prix, date d'expiration
+Action: Te rappeler de renouveler ou canceller
+```
+
+**2. Dépassement Budget**
+```
+Email reçu: "Tu as dépassé ton budget!"
+Budget: 300€/mois
+Dépense actuelle: 347€/mois
+Dépassement: +47€
+
+Suggestion: "Réduis tes dépenses de 47€ pour revenir dans le budget"
+```
+
+**3. Rapport Mensuel**
+```
+Email reçu: "Ton rapport mensuel de Mars"
+
+Contenu:
+├─ Nombre d'abonnements: 12
+├─ Coût total: 347€
+├─ Services expirés ce mois: 2
+├─ Nouveaux services: 1
+├─ Économies recommandées: 120€
+
+Lien: "Voir le détail dans l'app"
+```
+
+**Intégration Mailgun:**
+```
+Mailgun = service externe pour envoyer des emails
+L'app communique avec Mailgun via API
+Mailgun envoie les emails réels
+
+Exemple d'intégration:
+{
+  "from": "noreply@gestion-abos.com",
+  "to": "toi@example.com",
+  "subject": "Alerte: Slack expire bientôt!",
+  "html": "<h1>Ton abonnement Slack expire dans 7 jours...</h1>"
+}
+```
+
+**API ENDPOINTS:**
+```
+POST /api/email/send-alert-expiration    → Envoyer alerte expiration
+POST /api/email/send-rapport-mensuel     → Envoyer rapport mensuel
+POST /api/email/send-alerte-budget       → Envoyer alerte budget
+GET  /api/email/status                   → Vérifier connectivité Mailgun
+```
+
+---
+
+### 🔹 FEATURE #5: CONVERSION DE DEVISES (via ExchangeRate API)
+
+**Pourquoi?** Tes abonnements sont en USD, GBP, EUR... besoin de les comparer
+
+**Scenarios réels:**
+
+```
+1. Slack est en USD (12 USD/mois)
+   → Besoin de savoir: 12 USD = combien en EUR?
+   → Réponse: ~11€
+   
+   Pourquoi? Taux de change USD→EUR fluctue
+   Le coût en EUR change donc aussi
+
+2. T'as des services en GBP, USD, EUR, JPY
+   → Besoin d'une valeur de référence unique (EUR)
+   → Pour calculer le coût RÉEL en euros
+```
+
+**Fonctionnement:**
+
+```
+Service: GitHub Pro
+Prix: 21 USD/mois
+
+Fonction: "Convertis en EUR"
+├─ Appelle ExchangeRate API
+├─ Récupère: 1 USD = 0.92 EUR
+├─ Calcul: 21 * 0.92 = 19.32€
+└─ Résultat: 19.32€/mois en euros
+```
+
+**Analyses avec conversion:**
+
+```
+Dashboard avec tous les prix en EUR (normalisé):
+├─ Slack (USD):    12 USD  →  11.04€
+├─ GitHub (USD):   21 USD  →  19.32€
+├─ Notion (GBP):   8 GBP   →   9.44€
+├─ AWS (EUR):      50€     →   50.00€
+└─ TOTAL:          89.80€ (pas 91€, c'est plus précis)
+```
+
+**Analyse de stabilité:**
+
+```
+Question: "Cette devise est stable?"
+
+Analyse: "Compare la devise sur les 30 derniers jours"
+├─ Si stable: Pas de surprise sur les paiements
+├─ Si volatile: Risque de dépassement budget
+│  (Ex: JPY fluctue beaucoup → coût imprévisible)
+
+Recommandation: "Change ton service AWS en EUR si possible"
+```
+
+**API ENDPOINTS:**
+```
+POST /api/currency/convert      → Convertir montant
+POST /api/currency/to-eur       → Convertir n'importe quoi en EUR
+POST /api/currency/stabilite    → Analyser volatilité devise
+GET  /api/currency/status       → Vérifier API ExchangeRate
 ```
 
 ---
@@ -543,16 +716,33 @@ docker-compose up --build
    ├─ Import/Export CSV
    └─ Multi-user avec authentification
 
-✅ Feature #2: Analytics & Optimisations
+✅ Feature #2: Analytics & Optimisations avancées
    ├─ Détection anomalies (prix bizarres, services non utilisés)
    ├─ Recommandations d'économies (combien tu peux sauver)
    ├─ Forecasting (prédictions 6 mois)
    ├─ Calendrier de renouvellement
    └─ Portfolio rebalancing (réorganisation intelligente)
 
+✅ Feature #3: Authentification Multi-user
+   ├─ Registration + Email confirmation
+   ├─ Login/Logout
+   ├─ Chacun voit que SES données
+   └─ Session management
+
+✅ Feature #4: Email Alerts (via Mailgun)
+   ├─ Alerte expiration abonnement
+   ├─ Alerte dépassement budget
+   ├─ Rapport mensuel automatique
+   └─ Intégration API Mailgun
+
+✅ Feature #5: Conversion de Devises (via ExchangeRate API)
+   ├─ Convertis USD/GBP/etc en EUR
+   ├─ Analyse volatilité des devises
+   ├─ Coûts normalisés en unique devise
+   └─ Intégration API ExchangeRate
+
 ✅ Infrastructure moderne
    ├─ 100% containerisé (Docker Compose)
-   ├─ Multi-user avec auth
    ├─ Base de données persistante
    └─ Déploiement reproducible
 
@@ -560,7 +750,7 @@ docker-compose up --build
    ├─ 5 test scripts automatisés
    ├─ CI/CD pipeline (GitHub Actions)
    ├─ 100% build success rate
-   └─ Code quality: 21 endpoints, 60-70% coverage
+   └─ Code quality: 30+ endpoints, 60-70% coverage
 ```
 
 ### Points clé du projet
@@ -667,13 +857,22 @@ Résultat: "Voilà, c'est 100% fonctionnel et testé"
 🎯 1. Feature #1 = La base (facile à comprendre)
       "Juste une app web pour lister des abonnements"
 
-🎯 2. Feature #2 = La valeur (l'intelligence)
+🎯 2. Feature #2 = L'intelligence (analyse + économies)
       "Mais elle te dit combien tu peux économiser!"
 
-🎯 3. Docker = L'infrastructure (la confiance)
+🎯 3. Feature #3 = La sécurité (multi-user)
+      "Chacun voit que ses propres données"
+
+🎯 4. Feature #4 = Les notifications (emails intelligents)
+      "Tu reçois des alertes automatiques"
+
+🎯 5. Feature #5 = La flexibilité (devises mondiales)
+      "Fonctionne avec n'importe quelle devise"
+
+🎯 6. Docker = L'infrastructure (la confiance)
       "Tout le monde peut reproduire exactement la même chose"
 
-🎯 4. Tests = La qualité (la sécurité)
+🎯 7. Tests = La qualité (la sécurité)
       "On valide automatiquement que rien n'est cassé"
 ```
 
