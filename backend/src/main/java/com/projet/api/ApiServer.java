@@ -184,6 +184,42 @@ public class ApiServer {
                 }
             });
 
+            // 🔵 SMART SUBSCRIPTION BENCHMARK
+            get("/abonnements/:id/benchmark", (req, res) -> {
+                res.type("application/json");
+                
+                String abonnementId = req.params(":id");
+                
+                AbonnementRepository repo = getOrCreateRepo(req);
+                var opt = repo.findByUuid(abonnementId);
+                
+                if (opt.isEmpty()) {
+                    res.status(404);
+                    return mapper.writeValueAsString(Map.of("error", "Abonnement not found"));
+                }
+                
+                Abonnement abo = opt.get();
+                
+                try {
+                    com.projet.service.BenchmarkService benchmarkService = 
+                        new com.projet.service.BenchmarkServiceImpl();
+                    
+                    com.projet.backend.domain.BenchmarkResult result = benchmarkService.benchmark(
+                        abonnementId,
+                        abo.getNomService(),
+                        abo.getPrixMensuel()
+                    );
+                    
+                    return mapper.writeValueAsString(result);
+                    
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(
+                        Map.of("error", "Erreur lors du benchmark : " + e.getMessage())
+                    );
+                }
+            });
+
             // 🔵 PRÉVISION DU COÛT SUR 3 MOIS
             get("/prediction", (req, res) -> {
                 res.type("application/json");
