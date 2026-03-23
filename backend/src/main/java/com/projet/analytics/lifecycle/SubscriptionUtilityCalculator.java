@@ -41,20 +41,20 @@ public class SubscriptionUtilityCalculator {
         // Calcul final : combinaison pondérée
         double utility = 
             (valueScore * 0.4) - 
-            (costPenalty * 0.3) - 
+            (costPenalty * 0.1) - 
             (churnRisk / 100.0 * 0.2) + 
             (predictedUsage * 0.1);
         
         // Normaliser le score entre 0 et 100
-        return Math.max(0, Math.min(100, utility * 10));
+        return Math.max(0, Math.min(100, utility * 5));
     }
 
     /**
-     * Normalise le coût en pénalité [0-100].
+     * Normalise le coût en pénalité [0-10] pour équilibrer la formule.
      */
     private double normalizeCost(double price, double maxPrice) {
         if (maxPrice == 0) return 0;
-        return (price / maxPrice) * 100;
+        return (price / maxPrice) * 10;
     }
 
     /**

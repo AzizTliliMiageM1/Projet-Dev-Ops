@@ -1,12 +1,12 @@
 package com.projet.analytics.optimization;
 
-import com.projet.backend.domain.Abonnement;
-
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.projet.backend.domain.Abonnement;
 
 public class SubscriptionOptimizationServiceImpl implements SubscriptionOptimizationService {
 
@@ -50,10 +50,10 @@ public class SubscriptionOptimizationServiceImpl implements SubscriptionOptimiza
     // ----------------------------
     // coût — modéré
     // ----------------------------
-    score -= sub.getPrixMensuel() * 1.2;
+    score -= sub.getPrixMensuel() * 0.8;
 
     // ----------------------------
-    // inactivité — progressive (adoucie)
+    // inactivité — plus progressive
     // ----------------------------
     long daysInactive = ChronoUnit.DAYS.between(
             Optional.ofNullable(sub.getDerniereUtilisation())
@@ -62,7 +62,7 @@ public class SubscriptionOptimizationServiceImpl implements SubscriptionOptimiza
     );
 
     if (daysInactive > 30) {
-        score -= (daysInactive - 30) * 0.15; // Réduction de la pénalité d'inactivité
+        score -= (daysInactive - 30) * 0.7; // Inactivité pénalité
     }
 
     // ----------------------------
@@ -73,7 +73,7 @@ public class SubscriptionOptimizationServiceImpl implements SubscriptionOptimiza
             .filter(m -> m > 0)
             .orElse(0L);
 
-    score -= monthsRemaining * 1.0;
+    score -= monthsRemaining * 0.5;
 
     // ----------------------------
     // bonus fréquence

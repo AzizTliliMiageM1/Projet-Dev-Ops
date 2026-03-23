@@ -1,0 +1,11 @@
+Service;DateDebut;DateFin;PrixMensuel;ClientName;DerniereUtilisation;Categorie
+Netflix;2024-06-01;2026-06-01;15.99;TestUser;2025-03-20;Streaming
+Spotify;2024-01-15;2026-01-15;9.99;TestUser;2025-03-19;Musique
+Microsoft 365;2024-09-01;2026-09-01;7.99;TestUser;2025-03-15;Logiciel
+Adobe Creative Cloud;2024-03-01;2026-03-01;54.99;TestUser;2025-02-20;Logiciel
+Amazon Prime Video;2024-12-01;2026-12-01;14.99;TestUser;2025-03-10;Streaming
+Slack;2024-07-01;2026-07-01;12.50;TestUser;2025-03-01;Productivité
+Notion Plus;2024-11-01;2026-11-01;10.00;TestUser;2025-02-15;Productivité
+Canva Pro;2024-08-01;2026-08-01;13.00;TestUser;2025-01-10;Design
+ChatGPT Plus;2024-10-01;2026-10-01;20.00;TestUser;2024-12-20;IA
+Google One;2024-05-01;2026-05-01;9.99;TestUser;2025-03-15;Stockage
