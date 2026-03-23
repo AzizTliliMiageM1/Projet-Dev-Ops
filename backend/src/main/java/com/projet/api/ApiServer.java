@@ -708,15 +708,6 @@ public class ApiServer {
             });
 
             // =================================================
-            // 🔵  LOGOUT (pour navbar)
-            // =================================================
-            post("/logout", (req, res) -> {
-                req.session().invalidate();
-                return "Déconnecté.";
-            });
-
-
-            // =================================================
             //     🔵  INSCRIPTION UTILISATEUR
             // =================================================
             post("/register", (req, res) -> {
@@ -782,45 +773,61 @@ public class ApiServer {
                 return "Email confirmé ! Vous pouvez maintenant vous connecter.";
             });
 
-
             // =================================================
-            // 🔵  CONNEXION UTILISATEUR (SESSION)
+            // 🔵  CONNEXION UTILISATEUR (JSON BODY)
             // =================================================
             post("/login", (req, res) -> {
-                res.type("text/plain");
+                res.type("application/json");
 
-                String email = req.queryParams("email");
-                String password = req.queryParams("password");
+                try {
+                    Map<String, String> body = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, String>>() {});
+                    String email = body.get("email");
+                    String password = body.get("password");
 
-                FileUserRepository repoUser = new FileUserRepository();
-                User user = repoUser.findByEmail(email);
+                    if (email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Email et mot de passe requis"));
+                    }
 
-                if (user == null) {
+                    FileUserRepository repoUser = new FileUserRepository();
+                    User user = repoUser.findByEmail(email);
+
+                    if (user == null) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Utilisateur inconnu"));
+                    }
+
+                    if (!user.getPassword().equals(password)) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Mot de passe incorrect"));
+                    }
+
+                    if (!user.isConfirmed()) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Veuillez confirmer votre compte avant de vous connecter."));
+                    }
+
+                    req.session(true).attribute("user_email", email);
+
+                    return mapper.writeValueAsString(Map.of(
+                        "success", true,
+                        "message", "Connexion réussie",
+                        "email", email,
+                        "pseudo", user.getPseudo()
+                    ));
+                } catch (Exception e) {
                     res.status(400);
-                    return "Utilisateur inconnu";
+                    return mapper.writeValueAsString(Map.of("error", "Erreur lors du traitement de la requête: " + e.getMessage()));
                 }
-
-                if (!user.getPassword().equals(password)) {
-                    res.status(400);
-                    return "Mot de passe incorrect";
-                }
-
-                if (!user.isConfirmed()) {
-                    res.status(400);
-                    return "Veuillez confirmer votre compte avant de vous connecter.";
-                }
-
-                req.session(true).attribute("user_email", email);
-
-                return "Connexion réussie !";
             });
 
             // =================================================
             // 🔵  LOGOUT
             // =================================================
             post("/logout", (req, res) -> {
+                res.type("application/json");
                 req.session().invalidate();
-                return "Déconnecté.";
+                return mapper.writeValueAsString(Map.of("success", true, "message", "Déconnecté"));
             });
 
             // =================================================
