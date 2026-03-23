@@ -40,6 +40,41 @@ import static spark.Spark.post;
 import static spark.Spark.put;
 import static spark.Spark.staticFiles;
 
+/**
+ * Main REST API server for subscription management system.
+ * 
+ * <p>ApiServer serves as the central REST controller and HTTP layer of the application,
+ * orchestrating all REST endpoints for subscription, user, and analytics operations.
+ * It uses Spark Framework to define and route HTTP requests to appropriate business logic.</p>
+ * 
+ * <p><b>Architecture:</b> Implements the REST adapter pattern in Clean Architecture,
+ * translating HTTP requests to domain operations. Depends on service and repository layers
+ * for business logic and persistence. </p>
+ * 
+ * <p><b>Key Responsibilities:</b></p>
+ * <ul>
+ *   <li>Define and route REST endpoints (subscription management, users, analytics, reports)</li>
+ *   <li>Manage HTTP session state and repository context per user</li>
+ *   <li>Coordinate services (subscription optimization, forecasting, anomaly detection)</li>
+ *   <li>Handle JSON serialization/deserialization with proper date formatting</li>
+ *   <li>Convert domain objects to HTTP response DTOs</li>
+ * </ul>
+ * 
+ * <p><b>Public API Sections:</b></p>
+ * <ul>
+ *   <li>/auth/** - Authentication and user management</li>
+ *   <li>/abonnements/** - Subscription CRUD and analysis</li>
+ *   <li>/dashboard/* - Portfolio analysis and recommendations</li>
+ *   <li>/analytics/** - Advanced analytics and reports</li>
+ *   <li>/static/** - Static web resources</li>
+ * </ul>
+ * 
+ * <p><b>Note:</b> This class violates Single Responsibility Principle (1,099 lines).
+ * Future refactoring should split into multiple controllers by domain.</p>
+ * 
+ * @author Project Team
+ * @version 1.0
+ */
 public class ApiServer {
 
     private static final ForecastService forecastService = new ForecastServiceImpl();

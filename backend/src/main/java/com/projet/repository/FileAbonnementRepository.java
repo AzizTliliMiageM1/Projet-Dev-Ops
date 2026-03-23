@@ -17,6 +17,38 @@ import org.slf4j.LoggerFactory;
 import com.projet.backend.adapter.AbonnementCsvConverter;
 import com.projet.backend.domain.Abonnement;
 
+/**
+ * File-based repository implementation for subscription management.
+ * 
+ * <p>Implements persistent storage of {@link Abonnement} (subscription) objects using
+ * CSV-formatted text files. Each subscription record is serialized to CSV format and
+ * stored in a configurable file path, enabling offline-first and portable data storage.</p>
+ * 
+ * <p><b>Persistence Strategy:</b></p>
+ * <ul>
+ *   <li>Format: CSV with pipe delimiters (service;dateStart;dateEnd;price;client;lastUsed;category)</li>
+ *   <li>Storage: Single file per user context</li>
+ *   <li>Load: Lazy loading on demand (not preloaded into memory)</li>
+ *   <li>Encoding: UTF-8 text file</li>
+ * </ul>
+ * 
+ * <p><b>CRUD Operations:</b></p>
+ * <ul>
+ *   <li>{@code findAll()} - Load all subscriptions from file</li>
+ *   <li>{@code findById()} - Search for specific subscription</li>
+ *   <li>{@code save()} - Persist new or updated subscription</li>
+ *   <li>{@code delete()} - Remove subscription from file</li>
+ * </ul>
+ * 
+ * <p><b>Thread Safety:</b> Not thread-safe; assumes single-threaded file access
+ * per user session. Concurrent access may cause data corruption.</p>
+ * 
+ * @author Project Team
+ * @version 1.0
+ * @see Abonnement
+ * @see AbonnementRepository
+ * @see AbonnementCsvConverter
+ */
 public class FileAbonnementRepository implements AbonnementRepository {
     private final String filePath;
     private static final Logger logger = LoggerFactory.getLogger(FileAbonnementRepository.class);
