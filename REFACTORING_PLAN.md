@@ -13,11 +13,14 @@
 
 ## ✅ Tâches Complétées
 
-### Phase 1 : Nettoyage des Fichiers (DONE)
+### Phase 1 : Nettoyage des Fichiers (✅ COMPLETE)
 - [x] Supprimer PortfolioRebalancer orphelin (analytics/optimization/)
 - [x] Supprimer MainTest.java orphelin
 - [x] Supprimer BACKEND_CLI_MODE.md (fichier généré)
+- [x] Supprimer PortfolioRebalancerTest.java (importait PortfolioRebalancer orphelin)
+- [x] Ajouter package-info.java pour 5 packages majeurs
 - [x] Vérifier compilation après suppression : ✅ SUCCESS
+- [x] Exécuter test suite : 71 tests (5 défaillances pré-existantes, non causées)
 
 ---
 
@@ -82,6 +85,20 @@
 3. **Tests avant et après**
 4. **Revert immédiat en cas de problème**
 5. **Pas de suppression sans backup (git)**
+
+---
+
+## ⚠️ Tests Défaillants (Pré-existants, Non Causés par Refactoring)
+
+| Test | Issue | Priorité |
+|------|-------|----------|
+| SubscriptionUtilityCalculatorTest.calculateUtility_decaysOverMonths | Valeur 0.00 au lieu de décroissance | Medium |
+| SubscriptionUtilityCalculatorTest.calculateUtility_recentlyUsedHigherThanDormant | Récent 0.00 = dormant 0.00 | Medium |
+| SubscriptionOptimizationServiceImplTest.testCasAbonnementInutile | Retourne OPTIMISER au lieu de RESILIER | High |
+| SubscriptionOptimizationServiceImplTest.testPortefeuilleMixte | Retourne RESILIER au lieu de OPTIMISER | High |
+| CommandRouterTest.dashboard_withFile_shouldDisplayPortfolioData | Titre absent du résultat | Medium |
+
+**Action** : À investiguer après Phase 2 (tests n'étaient pas causés par nos modifications)
 
 ---
 
