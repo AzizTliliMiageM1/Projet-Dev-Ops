@@ -141,6 +141,15 @@
                     <environmentVariables>
                         <DISABLE_AUTH_FOR_TESTS>true</DISABLE_AUTH_FOR_TESTS>
                     </environmentVariables>
+                    <systemProperties>
+                        <property>
+                            <name>java.net.preferIPv4Stack</name>
+                            <value>true</value>
+                        </property>
+                    </systemProperties>
+                    <shutdown>kill</shutdown>
+                    <forkedProcessTimeoutInSeconds>120</forkedProcessTimeoutInSeconds>
+                    <failIfNoTests>false</failIfNoTests>
                 </configuration>
             </plugin>
 

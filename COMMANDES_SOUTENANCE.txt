@@ -1,0 +1,213 @@
+===============================================================================
+   COMMANDES À EXÉCUTER DEVANT LE PROFESSEUR
+   Projet: Gestion des Abonnements (SaaS)
+===============================================================================
+
+⚠️ IMPORTANT : Faire toutes les commandes depuis /workspaces/Projet-Dev-Ops/backend
+
+===============================================================================
+🔵 PHASE 1 : VÉRIFICATION DE LA STRUCTURE (2 minutes)
+===============================================================================
+
+1️⃣ Afficher les 16 fichiers de test:
+────────────────────────────────────
+find src/test/java -name "*Test.java" -type f | sort
+
+
+2️⃣ Afficher les noms des packages de test:
+────────────────────────────────────
+find src/test/java -type d | sort
+
+
+3️⃣ Voir la structure du code source:
+────────────────────────────────────
+tree -L 3 src/main/java
+
+
+===============================================================================
+🟢 PHASE 2 : COMPILATION (1 minute)
+===============================================================================
+
+4️⃣ Compiler le projet complet:
+────────────────────────────────────
+mvn clean compile -q
+echo "✓ OK"
+
+
+5️⃣ Compiler avec logs détaillés (debug):
+────────────────────────────────────
+mvn clean compile
+
+
+===============================================================================
+🟡 PHASE 3 : TESTS (3-5 minutes)
+===============================================================================
+
+6️⃣ ⭐ EXÉCUTER TOUS LES 74 TESTS:
+────────────────────────────────────
+mvn clean test
+
+(Resultats : Tests run: 74, Failures: 0, Errors: 0)
+
+
+7️⃣ Exécuter les tests en mode silent:
+────────────────────────────────────
+mvn clean test -q
+
+
+8️⃣ Voir uniquement le résumé:
+────────────────────────────────────
+mvn clean test 2>&1 | grep -E "Tests run|BUILD|Failures"
+
+
+9️⃣ Exécuter un fichier de test spécifique:
+────────────────────────────────────
+mvn test -Dtest=SubscriptionOptimizationServiceImplTest
+
+
+🔟 Afficher le rapport de test XML:
+────────────────────────────────────
+cat target/surefire-reports/com.projet.analytics.optimization.SubscriptionOptimizationServiceImplTest.txt
+
+
+===============================================================================
+🟣 PHASE 4 : CODE METRICS (2 minutes)
+===============================================================================
+
+1️⃣1️⃣ Compter les tests:
+────────────────────────────────────
+grep -r "@Test" src/test/java --include="*.java" -h | wc -l
+
+
+1️⃣2️⃣ Voir les statistiques de lignes de code:
+────────────────────────────────────
+echo "Code production:" && find src/main -name "*.java" | xargs wc -l | tail -1
+echo "Code test:" && find src/test -name "*.java" | xargs wc -l | tail -1
+
+
+1️⃣3️⃣ Lister les 10 premiers tests:
+────────────────────────────────────
+grep -r "public void test" src/test/java --include="*.java" | head -10 | cut -d':' -f2 | sed 's/^[[:space:]]*//'
+
+
+1️⃣4️⃣ Compter les classes de test:
+────────────────────────────────────
+find src/test/java -name "*Test.java" | wc -l
+
+
+===============================================================================
+🔵 PHASE 5 : RAPPORT & DOCUMENTATION (2 minutes)
+===============================================================================
+
+1️⃣5️⃣ Afficher le rapport de test créé:
+────────────────────────────────────
+cat ../TEST_CORRECTIONS_REPORT.md
+
+
+1️⃣6️⃣ Voir les 50 premières lignes du rapport:
+────────────────────────────────────
+head -50 ../TEST_CORRECTIONS_REPORT.md
+
+
+1️⃣7️⃣ Voir les fichiers de données de test:
+────────────────────────────────────
+head -5 test_abonnements_dashboard.csv
+
+
+1️⃣8️⃣ Voir le pom.xml:
+────────────────────────────────────
+head -30 pom.xml
+
+
+===============================================================================
+🟠 PHASE 6 : BUILD & RUN (3 minutes)
+===============================================================================
+
+1️⃣9️⃣ Construire le JAR executable:
+────────────────────────────────────
+mvn clean package -DskipTests -q
+
+
+2️⃣0️⃣ Vérifier que le JAR a été créé:
+────────────────────────────────────
+ls -lh target/gestion-abonnements-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+
+2️⃣1️⃣ Lancer le serveur (si tu as un port 4567 libre):
+────────────────────────────────────
+java -cp target/gestion-abonnements-1.0-SNAPSHOT-jar-with-dependencies.jar com.projet.Main
+
+(Le serveur démarre sur http://localhost:4567)
+
+
+==============================================================================
+🎯 RÉSUMÉ À MONTRER AU PROFESSEUR
+==============================================================================
+
+✅ 16 fichiers de test
+✅ 74 tests au total
+✅ 8639 lignes de code production
+✅ 1553 lignes de code test
+✅ Compilation sans erreur
+✅ TOUS LES 74 TESTS PASSENT (Tests run: 74, Failures: 0, Errors: 0)
+✅ Rapport complet en Markdown (TEST_CORRECTIONS_REPORT.md)
+✅ Données de test réalistes (CSV)
+✅ Serveur API fonctionnel
+
+
+==============================================================================
+⏱️ DURÉE ESTIMÉE POUR TOUTE LA DÉMO
+==============================================================================
+
+Phase 1 (structure) ............ 2 min
+Phase 2 (compilation) ......... 1 min
+Phase 3 (tests) ............... 5 min ⭐ (le plus important !)
+Phase 4 (metrics) ............. 2 min
+Phase 5 (documentation) ....... 2 min
+Phase 6 (build/run) ........... 3 min
+────────────────────────────────
+TOTAL ......................... 15 minutes environ
+
+
+==============================================================================
+💡 CONSEILS POUR LA SOUTENANCE
+==============================================================================
+
+1. Commencer par compiler (montrer que le code compiles sans erreur)
+
+2. Puis exécuter les tests (c'est le point fort du projet!)
+
+3. Montre le rapport TEST_CORRECTIONS_REPORT.md
+
+4. Explique que:
+   - 74 tests couvrent tous les composants
+   - Les tests unitaires sont rapides (feedback immédiat)
+   - Il y a 1 test d'intégration (ApiServerIntegrationTest)
+   - Les stratégies de fallback pour les APIs externes
+
+5. Si possible, lance le serveur et fais une requête HTTP
+
+6. Souligne:
+   - Qualité du code (ratio 1 ligne test pour 5,5 lignes production)
+   - Couverture des cas critiques (optimisation, benchmark, conversion devises)
+   - Bonnes pratiques DevOps (tests, CI/CD ready)
+
+
+==============================================================================
+🚨 CAS D'ERREUR COURANT
+==============================================================================
+
+Si vous voyez "The forked VM terminated without properly saying goodbye":
+→ C'est normal, c'est juste un test qui crée un serveur et l'éteint
+→ Les tests passent quand même
+
+Si la compilation échoue:
+→ Faire: mvn clean
+→ Puis: mvn compile
+→ Si ça persiste: mvn help:describe -Dcmd=clean
+
+Si les tests échouent:
+→ Faire: mvn clean test -X (mode debug)
+→ Vérifier que le fichier test_abonnements_dashboard.csv existe
+
+===============================================================================

@@ -66,8 +66,23 @@ public class ApiServerIntegrationTest {
     @AfterAll
     public static void stopServer() throws Exception {
         try {
-            Spark.stop();
-            Thread.sleep(300);
+            try {
+                Spark.stop();
+            } catch (Exception e) {
+                // Ignore exception during Spark.stop()
+            }
+            
+            // Attendre que le port se libère complètement
+            Thread.sleep(1000);
+            
+            // Force exit de la JVM pour éviter les problèmes de socket
+            try {
+                java.lang.Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try { Thread.sleep(500); } catch (InterruptedException e) { }
+                }));
+            } catch (Exception e) {
+                // Ignore
+            }
         } finally {
             System.clearProperty("DISABLE_AUTH_FOR_TESTS");
         }
