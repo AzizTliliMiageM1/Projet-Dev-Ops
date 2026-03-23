@@ -1,145 +1,180 @@
 package com.projet.analytics.lifecycle;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.projet.backend.domain.Abonnement;
 import com.projet.analytics.lifecycle.MonthlyOptimizer.MonthlyOptimizationResult;
+import com.projet.backend.domain.Abonnement;
 
-public class MonthlyOptimizerTest {
+@DisplayName("Tests de l'optimiseur mensuel des abonnements")
+class MonthlyOptimizerTest {
 
-    private final MonthlyOptimizer optimizer = new MonthlyOptimizer();
+    private static final LocalDate FIXED_DATE = LocalDate.of(2026, 3, 23);
+
+    private MonthlyOptimizer optimizer;
+
+    @BeforeEach
+    void setUp() {
+        optimizer = new MonthlyOptimizer();
+    }
 
     @Test
-    void optimize_respectsBudgetConstraint() {
-        List<Abonnement> subscriptions = List.of(
-            createSub("Netflix", 15.0),
-            createSub("Spotify", 11.0),
-            createSub("Disney+", 9.0)
+    @DisplayName("Doit respecter la contrainte de budget")
+    void shouldRespectBudgetConstraint() {
+        List<Abonnement> subscriptions = createSubscriptions(
+            subscription("Netflix", 15.0),
+            subscription("Spotify", 11.0),
+            subscription("Disney+", 9.0)
         );
 
         MonthlyOptimizationResult result = optimizer.optimize(subscriptions, 20.0, 0);
 
-        assertTrue(result.monthlyCost <= 20.0 + 1e-6);
-        assertNotNull(result.selected);
+        assertValidResult(result);
+        assertTrue(result.monthlyCost <= 20.0 + 1e-6, "Le coût mensuel dépasse le budget");
+        assertNotNull(result.selected, "La liste des abonnements sélectionnés ne doit pas être null");
     }
 
     @Test
-    void optimize_selectsHighUtilitySubscriptions() {
-        Abonnement netflix = createSub("Netflix", 15.0);
-        Abonnement spotify = createSub("Spotify", 11.0);
-
-        // Netflix est utilisé récemment (plus utile)
-        netflix.setDerniereUtilisation(LocalDate.now().minusDays(2));
-        spotify.setDerniereUtilisation(LocalDate.now().minusDays(90)); // Dormant
+    @DisplayName("Doit sélectionner les abonnements à plus forte utilité")
+    void shouldSelectHighUtilitySubscriptions() {
+        Abonnement netflix = createSubscription("Netflix", 15.0, FIXED_DATE.minusDays(2));
+        Abonnement spotify = createSubscription("Spotify", 11.0, FIXED_DATE.minusDays(90));
 
         List<Abonnement> subscriptions = List.of(netflix, spotify);
 
         MonthlyOptimizationResult result = optimizer.optimize(subscriptions, 30.0, 0);
 
-        // Netflix devrait être sélectionné car plus utile
-        assertTrue(result.selected.stream()
-            .map(Abonnement::getNomService)
-            .anyMatch(name -> name.equals("Netflix")));
+        assertValidResult(result);
+        assertTrue(
+            result.selected.stream()
+                .map(Abonnement::getNomService)
+                .anyMatch("Netflix"::equals),
+            "Netflix devrait être sélectionné car il est plus utile"
+        );
     }
 
     @Test
-    void optimize_createsDecisionsForAllSubscriptions() {
-        List<Abonnement> subscriptions = List.of(
-            createSub("Netflix", 15.0),
-            createSub("Spotify", 11.0),
-            createSub("Disney+", 9.0)
+    @DisplayName("Doit créer une décision pour chaque abonnement")
+    void shouldCreateDecisionsForAllSubscriptions() {
+        List<Abonnement> subscriptions = createSubscriptions(
+            subscription("Netflix", 15.0),
+            subscription("Spotify", 11.0),
+            subscription("Disney+", 9.0)
         );
 
         MonthlyOptimizationResult result = optimizer.optimize(subscriptions, 25.0, 0);
 
-        // Devrait avoir une décision pour chaque abonnement
-        assertEquals(3, result.decisions.size());
+        assertValidResult(result);
+        assertEquals(3, result.decisions.size(), "Il doit y avoir une décision pour chaque abonnement");
 
-        // Chaque décision doit être KEEP ou PAUSE
         for (LifecycleDecision decision : result.decisions.values()) {
-            assertTrue(decision == LifecycleDecision.KEEP || decision == LifecycleDecision.PAUSE);
+            assertTrue(
+                decision == LifecycleDecision.KEEP || decision == LifecycleDecision.PAUSE,
+                "Chaque décision doit être KEEP ou PAUSE"
+            );
         }
 
-        // Le nombre de KEEP devrait correspondre aux sélectionnés
         long keepCount = result.decisions.values().stream()
             .filter(d -> d == LifecycleDecision.KEEP)
             .count();
-        assertEquals(result.selected.size(), keepCount);
+
+        assertEquals(result.selected.size(), keepCount,
+            "Le nombre de décisions KEEP doit correspondre au nombre d'abonnements sélectionnés");
     }
 
     @Test
-    void optimize_withZeroBudgetSelectsNothing() {
-        List<Abonnement> subscriptions = List.of(
-            createSub("Netflix", 15.0),
-            createSub("Spotify", 11.0)
+    @DisplayName("Avec un budget nul, ne doit rien sélectionner")
+    void shouldSelectNothingWithZeroBudget() {
+        List<Abonnement> subscriptions = createSubscriptions(
+            subscription("Netflix", 15.0),
+            subscription("Spotify", 11.0)
         );
 
         MonthlyOptimizationResult result = optimizer.optimize(subscriptions, 0.0, 0);
 
-        assertEquals(0, result.selected.size());
-        assertEquals(0.0, result.monthlyCost);
+        assertValidResult(result);
+        assertEquals(0, result.selected.size(), "Aucun abonnement ne doit être sélectionné");
+        assertEquals(0.0, result.monthlyCost, 1e-6, "Le coût mensuel doit être nul");
     }
 
     @Test
-    void optimize_withHighBudgetSelectsAll() {
-        List<Abonnement> subscriptions = List.of(
-            createSub("Netflix", 15.0),
-            createSub("Spotify", 11.0),
-            createSub("Disney+", 9.0)
+    @DisplayName("Avec un budget élevé, doit sélectionner tous les abonnements")
+    void shouldSelectAllWithHighBudget() {
+        List<Abonnement> subscriptions = createSubscriptions(
+            subscription("Netflix", 15.0),
+            subscription("Spotify", 11.0),
+            subscription("Disney+", 9.0)
         );
 
         MonthlyOptimizationResult result = optimizer.optimize(subscriptions, 100.0, 0);
 
-        // Avec budget suffisant, tous devraient être sélectionnés
-        assertEquals(3, result.selected.size());
+        assertValidResult(result);
+        assertEquals(3, result.selected.size(), "Tous les abonnements devraient être sélectionnés");
     }
 
     @Test
-    void optimize_withEmptyListReturnsEmpty() {
+    @DisplayName("Avec une liste vide, doit retourner un résultat vide")
+    void shouldReturnEmptyResultWithEmptyList() {
         MonthlyOptimizationResult result = optimizer.optimize(List.of(), 50.0, 0);
 
-        assertEquals(0, result.selected.size());
-        assertEquals(0.0, result.monthlyCost);
-        assertTrue(result.decisions.isEmpty());
+        assertValidResult(result);
+        assertEquals(0, result.selected.size(), "Aucun abonnement ne doit être sélectionné");
+        assertEquals(0.0, result.monthlyCost, 1e-6, "Le coût mensuel doit être nul");
+        assertTrue(result.decisions.isEmpty(), "La map des décisions doit être vide");
     }
 
     @Test
-    void optimize_monthIndexAffectsSelection() {
-        List<Abonnement> subscriptions = List.of(
-            createSub("Netflix", 15.0),
-            createSub("Spotify", 11.0)
+    @DisplayName("Le mois cible ne doit pas casser l'optimisation")
+    void shouldHandleDifferentMonthIndexes() {
+        List<Abonnement> subscriptions = createSubscriptions(
+            subscription("Netflix", 15.0),
+            subscription("Spotify", 11.0)
         );
 
-        // Optimiser pour le mois 0 (courant)
-        MonthlyOptimizationResult result0 = optimizer.optimize(subscriptions, 30.0, 0);
+        MonthlyOptimizationResult resultMonth0 = optimizer.optimize(subscriptions, 30.0, 0);
+        MonthlyOptimizationResult resultMonth3 = optimizer.optimize(subscriptions, 30.0, 3);
 
-        // Optimiser pour le mois 3 (futur - utilisation prédite décroît)
-        MonthlyOptimizationResult result3 = optimizer.optimize(subscriptions, 30.0, 3);
-
-        // Les résultats peuvent différer due à la décroissance d'utilisation prédite
-        // Voici juste un test que les deux exécutions se terminent correctement
-        assertNotNull(result0);
-        assertNotNull(result3);
+        assertValidResult(resultMonth0);
+        assertValidResult(resultMonth3);
     }
 
-    // ===== Helpers =====
+    // =========================
+    // Helpers - Assertions
+    // =========================
 
-    private Abonnement createSub(String name, double price) {
+    private void assertValidResult(MonthlyOptimizationResult result) {
+        assertNotNull(result, "Le résultat ne doit pas être null");
+        assertNotNull(result.selected, "La liste selected ne doit pas être null");
+        assertNotNull(result.decisions, "La map decisions ne doit pas être null");
+    }
+
+    // =========================
+    // Helpers - Data builders
+    // =========================
+
+    private List<Abonnement> createSubscriptions(Abonnement... abonnements) {
+        return List.of(abonnements);
+    }
+
+    private Abonnement subscription(String name, double price) {
+        return createSubscription(name, price, FIXED_DATE.minusDays(5));
+    }
+
+    private Abonnement createSubscription(String name, double price, LocalDate derniereUtilisation) {
         Abonnement abo = new Abonnement(
             name,
-            LocalDate.now().minusMonths(3),
-            LocalDate.now().plusMonths(9),
+            FIXED_DATE.minusMonths(3),
+            FIXED_DATE.plusMonths(9),
             price,
             "TestUser",
-            LocalDate.now().minusDays(5),
+            derniereUtilisation,
             "Entertainment"
         );
         abo.setPriorite("Important");
