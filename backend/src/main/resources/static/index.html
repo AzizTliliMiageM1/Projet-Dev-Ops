@@ -1106,45 +1106,55 @@
 
         async function loadDashboard() {
             try {
-                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.abonnements));
-                const abonnements = await response.json();
+                // Fetch all data in parallel
+                const aboRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.abonnements));
+                const abonnements = aboRes.ok ? await aboRes.json() : [];
 
+                // Calculate base metrics
                 const count = abonnements.length;
                 const total = abonnements.reduce((sum, a) => sum + (a.prixMensuel || 0), 0);
                 const yearly = total * 12;
+                const savings = total * 0.15;
 
+                // Update top KPIs
                 document.getElementById('stat-count').textContent = count;
                 document.getElementById('stat-total').textContent = '€' + total.toFixed(2);
                 document.getElementById('stat-health').textContent = Math.round(Math.min((count / 10) * 100, 100)) + '%';
-                document.getElementById('stat-savings').textContent = '€' + (total * 0.15).toFixed(2);
+                document.getElementById('stat-savings').textContent = '€' + savings.toFixed(2);
 
-                // Fetch analytics data
+                // Fetch analytics data (non-blocking)
                 let insights = [];
                 let forecast = [];
                 let anomalies = [];
 
                 try {
-                    const optimRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimize));
-                    if (optimRes.ok) insights = await optimRes.json() || [];
-                } catch (e) { console.warn('Optimize fetch failed'); }
+                    const res = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimize));
+                    if (res.ok) insights = await res.json();
+                    if (!Array.isArray(insights)) insights = [];
+                } catch (e) {}
 
                 try {
-                    const foreRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.forecast) + '?months=6');
-                    if (foreRes.ok) forecast = await foreRes.json() || [];
-                } catch (e) { console.warn('Forecast fetch failed'); }
+                    const res = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.forecast) + '?months=6');
+                    if (res.ok) forecast = await res.json();
+                    if (!Array.isArray(forecast)) forecast = [];
+                } catch (e) {}
 
                 try {
-                    const anomRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.anomalies));
-                    if (anomRes.ok) anomalies = await anomRes.json() || [];
-                } catch (e) { console.warn('Anomalies fetch failed'); }
+                    const res = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.anomalies));
+                    if (res.ok) anomalies = await res.json();
+                    if (!Array.isArray(anomalies)) anomalies = [];
+                } catch (e) {}
 
-                // Sort by price
+                // Sort subscriptions by price
                 const sorted = [...abonnements].sort((a, b) => (b.prixMensuel || 0) - (a.prixMensuel || 0));
                 const topExpensive = sorted.slice(0, 3);
 
-                // Build dashboard HTML
-                let html = `
-                    <div class="dashboard-section-title">
+                // Build HTML content
+                let html = '';
+
+                // SECTION 1: Overview KPIs
+                html += `
+                    <div class="dashboard-section-title" style="margin-top: 0;">
                         <i class="fas fa-chart-pie"></i> Vue d'ensemble
                     </div>
                     <div class="dashboard-grid">
@@ -1154,188 +1164,285 @@
                             <div class="insight-desc">Projection 12 mois</div>
                         </div>
                         <div class="insight-card">
-                            <div class="insight-title">📊 Nombre d'Abos</div>
+                            <div class="insight-title">📊 Services Actifs</div>
                             <div class="insight-value">${count}</div>
-                            <div class="insight-desc">Services actifs</div>
+                            <div class="insight-desc">Abonnements en cours</div>
                         </div>
                         <div class="insight-card">
                             <div class="insight-title">💾 Économies Possibles</div>
-                            <div class="insight-value">€${(total * 0.15).toFixed(2)}</div>
+                            <div class="insight-value">€${savings.toFixed(2)}</div>
                             <div class="insight-desc">~15% de réduction</div>
                         </div>
                     </div>
+                `;
 
+                // SECTION 2: Top Expensive
+                html += `
                     <div class="dashboard-section-title">
-                        <i class="fas fa-star"></i> Top Dépenses
+                        <i class="fas fa-fire"></i> Top 3 Plus Chers
                     </div>
                     <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); margin-bottom: 24px;">
                 `;
 
-                topExpensive.forEach((sub, idx) => {
-                    html += `
-                        <div class="list-item">
-                            <div class="list-label">${idx + 1}. ${sub.nomService} <span class="badge badge-warning">${sub.clientName}</span></div>
-                            <div class="list-value">€${(sub.prixMensuel || 0).toFixed(2)}</div>
-                        </div>
-                    `;
-                });
+                if (topExpensive.length > 0) {
+                    topExpensive.forEach((sub, idx) => {
+                        const badge = `<span class="badge badge-warning">${sub.clientName || 'N/A'}</span>`;
+                        html += `
+                            <div class="list-item">
+                                <div class="list-label">
+                                    <strong>${idx + 1}. ${sub.nomService || 'Service'}</strong>
+                                    ${badge}
+                                </div>
+                                <div class="list-value" style="color: var(--danger); font-weight: 700;">
+                                    €${(sub.prixMensuel || 0).toFixed(2)}/mois
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div style="padding: 20px; text-align: center; color: var(--gray-500);">Aucun abonnement</div>`;
+                }
 
                 html += `</div>`;
 
-                // Charts
+                // SECTION 3: Charts
                 html += `
                     <div class="dashboard-section-title">
-                        <i class="fas fa-chart-bar"></i> Répartition par Catégorie
+                        <i class="fas fa-chart-bar"></i> Dépenses par Catégorie
                     </div>
-                    <div class="chart-container">
-                        <div class="chart-title">Dépenses par Service</div>
-                        <canvas id="categoryChart"></canvas>
+                    <div class="chart-container" style="height: 350px; margin-bottom: 24px;">
+                        <canvas id="categoryChart" style="display: block;"></canvas>
                     </div>
 
                     <div class="dashboard-section-title">
                         <i class="fas fa-chart-line"></i> Prévision 6 Mois
                     </div>
-                    <div class="chart-container">
-                        <div class="chart-title">Évolution des Coûts</div>
-                        <canvas id="forecastChart"></canvas>
+                    <div class="chart-container" style="height: 350px; margin-bottom: 24px;">
+                        <canvas id="forecastChart" style="display: block;"></canvas>
                     </div>
                 `;
 
-                // Insights
-                if (insights.length > 0) {
+                // SECTION 4: Recommendations
+                if (insights && insights.length > 0) {
                     html += `
                         <div class="dashboard-section-title">
                             <i class="fas fa-lightbulb"></i> Recommandations
                         </div>
                         <div class="dashboard-grid">
                     `;
+
                     insights.slice(0, 3).forEach(insight => {
-                        const icon = insight.type === 'churn' ? '⚠️' : '✨';
+                        const name = insight.name || insight.service || 'Recommandation';
+                        const score = insight.score ? parseFloat(insight.score).toFixed(1) : '0';
+                        const reason = insight.reason || insight.description || 'Voir détails';
+                        const type = insight.type || 'info';
+
                         html += `
-                            <div class="insight-card ${insight.type === 'churn' ? 'warning' : 'success'}">
-                                <div class="insight-title">${icon} ${insight.name || 'Insight'}</div>
-                                <div class="insight-value">${insight.score ? insight.score.toFixed(1) + '%' : 'N/A'}</div>
-                                <div class="insight-desc">${insight.reason || 'Voir détails'}</div>
+                            <div class="insight-card ${type === 'churn' || type === 'risk' ? 'warning' : 'success'}">
+                                <div class="insight-title">✨ ${name}</div>
+                                <div class="insight-value">${score}%</div>
+                                <div class="insight-desc">${reason}</div>
                             </div>
                         `;
                     });
+
                     html += `</div>`;
                 }
 
-                // Anomalies
-                if (anomalies.length > 0) {
+                // SECTION 5: Anomalies
+                if (anomalies && anomalies.length > 0) {
                     html += `
                         <div class="dashboard-section-title">
                             <i class="fas fa-exclamation-triangle"></i> Anomalies Détectées
                         </div>
                         <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); margin-bottom: 24px; border-left: 4px solid var(--danger);">
                     `;
+
                     anomalies.slice(0, 5).forEach(anom => {
+                        const name = anom.name || anom.service || 'Anomalie';
+                        const type = anom.type || 'Autre';
+                        const severity = anom.severity || 'Moyenne';
+
                         html += `
                             <div class="list-item">
-                                <div class="list-label"><span class="badge badge-danger">${anom.type || 'Anomaly'}</span> ${anom.name || 'Service'}</div>
-                                <div class="list-value danger">${anom.severity || 'Moyenne'}</div>
+                                <div class="list-label">
+                                    <span class="badge badge-danger">${type}</span>
+                                    <strong>${name}</strong>
+                                </div>
+                                <div class="list-value danger">${severity}</div>
                             </div>
                         `;
                     });
+
                     html += `</div>`;
                 }
 
-                // Forecast table
-                if (forecast.length > 0) {
+                // SECTION 6: Forecast Table
+                if (forecast && forecast.length > 0) {
                     html += `
                         <div class="dashboard-section-title">
-                            <i class="fas fa-calendar"></i> Prévisions Détaillées
+                            <i class="fas fa-calendar-alt"></i> Prévisions Détaillées (6 Mois)
                         </div>
-                        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); overflow-x: auto;">
-                            <table style="width: 100%; font-size: 14px;">
-                                <thead style="background: var(--gray-50);">
-                                    <tr>
-                                        <th style="padding: 12px; text-align: left; font-weight: 700; color: var(--gray-700);">Période</th>
-                                        <th style="padding: 12px; text-align: right; font-weight: 700; color: var(--gray-700);">Coût Prévu</th>
+                        <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md); margin-bottom: 24px; overflow-x: auto;">
+                            <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: var(--gray-50); border-bottom: 2px solid var(--gray-200);">
+                                        <th style="padding: 14px 16px; text-align: left; font-weight: 700; color: var(--gray-700);">Période</th>
+                                        <th style="padding: 14px 16px; text-align: right; font-weight: 700; color: var(--gray-700);">Coût Estimé</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                     `;
+
                     forecast.slice(0, 6).forEach(f => {
+                        const month = f.month || f.period || f.date || 'Mois';
+                        const cost = parseFloat(f.cost || f.total || f.amount || 0).toFixed(2);
+
                         html += `
-                            <tr>
-                                <td style="padding: 12px; border-bottom: 1px solid var(--gray-100);">${f.month || f.period || 'N/A'}</td>
-                                <td style="padding: 12px; border-bottom: 1px solid var(--gray-100); text-align: right; color: var(--primary); font-weight: 700;">€${(f.cost || f.total || 0).toFixed(2)}</td>
+                            <tr style="border-bottom: 1px solid var(--gray-100);">
+                                <td style="padding: 12px 16px; color: var(--gray-900);">${month}</td>
+                                <td style="padding: 12px 16px; text-align: right; color: var(--primary); font-weight: 700;">€${cost}</td>
                             </tr>
                         `;
                     });
-                    html += `</tbody></table></div>`;
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
                 }
 
+                // SECTION 7: Recent Subscriptions
+                html += `
+                    <div class="dashboard-section-title">
+                        <i class="fas fa-clock"></i> Abonnements Récents
+                    </div>
+                    <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-md);">
+                `;
+
+                if (abonnements.length > 0) {
+                    abonnements.slice(0, 5).forEach(sub => {
+                        const service = sub.nomService || 'Service';
+                        const client = sub.clientName || 'Client';
+                        const price = parseFloat(sub.prixMensuel || 0).toFixed(2);
+                        const startDate = sub.dateDebut || 'N/A';
+
+                        html += `
+                            <div class="list-item">
+                                <div class="list-label">
+                                    <strong>${service}</strong>
+                                    <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1);">${client}</span>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="list-value">€${price}/mois</div>
+                                    <div style="font-size: 12px; color: var(--gray-500);">Depuis ${startDate}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div style="padding: 20px; text-align: center; color: var(--gray-500);">Aucun abonnement</div>`;
+                }
+
+                html += `</div>`;
+
+                // Update DOM
                 document.getElementById('dashboard-content').innerHTML = html;
 
-                // Build charts after DOM update
-                buildCharts(abonnements, forecast);
+                // Initialize charts after a small delay to ensure DOM is ready
+                setTimeout(() => {
+                    initCharts(abonnements, forecast);
+                }, 100);
 
             } catch (error) {
-                console.error('Dashboard load failed:', error);
-                document.getElementById('dashboard-content').innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Erreur lors du chargement du dashboard</div>';
+                console.error('Dashboard error:', error);
+                document.getElementById('dashboard-content').innerHTML = `
+                    <div class="alert alert-error" style="margin: 20px;">
+                        <i class="fas fa-exclamation-circle"></i> Impossible de charger le dashboard
+                    </div>
+                `;
             }
         }
 
-        function buildCharts(abonnements, forecast) {
-            // Category chart
-            const ctx1 = document.getElementById('categoryChart');
-            if (ctx1) {
+        function initCharts(abonnements, forecast) {
+            // Chart 1: Category Distribution
+            const ctxCat = document.getElementById('categoryChart');
+            if (ctxCat && abonnements && abonnements.length > 0) {
                 const categories = {};
                 abonnements.forEach(a => {
-                    const cat = a.categorie || 'Autre';
-                    categories[cat] = (categories[cat] || 0) + (a.prixMensuel || 0);
+                    const cat = (a.categorie || 'Autre').trim();
+                    categories[cat] = (categories[cat] || 0) + (parseFloat(a.prixMensuel) || 0);
                 });
 
-                new Chart(ctx1, {
-                    type: 'doughnut',
-                    data: {
-                        labels: Object.keys(categories),
-                        datasets: [{
-                            data: Object.values(categories),
-                            backgroundColor: [
-                                '#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444', '#3b82f6'
-                            ],
-                            borderColor: 'white',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                });
+                const labels = Object.keys(categories);
+                const values = Object.values(categories);
+                const colors = ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#8366ff', '#ff6b9d'];
+
+                try {
+                    new Chart(ctxCat, {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                data: values,
+                                backgroundColor: colors.slice(0, labels.length),
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { padding: 16, font: { size: 13 } } }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Category chart failed:', e);
+                }
             }
 
-            // Forecast chart
-            const ctx2 = document.getElementById('forecastChart');
-            if (ctx2 && forecast.length > 0) {
-                new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: forecast.map(f => f.month || f.period || ''),
-                        datasets: [{
-                            label: 'Dépense Prévue (€)',
-                            data: forecast.map(f => f.cost || f.total || 0),
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: '#667eea',
-                            pointBorderColor: 'white',
-                            pointBorderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: true } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
+            // Chart 2: Forecast Line
+            const ctxFore = document.getElementById('forecastChart');
+            if (ctxFore && forecast && forecast.length > 0) {
+                const labels = forecast.map(f => f.month || f.period || f.date || 'Mois');
+                const values = forecast.map(f => parseFloat(f.cost || f.total || f.amount || 0));
+
+                try {
+                    new Chart(ctxFore, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Dépense Prévue (€)',
+                                data: values,
+                                borderColor: '#667eea',
+                                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#667eea',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 5
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { font: { size: 13 } } }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, ticks: { callback: function(v) { return '€' + v.toFixed(0); } } }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.warn('Forecast chart failed:', e);
+                }
             }
         }
 
