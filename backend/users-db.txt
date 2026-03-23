@@ -1,2 +1,2 @@
 aziz@example.com;Pass123;true;78eb9264-2811-427e-828d-b0478724cd2d;aziztlili
-aziz.tlili900@gmail.com;Chauffage11;false;a78752bf-9208-45e4-aa90-a2bf567ded71;OnlyKnow
+aziz.tlili900@gmail.com;Chauffage11;true;a78752bf-9208-45e4-aa90-a2bf567ded71;OnlyKnow
