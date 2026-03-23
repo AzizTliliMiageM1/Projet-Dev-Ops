@@ -427,25 +427,24 @@ document.getElementById("login-form").onsubmit = async (e) => {
 
         const data = await response.json();
 
-        if (response.status === 200 && data.success) {
-            // Succès
-            successBox.style.display = "block";
-            btnText.textContent = "Connecté !";
-            loadingIcon.style.display = "none";
-            
-            // Redirection après 1 seconde
-            setTimeout(() => {
-                window.location.href = "index.html";
-            }, 1000);
-            return;
+        if (!response.ok) {
+            throw new Error(data.error || "Erreur serveur");
         }
 
-        // Erreur
-        errorText.textContent = data.error || "Identifiants incorrects. Veuillez réessayer.";
-        errorBox.style.display = "block";
+        // Succès
+        console.log("SUCCESS:", data);
+        successBox.style.display = "block";
+        btnText.textContent = "Connecté !";
+        loadingIcon.style.display = "none";
+        
+        // Redirection après 1 seconde
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 1000);
         
     } catch (error) {
-        errorText.textContent = "Erreur de connexion au serveur. Veuillez réessayer.";
+        console.error("ERROR:", error);
+        errorText.textContent = error.message || "Erreur de connexion. Veuillez réessayer.";
         errorBox.style.display = "block";
     } finally {
         // Réactiver le bouton sauf si succès
