@@ -6,164 +6,202 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.projet.analytics.optimization.OptimizationResult;
 
 import spark.Spark;
 
-/**
- * Test d'intégration minimal qui démarre ApiServer puis exécute quelques requêtes HTTP.
- */
-public class ApiServerIntegrationTest {
+@DisplayName("Tests d'intégration de l'API Server")
+class ApiServerIntegrationTest {
+
+    private static final String BASE_URL = "http://localhost:4567";
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(2);
+
     private static Thread serverThread;
-    private static final HttpClient client = HttpClient.newHttpClient();
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static HttpClient client;
+    private static ObjectMapper objectMapper;
 
     @BeforeAll
-    public static void startServer() throws Exception {
-        // Désactiver l'authentification pour les tests d'intégration
+    static void startServer() throws Exception {
         System.setProperty("DISABLE_AUTH_FOR_TESTS", "true");
-        
+
+        client = HttpClient.newHttpClient();
+        objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
         serverThread = new Thread(() -> ApiServer.main(new String[0]));
         serverThread.setDaemon(true);
         serverThread.start();
 
-        // Attendre que Spark démarre (polling)
-        long start = System.currentTimeMillis();
-        boolean up = false;
-        while (System.currentTimeMillis() - start < 5000) {
-            try {
-                HttpRequest req = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:4567/api/abonnements"))
-                        .timeout(Duration.ofMillis(1000))
-                        .GET()
-                        .build();
-                HttpResponse<String> resp = client.send(req, HttpResponse.BodyHandlers.ofString());
-                if (resp.statusCode() == 200) {
-                    up = true;
-                    break;
-                }
-            } catch (IOException | InterruptedException e) {
-                Thread.sleep(200);
-            }
-        }
-        if (!up) {
-            // try one more time but fail test startup
-            throw new IllegalStateException("Le serveur API n'a pas démarré dans le temps imparti");
-        }
+        waitForServerStartup();
     }
 
     @AfterAll
-    public static void stopServer() throws Exception {
+    static void stopServer() throws Exception {
         try {
-            try {
-                Spark.stop();
-            } catch (Exception e) {
-                // Ignore exception during Spark.stop()
-            }
-            
-            // Attendre que le port se libère complètement
+            Spark.stop();
             Thread.sleep(1000);
-            
-            // Force exit de la JVM pour éviter les problèmes de socket
-            try {
-                java.lang.Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                    try { Thread.sleep(500); } catch (InterruptedException e) { }
-                }));
-            } catch (Exception e) {
-                // Ignore
-            }
+        } catch (Exception ignored) {
+            // Ignore arrêt Spark en fin de test
         } finally {
             System.clearProperty("DISABLE_AUTH_FOR_TESTS");
         }
     }
 
     @Test
-    public void testGetOptimizationAnalytics() throws Exception {
-        // Given: une requête vers l'endpoint d'optimisation
-        HttpRequest getReq = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:4567/api/analytics/optimization"))
-                .GET()
-                .build();
+    @DisplayName("Doit retourner les analytics d'optimisation en JSON valide")
+    void shouldReturnOptimizationAnalytics() throws Exception {
+        HttpResponse<String> response = sendGet("/api/analytics/optimization");
 
-        // When: on exécute la requête
-        HttpResponse<String> getResp = client.send(getReq, HttpResponse.BodyHandlers.ofString());
+        assertEquals(200, response.statusCode());
 
-        // Then: la réponse doit être un succès (200) et le JSON valide
-        assertEquals(200, getResp.statusCode());
+        OptimizationResult result =
+            objectMapper.readValue(response.body(), OptimizationResult.class);
 
-        String jsonBody = getResp.body();
-        OptimizationResult result = objectMapper.readValue(jsonBody, OptimizationResult.class);
+        assertAll(
+            () -> assertNotNull(result, "Le résultat ne doit pas être null"),
+            () -> assertNotNull(result.getSuggestions(), "Les suggestions ne doivent pas être null"),
+            () -> assertTrue(
+                result.getTotalEconomiePotentielle() >= 0,
+                "L'économie potentielle totale doit être positive ou nulle"
+            )
+        );
 
-        // Et: le résultat doit contenir des suggestions et une économie potentielle
-        assertTrue(result.getSuggestions() != null, "La liste des suggestions ne doit pas être nulle.");
-        assertTrue(result.getTotalEconomiePotentielle() >= 0, "L'économie potentielle totale doit être positive ou nulle.");
-        
-        // Vérification plus fine si des données de test existent
         if (!result.getSuggestions().isEmpty()) {
             var firstSuggestion = result.getSuggestions().get(0);
-            assertTrue(firstSuggestion.getAbonnement() != null);
-            assertTrue(firstSuggestion.getAction() != null);
+
+            assertAll(
+                () -> assertNotNull(firstSuggestion, "La première suggestion ne doit pas être null"),
+                () -> assertNotNull(firstSuggestion.getAbonnement(), "L'abonnement de la suggestion ne doit pas être null"),
+                () -> assertNotNull(firstSuggestion.getAction(), "L'action de la suggestion ne doit pas être null")
+            );
         }
     }
 
     @Test
-    public void testGetAndPostAndDeleteFlow() throws Exception {
+    @DisplayName("Doit permettre un cycle GET POST GET DELETE sur les abonnements")
+    void shouldSupportGetPostGetDeleteFlow() throws Exception {
         // GET initial
-        HttpRequest getReq = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:4567/api/abonnements"))
-                .GET()
-                .build();
-        HttpResponse<String> getResp = client.send(getReq, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, getResp.statusCode());
+        HttpResponse<String> initialGetResponse = sendGet("/api/abonnements");
+        assertEquals(200, initialGetResponse.statusCode());
 
-        // POST a new abonnement
-        String json = "{\"nomService\":\"ITestService\",\"dateDebut\":\"2025-10-01\",\"dateFin\":\"2026-10-01\",\"prixMensuel\":5.5,\"clientName\":\"Test\",\"derniereUtilisation\":\"2025-10-15\",\"categorie\":\"it\"}";
-        HttpRequest postReq = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:4567/api/abonnements"))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(json))
-                .build();
-    HttpResponse<String> postResp = client.send(postReq, HttpResponse.BodyHandlers.ofString());
-    assertEquals(201, postResp.statusCode());
+        // POST
+        Map<String, Object> payload = Map.of(
+            "nomService", "ITestService",
+            "dateDebut", "2025-10-01",
+            "dateFin", "2026-10-01",
+            "prixMensuel", 5.5,
+            "clientName", "Test",
+            "derniereUtilisation", "2025-10-15",
+            "categorie", "it"
+        );
 
-    // GET again should return array containing posted item
-    HttpResponse<String> getResp2 = client.send(getReq, HttpResponse.BodyHandlers.ofString());
-    assertEquals(200, getResp2.statusCode());
-    assertTrue(getResp2.body().contains("ITestService"));
+        HttpResponse<String> postResponse = sendPost("/api/abonnements", objectMapper.writeValueAsString(payload));
 
-    // extract uuid from POST response and delete by uuid
-    String body = postResp.body();
-    String uuid = null;
-    // simple JSON extraction (avoid regex complexity / Java string escaping)
-    int p = body.indexOf("\"id\"");
-    if (p >= 0) {
-        int col = body.indexOf(':', p);
-        if (col >= 0) {
-            int q1 = body.indexOf('"', col);
-            if (q1 >= 0) {
-                int q2 = body.indexOf('"', q1 + 1);
-                if (q2 > q1) uuid = body.substring(q1 + 1, q2);
+        assertEquals(201, postResponse.statusCode());
+
+        Map<String, Object> createdSubscription =
+            objectMapper.readValue(postResponse.body(), new TypeReference<Map<String, Object>>() {});
+
+        String uuid = (String) createdSubscription.get("id");
+
+        assertNotNull(uuid, "L'identifiant retourné par le POST ne doit pas être null");
+
+        // GET après POST
+        HttpResponse<String> secondGetResponse = sendGet("/api/abonnements");
+
+        assertAll(
+            () -> assertEquals(200, secondGetResponse.statusCode()),
+            () -> assertTrue(
+                secondGetResponse.body().contains("ITestService"),
+                "La liste des abonnements devrait contenir ITestService"
+            )
+        );
+
+        // DELETE
+        HttpResponse<String> deleteResponse = sendDelete("/api/abonnements/" + uuid);
+
+        assertTrue(
+            deleteResponse.statusCode() == 200 || deleteResponse.statusCode() == 204,
+            "Le DELETE doit retourner 200 ou 204"
+        );
+    }
+
+    // =========================
+    // Helpers - Startup
+    // =========================
+
+    private static void waitForServerStartup() throws Exception {
+        long startTime = System.currentTimeMillis();
+        boolean serverUp = false;
+
+        while (System.currentTimeMillis() - startTime < 5000) {
+            try {
+                HttpResponse<String> response = sendGet("/api/abonnements");
+                if (response.statusCode() == 200) {
+                    serverUp = true;
+                    break;
+                }
+            } catch (Exception ignored) {
+                Thread.sleep(200);
             }
         }
+
+        if (!serverUp) {
+            throw new IllegalStateException("Le serveur API n'a pas démarré dans le temps imparti");
+        }
     }
-    if (uuid != null) {
-        HttpRequest delReq = HttpRequest.newBuilder()
-            .uri(URI.create("http://localhost:4567/api/abonnements/" + uuid))
+
+    // =========================
+    // Helpers - HTTP
+    // =========================
+
+    private static HttpResponse<String> sendGet(String path) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(buildUri(path))
+            .timeout(REQUEST_TIMEOUT)
+            .GET()
+            .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static HttpResponse<String> sendPost(String path, String jsonBody) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(buildUri(path))
+            .timeout(REQUEST_TIMEOUT)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+            .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private static HttpResponse<String> sendDelete(String path) throws IOException, InterruptedException {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(buildUri(path))
+            .timeout(REQUEST_TIMEOUT)
             .DELETE()
             .build();
-        HttpResponse<String> delResp = client.send(delReq, HttpResponse.BodyHandlers.ofString());
-        assertTrue(delResp.statusCode() == 204 || delResp.statusCode() == 200);
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
+
+    private static URI buildUri(String path) {
+        return URI.create(BASE_URL + path);
     }
 }
