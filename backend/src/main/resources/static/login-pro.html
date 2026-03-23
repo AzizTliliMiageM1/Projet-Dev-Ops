@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Gestion des Abonnements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles-pro.css">
+    <style>
+        /* LOGIN-SPECIFIC STYLES */
+        body {
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .auth-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                border-radius: var(--radius-lg);
+                padding: var(--spacing-lg);
+            }
+
+            .auth-header {
+                margin-bottom: var(--spacing-lg);
+            }
+
+            .auth-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Login Form -->
+            <form id="login-form" style="display: none;">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h2>Connexion</h2>
+                    <p>Accédez à votre espace personnel</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="login-email">Email</label>
+                    <div class="input-group">
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            class="form-control form-control-with-icon"
+                            placeholder="vous@exemple.com"
+                            required
+                        >
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="login-password">Mot de passe</label>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            class="form-control form-control-with-icon"
+                            placeholder="••••••••"
+                            required
+                        >
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+
+                <div id="login-error" class="error-message"></div>
+                <div id="login-success" class="success-message"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-sign-in-alt"></i> Se connecter
+                </button>
+
+                <div class="auth-toggle">
+                    Pas de compte? <a onclick="toggleAuth(event)">S'inscrire</a>
+                </div>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form">
+                <div class="auth-header">
+                    <div class="auth-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2>Inscription</h2>
+                    <p>Créez votre compte en quelques secondes</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-email">Email</label>
+                    <div class="input-group">
+                        <input 
+                            type="email" 
+                            id="register-email" 
+                            class="form-control form-control-with-icon"
+                            placeholder="vous@exemple.com"
+                            required
+                        >
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-pseudo">Pseudo (optionnel)</label>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="register-pseudo" 
+                            class="form-control form-control-with-icon"
+                            placeholder="Votre pseudo"
+                        >
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-password">Mot de passe</label>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="register-password" 
+                            class="form-control form-control-with-icon"
+                            placeholder="••••••••"
+                            required
+                        >
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="register-password-confirm">Confirmer le mot de passe</label>
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="register-password-confirm" 
+                            class="form-control form-control-with-icon"
+                            placeholder="••••••••"
+                            required
+                        >
+                        <i class="fas fa-key"></i>
+                    </div>
+                </div>
+
+                <div id="register-error" class="error-message"></div>
+                <div id="register-success" class="success-message"></div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-user-plus"></i> S'inscrire
+                </button>
+
+                <div class="auth-toggle">
+                    Déjà inscrit? <a onclick="toggleAuth(event)">Se connecter</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="api-config.js"></script>
+    <script>
+        // ========== TOGGLE AUTH FORMS ==========
+        function toggleAuth(event) {
+            event?.preventDefault();
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            const loginVisible = loginForm.style.display !== 'none';
+            loginForm.style.display = loginVisible ? 'none' : 'block';
+            registerForm.style.display = loginVisible ? 'block' : 'none';
+
+            // Clear error messages
+            document.getElementById('login-error').classList.remove('show');
+            document.getElementById('register-error').classList.remove('show');
+        }
+
+        // Initialize - show login form first
+        document.getElementById('login-form').style.display = 'block';
+
+        // ========== LOGIN HANDLER ==========
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('login-error');
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            // Clear previous errors
+            errorDiv.classList.remove('show');
+
+            if (!email || !password) {
+                showError(errorDiv, 'Veuillez remplir tous les champs');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.login), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showError(errorDiv, data.error || 'Erreur de connexion');
+                    return;
+                }
+
+                // Success
+                document.getElementById('login-success').innerHTML = 
+                    '<i class="fas fa-check-circle"></i> Connexion réussie! Redirection...';
+                document.getElementById('login-success').classList.add('show');
+
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1500);
+
+            } catch (error) {
+                showError(errorDiv, 'Erreur de connexion: ' + error.message);
+            }
+        });
+
+        // ========== REGISTER HANDLER ==========
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('register-error');
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const pseudo = document.getElementById('register-pseudo').value.trim();
+
+            errorDiv.classList.remove('show');
+
+            if (!email || !password || !passwordConfirm) {
+                showError(errorDiv, 'Veuillez remplir tous les champs');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError(errorDiv, 'Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError(errorDiv, 'Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    email,
+                    password,
+                    pseudo: pseudo || email.split('@')[0]
+                });
+
+                const response = await fetch(
+                    API_CONFIG.getUrl(API_CONFIG.endpoints.register) + '?' + params,
+                    { method: 'POST' }
+                );
+
+                const text = await response.text();
+
+                if (!response.ok) {
+                    showError(errorDiv, text || 'Erreur lors de l\'inscription');
+                    return;
+                }
+
+                // Success
+                document.getElementById('register-success').innerHTML = 
+                    '<i class="fas fa-check-circle"></i> Inscription réussie! Veuillez vérifier votre email.';
+                document.getElementById('register-success').classList.add('show');
+
+                // Reset form
+                document.getElementById('register-form').reset();
+
+                // Show login form after 3 seconds
+                setTimeout(() => {
+                    toggleAuth({ preventDefault: () => {} });
+                }, 3000);
+
+            } catch (error) {
+                showError(errorDiv, 'Erreur lors de l\'inscription: ' + error.message);
+            }
+        });
+
+        // ========== UTILITY FUNCTIONS ==========
+        function showError(errorDiv, message) {
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            errorDiv.classList.add('show');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>

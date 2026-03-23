@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Gestion des Abonnements</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles-pro.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container-lg">
+            <div class="navbar-inner">
+                <a href="#" class="navbar-brand">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>AboManager</span>
+                </a>
+                <div class="navbar-end">
+                    <span class="user-email" id="user-email"></span>
+                    <button class="btn btn-danger btn-sm" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Déconnexion
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- DASHBOARD CONTAINER -->
+    <div class="dashboard-container">
+        <div class="container-lg">
+            <!-- PAGE HEADER -->
+            <div class="dashboard-header mb-lg">
+                <div class="dashboard-title">
+                    <h1>Dashboard</h1>
+                    <p class="text-muted">Bienvenue sur votre espace de gestion d'abonnements</p>
+                </div>
+            </div>
+
+            <!-- METRICS GRID -->
+            <div class="grid grid-4 mb-lg">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="metric-label">Abonnements actifs</div>
+                    <div class="metric-value" id="stat-count">0</div>
+                    <div class="metric-change" id="stat-count-change"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-euro-sign"></i>
+                    </div>
+                    <div class="metric-label">Dépense mensuelle</div>
+                    <div class="metric-value" id="stat-total">€0.00</div>
+                    <div class="metric-change"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <div class="metric-label">Santé portefeuille</div>
+                    <div class="metric-value" id="stat-health">--</div>
+                    <div class="metric-change" id="stat-health-status"></div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <div class="metric-label">Économies possibles</div>
+                    <div class="metric-value" id="stat-savings">€0.00</div>
+                    <div class="metric-change positive"></div>
+                </div>
+            </div>
+
+            <!-- TABS NAVIGATION -->
+            <div class="tabs">
+                <button class="tab active" data-tab="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="tab" data-tab="abonnements">
+                    <i class="fas fa-list"></i> Abonnements
+                </button>
+                <button class="tab" data-tab="analytics">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </button>
+                <button class="tab" data-tab="portfolio">
+                    <i class="fas fa-wallet"></i> Portfolio
+                </button>
+                <button class="tab" data-tab="lifecycle">
+                    <i class="fas fa-calendar"></i> Lifecycle
+                </button>
+            </div>
+
+            <!-- TAB CONTENT -->
+
+            <!-- DASHBOARD TAB -->
+            <div class="tab-pane active" data-tab="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📊 Résumé du portefeuille</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="dashboard-content" class="flex-center" style="min-height: 200px;">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABONNEMENTS TAB -->
+            <div class="tab-pane" data-tab="abonnements">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📋 Gestion des abonnements</span>
+                        <button class="btn btn-success btn-sm" onclick="showNewForm()">
+                            <i class="fas fa-plus"></i> Ajouter
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Service</th>
+                                        <th>Client</th>
+                                        <th>Début</th>
+                                        <th>Fin</th>
+                                        <th>Prix</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="abonnements-list">
+                                    <tr>
+                                        <td class="text-center text-muted" colspan="6">
+                                            <div class="spinner-small" style="margin: 20px auto;"></div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ANALYTICS TAB -->
+            <div class="tab-pane" data-tab="analytics">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📈 Analyse avancée</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="analytics-content" class="flex-center" style="min-height: 300px;">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PORTFOLIO TAB -->
+            <div class="tab-pane" data-tab="portfolio">
+                <div class="card">
+                    <div class="card-header">
+                        <span>💼 Optimisation du portefeuille</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-2 mb-lg">
+                            <div>
+                                <label class="form-label">Budget cible (€)</label>
+                                <input type="number" id="budget-target" class="form-control" value="100" min="0">
+                            </div>
+                            <div>
+                                <label class="form-label">Poids valeur (0-1)</label>
+                                <input type="number" id="value-weight" class="form-control" value="0.4" min="0" max="1" step="0.1">
+                            </div>
+                            <div>
+                                <label class="form-label">Poids risque (0-1)</label>
+                                <input type="number" id="risk-weight" class="form-control" value="0.3" min="0" max="1" step="0.1">
+                            </div>
+                            <div>
+                                <label class="form-label">Poids confort (0-1)</label>
+                                <input type="number" id="comfort-weight" class="form-control" value="0.3" min="0" max="1" step="0.1">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="optimizePortfolio()">
+                            <i class="fas fa-magic"></i> Optimiser
+                        </button>
+                        <div id="portfolio-results" class="mt-lg"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIFECYCLE TAB -->
+            <div class="tab-pane" data-tab="lifecycle">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📅 Planification du cycle de vie</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid grid-2 mb-lg">
+                            <div>
+                                <label class="form-label">Nombre de mois</label>
+                                <input type="number" id="plan-months" class="form-control" value="12" min="1" max="24">
+                            </div>
+                            <div>
+                                <label class="form-label">Budget total (€)</label>
+                                <input type="number" id="plan-budget" class="form-control" value="1200" min="0">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="generateLifecycle()">
+                            <i class="fas fa-play"></i> Générer le plan
+                        </button>
+                        <div id="lifecycle-results" class="mt-lg"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="api-config.js"></script>
+    <script src="app-dashboard-pro.js"></script>
+</body>
+</html>
