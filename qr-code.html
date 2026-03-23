@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Projet Dev-Ops</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode.js/1.5.3/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        #qrCode {
+            margin: 30px auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .link-text {
+            color: #333;
+            margin-top: 20px;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .link-text a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-text a:hover {
+            text-decoration: underline;
+        }
+
+        .instructions {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .instructions p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .github-link-btn {
+            background: linear-gradient(135deg, #333, #555);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            #qrCode {
+                transform: scale(0.9);
+            }
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 QR Code</h1>
+        <p class="subtitle">Projet Dev-Ops - Semestre 2</p>
+
+        <div id="qrCode"></div>
+
+        <div class="link-text">
+            📍 <strong>Lien</strong><br>
+            <a href="https://github.com/AzizTliliMiageM1/Projet-Dev-Ops.git" target="_blank">
+                https://github.com/AzizTliliMiageM1/Projet-Dev-Ops.git
+            </a>
+        </div>
+
+        <div class="instructions">
+            <h3>💡 Comment utiliser?</h3>
+            <p>
+                1️⃣ <strong>Scannez</strong> le QR code avec votre téléphone<br>
+                2️⃣ <strong>Ouvrez</strong> le lien GitHub<br>
+                3️⃣ <strong>Consultez</strong> le code source et la documentation
+            </p>
+        </div>
+
+        <div class="buttons">
+            <a href="https://github.com/AzizTliliMiageM1/Projet-Dev-Ops" target="_blank">
+                <button class="github-link-btn">⭐ GitHub Repository</button>
+            </a>
+            <button onclick="downloadQR()">📥 Télécharger QR Code</button>
+        </div>
+
+        <div class="footer">
+            <p>Scannable sur tous les appareils avec caméra</p>
+            <p>QR Code généré automatiquement</p>
+        </div>
+    </div>
+
+    <script>
+        // Générer QR Code
+        const qrCode = new QRCode(document.getElementById('qrCode'), {
+            text: 'https://github.com/AzizTliliMiageM1/Projet-Dev-Ops.git',
+            width: 300,
+            height: 300,
+            colorDark: '#667eea',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Télécharger QR Code
+        function downloadQR() {
+            const canvas = document.querySelector('#qrCode canvas');
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'QR_Code_Projet_Dev_Ops.png';
+            link.click();
+        }
+    </script>
+</body>
+</html>
