@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📧 Notifications Email - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/theme-variables.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            padding: 20px 0;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .notification-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .notification-toggle:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .test-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        .email-preview {
+            background: white;
+            color: #333;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .email-preview h3 {
+            color: var(--primary-color);
+        }
+
+        .email-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+
+        .notification-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .notification-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--card-border);
+            color: var(--text-secondary);
+        }
+
+        .notification-list li:last-child {
+            border-bottom: none;
+        }
+
+        .notification-list .bi {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="index.html">
+                <i class="bi bi-wallet2"></i> Gestion Abonnements
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="analytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link" href="expenses.html"><i class="bi bi-wallet2"></i> Dépenses</a></li>
+                    <li class="nav-item"><a class="nav-link" href="export-import.html"><i class="bi bi-download"></i> Export/Import</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="notifications.html"><i class="bi bi-envelope"></i> Notifications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="themes.html"><i class="bi bi-palette"></i> Thèmes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="stats.html"><i class="bi bi-graph-up"></i> Stats</a></li>
+                    <li class="nav-item"><a class="nav-link" href="api.html"><i class="bi bi-code-slash"></i> API</a></li>
+                    <li class="nav-item"><a class="nav-link" href="home.html"><i class="bi bi-house"></i> Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold" style="background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                📧 Notifications Email
+            </h1>
+            <p class="lead text-white-50">Configurez vos alertes et rappels automatiques</p>
+        </div>
+
+        <div class="row">
+            <!-- Configuration Email -->
+            <div class="col-lg-6 mb-4">
+                <div class="settings-card">
+                    <h3 class="text-white mb-4"><i class="bi bi-envelope-fill me-2"></i> Configuration Email</h3>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-white">Adresse email</label>
+                        <input type="email" class="form-control form-control-custom" id="emailAddress" 
+                               placeholder="votre@email.com">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Fréquence des rappels</label>
+                        <select class="form-select form-control-custom" id="reminderFrequency">
+                            <option value="daily">Quotidien</option>
+                            <option value="weekly" selected>Hebdomadaire</option>
+                            <option value="monthly">Mensuel</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">Jour de rappel avant expiration</label>
+                        <input type="number" class="form-control form-control-custom" id="daysBefore" 
+                               value="7" min="1" max="30">
+                        <small class="text-white-50">Recevoir une alerte X jours avant l'expiration</small>
+                    </div>
+
+                    <button class="btn test-btn w-100" onclick="saveEmailSettings()">
+                        <i class="bi bi-save me-2"></i> Sauvegarder les paramètres
+                    </button>
+                </div>
+
+                <!-- Types de notifications -->
+                <div class="settings-card">
+                    <h3 class="text-white mb-4"><i class="bi bi-bell-fill me-2"></i> Types de notifications</h3>
+                    
+                    <!-- Expiration -->
+                    <div class="notification-toggle">
+                        <div>
+                            <h5 class="text-white mb-1">Alertes d'expiration</h5>
+                            <p class="text-white-50 mb-0 small">Rappel avant l'expiration d'un abonnement</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="expirationAlerts" checked onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Dépassement budget -->
+                    <div class="notification-toggle">
+                        <div>
+                            <h5 class="text-white mb-1">Dépassement de budget</h5>
+                            <p class="text-white-50 mb-0 small">Alerte lorsque vous dépassez votre budget mensuel</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="budgetAlerts" checked onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Résumé mensuel -->
+                    <div class="notification-toggle">
+                        <div>
+                            <h5 class="text-white mb-1">Résumé mensuel</h5>
+                            <p class="text-white-50 mb-0 small">Rapport détaillé envoyé chaque mois</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="monthlyReport" checked onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Nouveaux abonnements -->
+                    <div class="notification-toggle">
+                        <div>
+                            <h5 class="text-white mb-1">Nouveaux abonnements</h5>
+                            <p class="text-white-50 mb-0 small">Confirmation lors de l'ajout d'un abonnement</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="newSubAlerts" onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Dépenses inhabituelles -->
+                    <div class="notification-toggle">
+                        <div>
+                            <h5 class="text-white mb-1">Dépenses inhabituelles</h5>
+                            <p class="text-white-50 mb-0 small">Détection des dépenses anormalement élevées</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="unusualExpenses" onchange="saveNotificationSettings()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <button class="btn test-btn w-100 mt-3" onclick="sendTestEmail()">
+                        <i class="bi bi-send me-2"></i> Envoyer un email de test
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aperçu des emails -->
+            <div class="col-lg-6 mb-4">
+                <div class="settings-card">
+                    <h3 class="text-white mb-4"><i class="bi bi-eye-fill me-2"></i> Aperçu des emails</h3>
+                    
+                    <!-- Tabs -->
+                    <ul class="nav nav-pills mb-3" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#preview-expiration">
+                                Expiration
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#preview-budget">
+                                Budget
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" data-bs-toggle="pill" data-bs-target="#preview-monthly">
+                                Mensuel
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Expiration Preview -->
+                        <div class="tab-pane fade show active" id="preview-expiration">
+                            <div class="email-preview">
+                                <div class="email-header">
+                                    <h4 class="mb-0">⚠️ Alerte d'Expiration</h4>
+                                </div>
+                                <h5>Bonjour,</h5>
+                                <p>Votre abonnement <strong>Netflix Premium</strong> expire dans <strong>7 jours</strong>.</p>
+                                <div class="alert alert-warning">
+                                    <strong>Détails :</strong><br>
+                                    Prix : 15.99€/mois<br>
+                                    Date d'expiration : 15/02/2024<br>
+                                    Catégorie : Streaming
+                                </div>
+                                <p>Pensez à renouveler pour continuer à profiter du service.</p>
+                                <button class="btn btn-primary">Renouveler maintenant</button>
+                            </div>
+                        </div>
+
+                        <!-- Budget Preview -->
+                        <div class="tab-pane fade" id="preview-budget">
+                            <div class="email-preview">
+                                <div class="email-header">
+                                    <h4 class="mb-0">💸 Dépassement de Budget</h4>
+                                </div>
+                                <h5>Attention !</h5>
+                                <p>Vous avez dépassé votre budget mensuel de <strong>50€</strong>.</p>
+                                <div class="alert alert-danger">
+                                    <strong>Résumé :</strong><br>
+                                    Budget : 500€<br>
+                                    Dépensé : 550€<br>
+                                    Dépassement : 50€ (10%)
+                                </div>
+                                <p>Consultez vos dépenses pour optimiser votre budget.</p>
+                                <button class="btn btn-primary">Voir les détails</button>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Preview -->
+                        <div class="tab-pane fade" id="preview-monthly">
+                            <div class="email-preview">
+                                <div class="email-header">
+                                    <h4 class="mb-0">📊 Résumé Mensuel</h4>
+                                </div>
+                                <h5>Bonjour,</h5>
+                                <p>Voici votre résumé financier pour le mois de <strong>Janvier 2024</strong>.</p>
+                                <div class="row text-center mb-3">
+                                    <div class="col-6">
+                                        <h3 style="color: var(--primary-color);">450€</h3>
+                                        <small>Total dépensé</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 style="color: var(--primary-color);">12</h3>
+                                        <small>Abonnements</small>
+                                    </div>
+                                </div>
+                                <ul class="notification-list">
+                                    <li><i class="bi bi-check-circle-fill"></i> 3 abonnements renouvelés</li>
+                                    <li><i class="bi bi-exclamation-triangle-fill"></i> 2 expirations à venir</li>
+                                    <li><i class="bi bi-graph-up"></i> Économies : 50€ vs mois dernier</li>
+                                </ul>
+                                <button class="btn btn-primary mt-3">Voir le rapport complet</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historique des notifications -->
+                <div class="settings-card">
+                    <h3 class="text-white mb-4"><i class="bi bi-clock-history me-2"></i> Historique des notifications</h3>
+                    <div class="table-responsive">
+                        <table class="table text-white">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody id="notificationHistory">
+                                <tr>
+                                    <td>25/01/2024 10:30</td>
+                                    <td>Résumé mensuel</td>
+                                    <td><span class="badge badge-success">Envoyé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>20/01/2024 08:00</td>
+                                    <td>Alerte budget</td>
+                                    <td><span class="badge badge-success">Envoyé</span></td>
+                                </tr>
+                                <tr>
+                                    <td>15/01/2024 09:00</td>
+                                    <td>Expiration Netflix</td>
+                                    <td><span class="badge badge-success">Envoyé</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration SMTP (optionnel) -->
+        <div class="row">
+            <div class="col-12">
+                <div class="settings-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="text-white mb-0"><i class="bi bi-gear-fill me-2"></i> Configuration SMTP (Avancé)</h3>
+                        <button class="btn btn-sm test-btn" onclick="toggleSMTPConfig()">
+                            <i class="bi bi-chevron-down" id="smtpToggleIcon"></i>
+                        </button>
+                    </div>
+                    
+                    <div id="smtpConfig" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Serveur SMTP</label>
+                                <input type="text" class="form-control form-control-custom" 
+                                       placeholder="smtp.gmail.com" value="smtp.gmail.com">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-white">Port</label>
+                                <input type="number" class="form-control form-control-custom" value="587">
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label text-white">Sécurité</label>
+                                <select class="form-select form-control-custom">
+                                    <option>TLS</option>
+                                    <option>SSL</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Nom d'utilisateur</label>
+                                <input type="text" class="form-control form-control-custom" 
+                                       placeholder="votre@email.com">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-white">Mot de passe</label>
+                                <input type="password" class="form-control form-control-custom" 
+                                       placeholder="••••••••">
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Pour Gmail, utilisez un <strong>Mot de passe d'application</strong> au lieu de votre mot de passe habituel.
+                        </div>
+                        <button class="btn test-btn">
+                            <i class="bi bi-check-circle me-2"></i> Tester la connexion
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="themes.js"></script>
+    <script>
+        // Charger le thème au démarrage
+        if (window.ThemeManager) {
+            window.ThemeManager.loadSavedTheme();
+        }
+    </script>
+    <script src="navbar-auth.js"></script>
+    <script src="email-settings.js"></script>
+</body>
+</html>

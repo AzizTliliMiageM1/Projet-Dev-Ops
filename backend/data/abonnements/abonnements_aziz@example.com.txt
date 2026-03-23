@@ -1,0 +1,2 @@
+84edb26a-021b-433c-bcdd-602faebe0c32;Netflix;2025-01-01;2026-12-31;15.99;John Doe;;Non classé;;;Important;;1;NON;7;Mensuel
+74fdc60c-321f-4f13-8550-a4dfcc59ab60;Netflix;2025-01-01;2026-12-31;15.99;John Doe;;Non classé;;;Important;;1;NON;7;Mensuel

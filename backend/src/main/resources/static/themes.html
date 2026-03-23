@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Personnalisation des Thèmes - Gestion Abonnements</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Variables CSS par défaut (thème Violet) */
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --bg-gradient: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.3), transparent 50%),
+                           radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.2), transparent 50%),
+                           linear-gradient(135deg, #1e1e2e 0%, #2d1b4e 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin-bottom: 30px;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { filter: hue-rotate(0deg); }
+            50% { filter: hue-rotate(10deg); }
+        }
+
+        /* Theme Cards */
+        .theme-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 2px solid transparent;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--theme-gradient);
+            opacity: 0.1;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .theme-card:hover::before {
+            opacity: 0.2;
+        }
+
+        .theme-card.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px var(--primary-color);
+        }
+
+        .theme-preview {
+            width: 100%;
+            height: 80px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-picker-group {
+            margin-bottom: 20px;
+        }
+
+        .color-picker {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-picker:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-apply {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-apply:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .preview-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            padding: 30px;
+            margin-top: 30px;
+        }
+
+        .preview-kpi {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+        }
+
+        .gradient-preview {
+            height: 100px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg mb-4" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border-radius: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white" href="/index.html">
+                <i class="bi bi-palette-fill me-2"></i> Gestion Abonnements
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link text-white" href="/index.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/analytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/expenses.html"><i class="bi bi-wallet2"></i> Dépenses</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/export-import.html"><i class="bi bi-download"></i> Export/Import</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/bank-integration.html"><i class="bi bi-bank"></i> Banque</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/notifications.html"><i class="bi bi-envelope"></i> Notifications</a></li>
+                    <li class="nav-item"><a class="nav-link text-white active" href="/themes.html"><i class="bi bi-palette"></i> Thèmes</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/stats.html"><i class="bi bi-graph-up"></i> Stats</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/api.html"><i class="bi bi-code-slash"></i> API</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="/home.html"><i class="bi bi-house"></i> Home</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+                        <a class="nav-link text-white active" href="/themes.html">
+                            <i class="bi bi-palette me-1"></i> Thèmes
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="text-center mb-5">
+            <i class="bi bi-palette-fill me-3"></i>
+            Personnalisation des Thèmes
+        </h1>
+
+        <!-- Thèmes Prédéfinis -->
+        <div class="glass-card mb-4">
+            <h3 class="text-white mb-4">
+                <i class="bi bi-collection me-2"></i> Thèmes Prédéfinis
+            </h3>
+            <div class="row g-4">
+                <!-- Thème Violet (Défaut) -->
+                <div class="col-md-4">
+                    <div class="theme-card active" data-theme="violet" 
+                         data-primary="#667eea" data-secondary="#764ba2" data-accent="#f093fb">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);"></div>
+                        <h5 class="text-white text-center mb-2">Violet Premium</h5>
+                        <p class="text-center text-white-50 small">Thème par défaut</p>
+                    </div>
+                </div>
+
+                <!-- Thème Bleu -->
+                <div class="col-md-4">
+                    <div class="theme-card" data-theme="bleu"
+                         data-primary="#4facfe" data-secondary="#00f2fe" data-accent="#43e97b">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #4facfe, #00f2fe, #43e97b);"></div>
+                        <h5 class="text-white text-center mb-2">Bleu Océan</h5>
+                        <p class="text-center text-white-50 small">Frais et dynamique</p>
+                    </div>
+                </div>
+
+                <!-- Thème Rose -->
+                <div class="col-md-4">
+                    <div class="theme-card" data-theme="rose"
+                         data-primary="#f857a6" data-secondary="#ff5858" data-accent="#feca57">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #f857a6, #ff5858, #feca57);"></div>
+                        <h5 class="text-white text-center mb-2">Rose Sunset</h5>
+                        <p class="text-center text-white-50 small">Chaleureux et moderne</p>
+                    </div>
+                </div>
+
+                <!-- Thème Vert -->
+                <div class="col-md-4">
+                    <div class="theme-card" data-theme="vert"
+                         data-primary="#11998e" data-secondary="#38ef7d" data-accent="#7ed6df">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #11998e, #38ef7d, #7ed6df);"></div>
+                        <h5 class="text-white text-center mb-2">Vert Nature</h5>
+                        <p class="text-center text-white-50 small">Apaisant et naturel</p>
+                    </div>
+                </div>
+
+                <!-- Thème Orange -->
+                <div class="col-md-4">
+                    <div class="theme-card" data-theme="orange"
+                         data-primary="#f79d00" data-secondary="#ff6b6b" data-accent="#ee5a6f">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #f79d00, #ff6b6b, #ee5a6f);"></div>
+                        <h5 class="text-white text-center mb-2">Orange Énergie</h5>
+                        <p class="text-center text-white-50 small">Énergique et vif</p>
+                    </div>
+                </div>
+
+                <!-- Thème Minimaliste -->
+                <div class="col-md-4">
+                    <div class="theme-card" data-theme="minimal"
+                         data-primary="#667eea" data-secondary="#764ba2" data-accent="#a8a8a8">
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #667eea, #764ba2, #a8a8a8);"></div>
+                        <h5 class="text-white text-center mb-2">Minimaliste</h5>
+                        <p class="text-center text-white-50 small">Sobre et élégant</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personnalisation Avancée -->
+        <div class="glass-card mb-4">
+            <h3 class="text-white mb-4">
+                <i class="bi bi-sliders me-2"></i> Personnalisation Avancée
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="color-picker-group">
+                        <label class="text-white mb-2">Couleur Primaire</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="color" id="primaryColor" class="color-picker" value="#667eea">
+                            <span class="text-white" id="primaryHex">#667eea</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="color-picker-group">
+                        <label class="text-white mb-2">Couleur Secondaire</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="color" id="secondaryColor" class="color-picker" value="#764ba2">
+                            <span class="text-white" id="secondaryHex">#764ba2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="color-picker-group">
+                        <label class="text-white mb-2">Couleur Accent</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="color" id="accentColor" class="color-picker" value="#f093fb">
+                            <span class="text-white" id="accentHex">#f093fb</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-apply me-3" onclick="applyCustomTheme()">
+                    <i class="bi bi-check-circle me-2"></i> Appliquer le Thème
+                </button>
+                <button class="btn btn-reset" onclick="resetTheme()">
+                    <i class="bi bi-arrow-counterclockwise me-2"></i> Réinitialiser
+                </button>
+            </div>
+        </div>
+
+        <!-- Aperçu en Temps Réel -->
+        <div class="preview-section">
+            <h3 class="text-white mb-4">
+                <i class="bi bi-eye me-2"></i> Aperçu en Temps Réel
+            </h3>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="preview-kpi">
+                        <i class="bi bi-speedometer2 fs-2 mb-2"></i>
+                        <div class="fs-4 fw-bold">42</div>
+                        <small>Total Abonnements</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="preview-kpi">
+                        <i class="bi bi-wallet2 fs-2 mb-2"></i>
+                        <div class="fs-4 fw-bold">150€</div>
+                        <small>Dépenses Mensuelles</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="preview-kpi">
+                        <i class="bi bi-graph-up fs-2 mb-2"></i>
+                        <div class="fs-4 fw-bold">+15%</div>
+                        <small>Économies</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="preview-kpi">
+                        <i class="bi bi-bell fs-2 mb-2"></i>
+                        <div class="fs-4 fw-bold">3</div>
+                        <small>Alertes</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gradient-preview">
+                Prévisualisation du Gradient
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/navbar-auth.js"></script>
+    <script src="/themes.js"></script>
+</body>
+</html>
