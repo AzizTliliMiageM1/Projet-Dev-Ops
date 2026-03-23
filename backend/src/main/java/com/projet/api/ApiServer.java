@@ -134,6 +134,56 @@ public class ApiServer {
                 return mapper.writeValueAsString(opt.get());
             });
 
+            // 🔵 CONVERSION DE DEVISES POUR UN ABONNEMENT
+            get("/abonnements/:id/convert", (req, res) -> {
+                res.type("application/json");
+                
+                String abonnementId = req.params(":id");
+                String currencies = req.queryParamOrDefault("currencies", "USD,GBP,CHF");
+                
+                AbonnementRepository repo = getOrCreateRepo(req);
+                var opt = repo.findByUuid(abonnementId);
+                
+                if (opt.isEmpty()) {
+                    res.status(404);
+                    return "{\"error\":\"Abonnement not found\"}";
+                }
+                
+                Abonnement abo = opt.get();
+                
+                try {
+                    com.projet.service.ExchangeRateService exchangeService = 
+                        new com.projet.service.ExchangeRateServiceImpl();
+                    
+                    Map<String, Double> rates = exchangeService.getExchangeRates("EUR", currencies);
+                    
+                    com.projet.backend.domain.CurrencyConversion conversion = 
+                        new com.projet.backend.domain.CurrencyConversion(
+                            abonnementId,
+                            abo.getNomService(),
+                            abo.getPrixMensuel(),
+                            "EUR"
+                        );
+                    
+                    // Convertir pour chaque devise
+                    for (String currency : currencies.split(",")) {
+                        currency = currency.trim();
+                        Double rate = rates.get(currency.toUpperCase());
+                        if (rate != null) {
+                            double convertedPrice = abo.getPrixMensuel() * rate;
+                            conversion.addConversion(currency, convertedPrice, rate);
+                        }
+                    }
+                    
+                    return mapper.writeValueAsString(conversion);
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(
+                        Map.of("error", "Erreur lors de la conversion : " + e.getMessage())
+                    );
+                }
+            });
+
             // 🔵 PRÉVISION DU COÛT SUR 3 MOIS
             get("/prediction", (req, res) -> {
                 res.type("application/json");
