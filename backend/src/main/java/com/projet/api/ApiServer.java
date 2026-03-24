@@ -704,14 +704,19 @@ public class ApiServer {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
-                
+
                 res.type("application/json");
-                AbonnementRepository repo = getOrCreateRepo(req);
-                List<Abonnement> abonnements = repo.findAll();
-                
-                var report = SubscriptionOptimizer.generateOptimizationReport(abonnements);
-                
-                return mapper.writeValueAsString(report);
+                try {
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    var report = SubscriptionOptimizer.generateOptimizationReport(abonnements);
+
+                    return mapper.writeValueAsString(report);
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(Map.of("error", "Erreur interne lors du calcul d'optimisation"));
+                }
             });
 
             // =================================================
@@ -723,17 +728,33 @@ public class ApiServer {
                     res.status(401);
                     return "{\"error\":\"Vous devez être connecté\"}";
                 }
-                
-                res.type("application/json");
-                AbonnementRepository repo = getOrCreateRepo(req);
-                List<Abonnement> abonnements = repo.findAll();
-                
-                String monthsParam = req.queryParams("months");
-                int months = (monthsParam != null) ? Integer.parseInt(monthsParam) : 6;
 
-                var forecast = forecastService.projectCosts(abonnements, months);
-                
-                return mapper.writeValueAsString(forecast);
+                res.type("application/json");
+                try {
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    List<Abonnement> abonnements = repo.findAll();
+
+                    String monthsParam = req.queryParams("months");
+                    int months = 6;
+                    if (monthsParam != null) {
+                        try {
+                            months = Integer.parseInt(monthsParam);
+                        } catch (NumberFormatException nfe) {
+                            res.status(400);
+                            return mapper.writeValueAsString(Map.of("error", "Le paramètre 'months' doit être un entier"));
+                        }
+                    }
+
+                    var forecast = forecastService.projectCosts(abonnements, months);
+
+                    return mapper.writeValueAsString(forecast);
+                } catch (IllegalArgumentException iae) {
+                    res.status(400);
+                    return mapper.writeValueAsString(Map.of("error", iae.getMessage()));
+                } catch (Exception e) {
+                    res.status(500);
+                    return mapper.writeValueAsString(Map.of("error", "Erreur interne lors du calcul de prévision"));
+                }
             });
 
             // =================================================

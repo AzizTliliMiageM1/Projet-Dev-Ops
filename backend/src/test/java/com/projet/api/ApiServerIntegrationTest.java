@@ -2,6 +2,7 @@ package com.projet.api;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.ServerSocket;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,8 +29,9 @@ import spark.Spark;
 @DisplayName("Tests d'intégration de l'API Server")
 class ApiServerIntegrationTest {
 
-    private static final String BASE_URL = "http://localhost:4567";
+    private static String baseUrl;
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(2);
+    private static int testPort;
 
     private static Thread serverThread;
     private static HttpClient client;
@@ -38,6 +40,9 @@ class ApiServerIntegrationTest {
     @BeforeAll
     static void startServer() throws Exception {
         System.setProperty("DISABLE_AUTH_FOR_TESTS", "true");
+        testPort = findAvailablePort();
+        System.setProperty("app.port", String.valueOf(testPort));
+        baseUrl = "http://localhost:" + testPort;
 
         client = HttpClient.newHttpClient();
         objectMapper = new ObjectMapper();
@@ -59,6 +64,7 @@ class ApiServerIntegrationTest {
             // Ignore arrêt Spark en fin de test
         } finally {
             System.clearProperty("DISABLE_AUTH_FOR_TESTS");
+            System.clearProperty("app.port");
         }
     }
 
@@ -202,6 +208,15 @@ class ApiServerIntegrationTest {
     }
 
     private static URI buildUri(String path) {
-        return URI.create(BASE_URL + path);
+        return URI.create(baseUrl + path);
+    }
+
+    private static int findAvailablePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            socket.setReuseAddress(true);
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new IllegalStateException("Impossible de réserver un port de test", e);
+        }
     }
 }

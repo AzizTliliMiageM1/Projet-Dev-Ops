@@ -282,55 +282,87 @@
         let forecastChart = null;
         let predictionChart = null;
 
+        async function fetchJsonSafe(url) {
+            try {
+                const response = await fetch(url);
+                let payload = null;
+
+                try {
+                    payload = await response.json();
+                } catch (_) {
+                    payload = null;
+                }
+
+                if (!response.ok) {
+                    const message = (payload && (payload.error || payload.message))
+                        ? (payload.error || payload.message)
+                        : `HTTP ${response.status}`;
+                    return { ok: false, data: null, error: message };
+                }
+
+                return { ok: true, data: payload, error: null };
+            } catch (error) {
+                return {
+                    ok: false,
+                    data: null,
+                    error: error && error.message ? error.message : 'Erreur réseau'
+                };
+            }
+        }
+
         // Charger toutes les analytics
         async function loadAnalytics() {
             try {
-                // Charger données en parallèle
-                const [optimize, forecast, metrics, anomalies, duplicates, monthlyReport, clusters, predictions, patterns, portfolioHealth] = await Promise.all([
-                    fetch('/api/analytics/optimize').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement optimize');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/forecast').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement forecast');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/metrics').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement metrics');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/anomalies').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement anomalies');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/duplicates').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement duplicates');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/monthly-report').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement report');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/clusters').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement clusters');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/predict-spending').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement predictions');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/seasonal-patterns').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement patterns');
-                        return r.json();
-                    }),
-                    fetch('/api/analytics/portfolio-health').then(r => {
-                        if (!r.ok) throw new Error('Erreur chargement health');
-                        return r.json();
-                    })
+                document.getElementById('loading').innerHTML = `
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-3">Récupération des données analytics...</p>
+                `;
+
+                const [
+                    optimizeRes,
+                    forecastRes,
+                    metricsRes,
+                    anomaliesRes,
+                    duplicatesRes,
+                    monthlyReportRes,
+                    clustersRes,
+                    predictionsRes,
+                    patternsRes,
+                    portfolioHealthRes
+                ] = await Promise.all([
+                    fetchJsonSafe('/api/analytics/optimize'),
+                    fetchJsonSafe('/api/analytics/forecast'),
+                    fetchJsonSafe('/api/analytics/metrics'),
+                    fetchJsonSafe('/api/analytics/anomalies'),
+                    fetchJsonSafe('/api/analytics/duplicates'),
+                    fetchJsonSafe('/api/analytics/monthly-report'),
+                    fetchJsonSafe('/api/analytics/clusters'),
+                    fetchJsonSafe('/api/analytics/predict-spending'),
+                    fetchJsonSafe('/api/analytics/seasonal-patterns'),
+                    fetchJsonSafe('/api/analytics/portfolio-health')
                 ]);
 
+                const optimize = optimizeRes.data || {};
+                const forecast = forecastRes.data || {};
+                const metrics = metricsRes.data || {};
+                const anomalies = anomaliesRes.data || {};
+                const duplicates = duplicatesRes.data || [];
+                const monthlyReport = monthlyReportRes.data || {};
+                const clusters = clustersRes.data || {};
+                const predictions = predictionsRes.data || {};
+                const patterns = patternsRes.data || {};
+                const portfolioHealth = portfolioHealthRes.data || {};
+
+                const criticalErrors = [optimizeRes, metricsRes, monthlyReportRes].filter(r => !r.ok);
+                if (criticalErrors.length === 3) {
+                    const firstError = criticalErrors[0].error || 'Erreur de chargement';
+                    throw new Error(firstError);
+                }
+
                 // Afficher score santé portfolio
-                displayPortfolioHealth(portfolioHealth.healthScore);
+                displayPortfolioHealth(Number(portfolioHealth.healthScore) || 0);
 
                 // Afficher clustering
                 displayClustering(clusters);
@@ -339,7 +371,7 @@
                 displayMainMetrics(optimize, metrics);
 
                 // Afficher analyse détaillée
-                displaySubscriptionAnalysis(optimize.analyses);
+                displaySubscriptionAnalysis(Array.isArray(optimize.analyses) ? optimize.analyses : []);
 
                 // Afficher prévisions
                 displayForecast(forecast);
@@ -357,10 +389,10 @@
                 displayDuplicates(duplicates);
 
                 // Afficher recommandations
-                displayRecommendations(monthlyReport.recommendations);
+                displayRecommendations(Array.isArray(monthlyReport.recommendations) ? monthlyReport.recommendations : []);
 
                 // Afficher top dépenses
-                displayTopExpenses(monthlyReport.top3Depenses);
+                displayTopExpenses(Array.isArray(monthlyReport.top3Depenses) ? monthlyReport.top3Depenses : []);
 
                 // Masquer loading, afficher contenu
                 document.getElementById('loading').style.display = 'none';
@@ -383,14 +415,18 @@
             const score = 75; // À calculer selon la logique
             document.getElementById('optimizationScore').textContent = score + '%';
 
+            const savings = Number(optimize.economiesPotentielles) || 0;
+            const averageROI = Number(metrics.averageROI) || 0;
+            const highRiskCount = Number(metrics.highRiskCount) || 0;
+
             document.getElementById('potentialSavings').textContent = 
-                optimize.economiesPotentielles.toFixed(2) + '€/mois';
+                savings.toFixed(2) + '€/mois';
 
             document.getElementById('averageROI').textContent = 
-                metrics.averageROI.toFixed(0) + '%';
+                averageROI.toFixed(0) + '%';
 
             document.getElementById('highRiskCount').textContent = 
-                metrics.highRiskCount;
+                highRiskCount;
         }
 
         function displaySubscriptionAnalysis(analyses) {
@@ -403,29 +439,32 @@
 
             let html = '';
             analyses.forEach(analysis => {
-                const abo = analysis.abonnement;
-                const scoreClass = getScoreClass(analysis.valueScore);
-                const riskBadge = getRiskBadge(analysis.churnRisk);
+                const abo = analysis.abonnement || {};
+                const valueScore = Number(analysis.valueScore) || 0;
+                const churnRisk = Number(analysis.churnRisk) || 0;
+                const costPerUse = Number(analysis.costPerUse) || 0;
+                const scoreClass = getScoreClass(valueScore);
+                const riskBadge = getRiskBadge(churnRisk);
 
                 html += `
                     <div class="subscription-item">
                         <div>
-                            <h5 class="mb-1">${abo.nomService}</h5>
+                            <h5 class="mb-1">${abo.nomService || 'Service inconnu'}</h5>
                             <small class="text-muted">${abo.categorie || 'Non classé'}</small>
                             <div class="mt-2">
                                 ${riskBadge}
                                 ${analysis.priceAnomaly ? '<span class="risk-badge risk-high">⚠️ Prix anormal</span>' : ''}
                             </div>
                             <div class="mt-2 small">
-                                <i class="fas fa-info-circle"></i> ${analysis.recommendation}
+                                <i class="fas fa-info-circle"></i> ${analysis.recommendation || 'Aucune recommandation'}
                             </div>
                         </div>
                         <div class="text-end">
                             <div class="score-circle ${scoreClass}">
-                                ${analysis.valueScore.toFixed(1)}
+                                ${valueScore.toFixed(1)}
                             </div>
-                            <small class="d-block mt-2">${abo.prixMensuel}€/mois</small>
-                            <small class="text-muted">${analysis.costPerUse.toFixed(2)}€/usage</small>
+                            <small class="d-block mt-2">${(Number(abo.prixMensuel) || 0).toFixed(2)}€/mois</small>
+                            <small class="text-muted">${costPerUse.toFixed(2)}€/usage</small>
                         </div>
                     </div>
                 `;
@@ -435,8 +474,16 @@
         }
 
         function displayForecast(forecast) {
-            const labels = Object.keys(forecast);
-            const data = Object.values(forecast);
+            const costs = (forecast && forecast.projectedCosts && typeof forecast.projectedCosts === 'object')
+                ? forecast.projectedCosts
+                : (forecast || {});
+
+            const labels = Object.keys(costs);
+            const data = Object.values(costs).map(value => Number(value) || 0);
+
+            if (labels.length === 0) {
+                return;
+            }
 
             const ctx = document.getElementById('forecastChart').getContext('2d');
             
@@ -481,20 +528,51 @@
 
         function displayAnomalies(anomalies) {
             const container = document.getElementById('anomaliesList');
-            
-            if (!anomalies || anomalies.length === 0) {
+
+            const underutilized = Array.isArray(anomalies.underutilizedSubscriptions)
+                ? anomalies.underutilizedSubscriptions
+                : [];
+            const duplicateSubscriptions = Array.isArray(anomalies.duplicateSubscriptions)
+                ? anomalies.duplicateSubscriptions
+                : [];
+            const inconsistencies = anomalies.inconsistentSubscriptions && typeof anomalies.inconsistentSubscriptions === 'object'
+                ? anomalies.inconsistentSubscriptions
+                : {};
+
+            if (underutilized.length === 0 && duplicateSubscriptions.length === 0 && Object.keys(inconsistencies).length === 0) {
                 container.innerHTML = '<p class="text-success"><i class="fas fa-check-circle"></i> Aucune anomalie détectée</p>';
                 return;
             }
 
             let html = '';
-            anomalies.forEach(anomaly => {
+
+            underutilized.forEach(sub => {
                 html += `
                     <div class="recommendation-card" style="border-left-color: #dc3545;">
-                        <h6><i class="fas fa-exclamation-triangle"></i> ${anomaly.nomService}</h6>
-                        <p class="mb-0">${anomaly.message} - <strong>${anomaly.prix}€/mois</strong></p>
+                        <h6><i class="fas fa-exclamation-triangle"></i> Sous-utilisé: ${sub.nomService || 'Service'}</h6>
+                        <p class="mb-0">Abonnement actif à faible valeur d'usage - <strong>${(Number(sub.prixMensuel) || 0).toFixed(2)}€/mois</strong></p>
                     </div>
                 `;
+            });
+
+            duplicateSubscriptions.forEach(sub => {
+                html += `
+                    <div class="recommendation-card" style="border-left-color: #ffc107;">
+                        <h6><i class="fas fa-copy"></i> Doublon potentiel: ${sub.nomService || 'Service'}</h6>
+                        <p class="mb-0">Client: ${sub.clientName || 'N/A'} - <strong>${(Number(sub.prixMensuel) || 0).toFixed(2)}€/mois</strong></p>
+                    </div>
+                `;
+            });
+
+            Object.entries(inconsistencies).forEach(([key, list]) => {
+                if (Array.isArray(list) && list.length > 0) {
+                    html += `
+                        <div class="recommendation-card" style="border-left-color: #17a2b8;">
+                            <h6><i class="fas fa-info-circle"></i> Incohérence: ${key}</h6>
+                            <p class="mb-0">${list.length} abonnement(s) concerné(s)</p>
+                        </div>
+                    `;
+                }
             });
 
             container.innerHTML = html;

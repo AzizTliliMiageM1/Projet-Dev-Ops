@@ -72,9 +72,10 @@ class ForecastServiceTest {
 
         Map<?, ?> projectedCosts = result.getProjectedCosts();
 
+        // Fenêtre glissante sur N mois: selon le jour du mois, le résultat peut couvrir N+1 périodes YearMonth.
         assertTrue(
-                projectedCosts.size() <= 6,
-                "Le nombre de périodes projetées ne doit pas dépasser le nombre de mois demandé"
+                projectedCosts.size() <= 7,
+                "Le nombre de périodes projetées ne doit pas dépasser le nombre de mois demandé + 1"
         );
     }
 
