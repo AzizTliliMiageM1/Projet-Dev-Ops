@@ -519,6 +519,19 @@
             transform: translateY(-2px) scale(1.05);
         }
 
+        .btn-banking {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-banking:hover {
+            color: white;
+            transform: translateY(-2px) scale(1.04);
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+        }
+
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -858,7 +871,9 @@
     <div id="dashboard-section" class="dashboard-section">
         <div class="dashboard-container">
             <div class="dashboard-header">
-                <div></div>
+                <a href="/bank-integration.html" class="btn btn-banking">
+                    <i class="fas fa-building-columns"></i> Intégration bancaire
+                </a>
                 <button class="btn-logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Déconnexion
                 </button>

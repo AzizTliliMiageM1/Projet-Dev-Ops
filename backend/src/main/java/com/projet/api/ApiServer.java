@@ -2,10 +2,16 @@ package com.projet.api;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 
 import com.projet.backend.domain.Abonnement;
+import com.projet.backend.domain.Transaction;
+import com.projet.backend.domain.DetectedSubscription;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -27,6 +33,8 @@ import com.projet.analytics.lifecycle.LifecyclePlanResult;
 import com.projet.service.SubscriptionOptimizer;
 import com.projet.service.ServiceMailgun;
 import com.projet.service.ServiceTauxChange;
+import com.projet.service.OpenBankingSubscriptionDetectionService;
+import com.projet.service.PDFToCsvConverter;
 import com.projet.analytics.optimization.SubscriptionOptimizationService;
 import com.projet.analytics.optimization.SubscriptionOptimizationServiceImpl;
 
@@ -121,6 +129,189 @@ public class ApiServer {
         //     🔵  API /api/...
         // =================================================
         path("/api", () -> {
+
+            // =================================================
+            // 🟢 IMPORT BANCAIRE UNIFIÉ (CSV/PDF)
+            // =================================================
+            path("/bank", () -> {
+                post("/import", (req, res) -> {
+                    res.type("application/json");
+                    String userEmail = req.session().attribute("user_email");
+
+                    if (userEmail == null) {
+                        res.status(401);
+                        return mapper.writeValueAsString(Map.of("error", "Non authentifié"));
+                    }
+
+                    byte[] payload = req.bodyAsBytes();
+                    if (payload == null || payload.length == 0) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Fichier vide"));
+                    }
+
+                    String contentType = req.contentType() == null ? "" : req.contentType().toLowerCase();
+                    String fileName = req.headers("X-File-Name") == null ? "" : req.headers("X-File-Name").toLowerCase();
+
+                    boolean isPdf = contentType.contains("pdf") || fileName.endsWith(".pdf");
+                    boolean isCsv = contentType.contains("csv")
+                        || contentType.contains("text/plain")
+                        || contentType.contains("ms-excel")
+                        || fileName.endsWith(".csv")
+                        || fileName.endsWith(".txt")
+                        || contentType.isBlank();
+
+                    if (!isPdf && !isCsv) {
+                        res.status(415);
+                        return mapper.writeValueAsString(Map.of(
+                            "error", "Format non supporté. Utilisez un fichier CSV ou PDF"
+                        ));
+                    }
+
+                    String csvContent;
+                    try {
+                        if (isPdf) {
+                            try (InputStream pdfInputStream = new ByteArrayInputStream(payload)) {
+                                csvContent = PDFToCsvConverter.convertPdfToCsv(pdfInputStream);
+                            }
+                        } else {
+                            csvContent = new String(payload, StandardCharsets.UTF_8);
+                        }
+                    } catch (Exception e) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of(
+                            "error", "Impossible de lire le fichier importé: " + e.getMessage()
+                        ));
+                    }
+
+                    if (csvContent == null || csvContent.trim().isEmpty()) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Aucune donnée exploitable trouvée"));
+                    }
+
+                    OpenBankingSubscriptionDetectionService service = new OpenBankingSubscriptionDetectionService();
+                    List<Transaction> transactions = service.parseCSV(csvContent);
+                    List<DetectedSubscription> detected = service.detectRecurringSubscriptions(transactions);
+
+                    List<Map<String, Object>> result = new ArrayList<>();
+                    for (DetectedSubscription sub : detected) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("service", sub.getService());
+                        item.put("category", sub.getCategory());
+                        item.put("amount", sub.getAmount());
+                        item.put("frequency", sub.getFrequency());
+                        item.put("confidence", sub.getConfidence());
+                        item.put("optimizationScore", sub.getOptimizationScore());
+                        item.put("recommendation", sub.getRecommendation());
+                        item.put("occurrences", sub.getOccurrences());
+                        item.put("firstDetected", sub.getFirstDetected());
+                        item.put("lastDetected", sub.getLastDetected());
+                        result.add(item);
+                    }
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("importedFormat", isPdf ? "PDF" : "CSV");
+                    response.put("csvContent", csvContent);
+                    response.put("transactionsProcessed", transactions.size());
+                    response.put("subscriptionsDetected", detected.size());
+                    response.put("detections", result);
+
+                    return mapper.writeValueAsString(response);
+                });
+            });
+
+            // =================================================
+            // 🟢 OPEN BANKING - DÉTECTION ABONNEMENTS
+            // =================================================
+            path("/open-banking", () -> {
+                post("/import", (req, res) -> {
+                    res.type("application/json");
+                    String userEmail = req.session().attribute("user_email");
+
+                    if (userEmail == null) {
+                        res.status(401);
+                        return mapper.writeValueAsString(Map.of("error", "Non authentifié"));
+                    }
+
+                    String csvContent = req.body();
+                    if (csvContent == null || csvContent.trim().isEmpty()) {
+                        res.status(400);
+                        return mapper.writeValueAsString(Map.of("error", "Contenu CSV vide"));
+                    }
+
+                    OpenBankingSubscriptionDetectionService service = new OpenBankingSubscriptionDetectionService();
+                    List<Transaction> transactions = service.parseCSV(csvContent);
+                    List<DetectedSubscription> detected = service.detectRecurringSubscriptions(transactions);
+
+                    List<Map<String, Object>> result = new ArrayList<>();
+                    for (DetectedSubscription sub : detected) {
+                        Map<String, Object> item = new HashMap<>();
+                        item.put("service", sub.getService());
+                        item.put("category", sub.getCategory());
+                        item.put("amount", sub.getAmount());
+                        item.put("frequency", sub.getFrequency());
+                        item.put("confidence", sub.getConfidence());
+                        item.put("optimizationScore", sub.getOptimizationScore());
+                        item.put("recommendation", sub.getRecommendation());
+                        item.put("occurrences", sub.getOccurrences());
+                        item.put("firstDetected", sub.getFirstDetected());
+                        item.put("lastDetected", sub.getLastDetected());
+                        result.add(item);
+                    }
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("transactionsProcessed", transactions.size());
+                    response.put("subscriptionsDetected", detected.size());
+                    response.put("detections", result);
+
+                    return mapper.writeValueAsString(response);
+                });
+
+                post("/add-detected", (req, res) -> {
+                    res.type("application/json");
+                    String userEmail = req.session().attribute("user_email");
+
+                    if (userEmail == null) {
+                        res.status(401);
+                        return mapper.writeValueAsString(Map.of("error", "Non authentifié"));
+                    }
+
+                    com.fasterxml.jackson.databind.JsonNode body = mapper.readTree(req.body());
+                    String serviceName = body.get("service").asText();
+                    String category = body.get("category").asText();
+                    double amount = body.get("amount").asDouble();
+
+                    DetectedSubscription detected = new DetectedSubscription(serviceName, category, amount, "Mensuel");
+                    OpenBankingSubscriptionDetectionService detectionService = new OpenBankingSubscriptionDetectionService();
+                    Abonnement abonnement = detectionService.convertToAbonnement(detected, userEmail);
+
+                    AbonnementRepository repo = getOrCreateRepo(req);
+                    repo.save(abonnement);
+
+                    Map<String, Object> response = new HashMap<>();
+                    response.put("success", true);
+                    response.put("abonnementId", abonnement.getId());
+                    response.put("message", "Abonnement détecté ajouté avec succès");
+
+                    return mapper.writeValueAsString(response);
+                });
+            });
+
+            // =================================================
+            // 🏦 PDF BANK STATEMENT - STATUS / BACKWARD COMPAT
+            // =================================================
+            path("/pdf-bank", () -> {
+                get("/status", (req, res) -> {
+                    res.type("application/json");
+                    return mapper.writeValueAsString(Map.of(
+                        "status", "active",
+                        "supported_format", "PDF",
+                        "conversion_target", "CSV",
+                        "parser", "Apache PDFBox 3.0"
+                    ));
+                });
+            });
 
             // =================================================
             // 🔒 PROTECTION : Routes abonnements - créer repo par utilisateur

@@ -3,290 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🏦 Intégration Bancaire - Gestion Abonnements</title>
+    <title>Import Bancaire - AboManager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="/theme-variables.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
     <style>
+        * { font-family: 'Inter', -apple-system, sans-serif; }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            padding: 2rem 0;
         }
-
-        .bank-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 2rem;
-            margin-bottom: 2rem;
+        
+        .import-container {
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
-
-        .upload-zone {
-            border: 3px dashed var(--primary-color, #667eea);
-            border-radius: 20px;
-            padding: 3rem;
-            text-align: center;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-zone:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            transform: scale(1.02);
-        }
-
-        .upload-zone.dragover {
-            border-color: #f093fb;
-            background: linear-gradient(135deg, rgba(240, 147, 251, 0.2), rgba(245, 87, 108, 0.2));
-        }
-
-        .transaction-row {
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 10px;
+        
+        .import-card {
             background: white;
-            border: 2px solid #e0e0e0;
-            transition: all 0.3s;
-        }
-
-        .transaction-row:hover {
-            border-color: var(--primary-color, #667eea);
-            transform: translateX(5px);
-        }
-
-        .transaction-matched {
-            border-color: #10b981;
-            background: linear-gradient(to right, rgba(16, 185, 129, 0.1), transparent);
-        }
-
-        .transaction-unmatched {
-            border-color: #f59e0b;
-            background: linear-gradient(to right, rgba(245, 158, 11, 0.1), transparent);
-        }
-
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2));
-            color: white;
             border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            padding: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
         }
-
-        .balance-amount {
-            font-size: 3rem;
+        
+        .import-title {
+            color: #667eea;
+            font-size: 2rem;
             font-weight: 800;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-
-        .impact-positive {
-            color: #10b981;
-            font-weight: 600;
+        
+        .import-subtitle {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 30px;
         }
-
-        .impact-negative {
-            color: #ef4444;
-            font-weight: 600;
+        
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
         }
-
-        .detected-badge {
-            background: linear-gradient(135deg, #f59e0b, #fbbf24);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
+        
+        .upload-zone:hover {
+            background: #e8eaff;
+            border-color: #764ba2;
+            transform: translateY(-2px);
+        }
+        
+        .upload-zone.dragover {
+            background: #e0e2ff;
+            border-color: #764ba2;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .help-section {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .help-title {
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .result-badge {
             display: inline-block;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-            animation: pulse 2s infinite;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 5px;
         }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        
+        .detection-row {
+            border-bottom: 1px solid #eee;
+            padding: 15px 0;
         }
-
-        .btn-action {
-            background: linear-gradient(135deg, var(--primary-color, #667eea), var(--secondary-color, #764ba2));
+        
+        .detection-row:last-child {
+            border-bottom: none;
+        }
+        
+        .confidence-bar {
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%);
+        }
+        
+        .btn-success-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             color: white;
-            padding: 12px 30px;
-            border-radius: 15px;
-            font-weight: 600;
-            transition: all 0.3s;
         }
-
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        
+        .btn-success-gradient:hover {
+            opacity: 0.9;
             color: white;
         }
 
-        .timeline-month {
-            position: relative;
-            padding-left: 30px;
-            border-left: 3px solid var(--primary-color, #667eea);
-            margin-bottom: 2rem;
-        }
-
-        .timeline-month::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 0;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--primary-color, #667eea);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
+        .auth-warning {
+            background: #fff3cd;
+            border: 1px solid #ffe69c;
+            color: #664d03;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+    <div class="import-container">
         <div class="container">
-            <a class="navbar-brand" href="/index.html">
-                <i class="bi bi-bank"></i> Intégration Bancaire
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/analytics.html"><i class="bi bi-bar-chart-line"></i> Analytics</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/expenses.html"><i class="bi bi-wallet2"></i> Dépenses</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/export-import.html"><i class="bi bi-download"></i> Export/Import</a></li>
-                    <li class="nav-item"><a class="nav-link active" href="/bank-integration.html"><i class="bi bi-bank"></i> Banque</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/notifications.html"><i class="bi bi-envelope"></i> Notifications</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/themes.html"><i class="bi bi-palette"></i> Thèmes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/home.html"><i class="bi bi-house"></i> Home</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+            <div id="auth-warning" class="auth-warning" style="display:none;"></div>
 
-    <div class="container">
-        <!-- Header -->
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-white mb-3">
-                🏦 Intégration Bancaire Intelligente
-            </h1>
-            <p class="lead text-white">Importez vos transactions, détectez les abonnements cachés et simulez votre solde</p>
-        </div>
-
-        <!-- Solde Virtuel -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="balance-card">
-                    <h4 class="mb-3"><i class="bi bi-cash-coin"></i> Solde Actuel</h4>
-                    <div class="balance-amount" id="currentBalance">0.00€</div>
-                    <small class="opacity-75">Mis à jour en temps réel</small>
+            <!-- Navigation -->
+            <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); border-radius: 12px;">
+                <div class="container-fluid">
+                    <span class="navbar-brand"><i class="bi bi-bank2"></i> Intégration Bancaire</span>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="balance-card" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
-                    <h4 class="mb-3"><i class="bi bi-calculator"></i> Solde Prévu (30j)</h4>
-                    <div class="balance-amount" id="projectedBalance">0.00€</div>
-                    <div id="balanceImpact" class="mt-2"></div>
+            </nav>
+            
+            <!-- Main Import Card -->
+            <div class="import-card">
+                <div class="import-title">
+                    <i class="bi bi-bank"></i>
+                    <span>Détection d'Abonnements Bancaires</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Upload Zone -->
-        <div class="bank-card">
-            <h3 class="mb-4"><i class="bi bi-cloud-upload"></i> Importer Relevé Bancaire</h3>
-            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-                <i class="bi bi-file-earmark-arrow-up" style="font-size: 4rem; color: var(--primary-color, #667eea);"></i>
-                <h4 class="mt-3">Glissez votre fichier CSV ici</h4>
-                <p class="text-muted">ou cliquez pour sélectionner</p>
-                <p class="small text-muted">Formats acceptés : CSV, OFX, QIF</p>
-                <input type="file" id="fileInput" accept=".csv,.ofx,.qif" style="display: none;" onchange="handleFileUpload(event)">
+                <p class="import-subtitle">
+                    Importez votre relevé bancaire pour détecter automatiquement vos abonnements récurrents
+                </p>
+                
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="uploadZone">
+                    <div class="upload-icon">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                    </div>
+                    <h5>Dépose ton fichier CSV ici</h5>
+                    <p class="text-muted">ou clique pour parcourir</p>
+                    <input type="file" id="csvFileInput" class="file-input" accept=".csv,.txt">
+                </div>
+                
+                <!-- Import Button -->
+                <div class="mt-4 text-center">
+                    <button class="btn btn-lg btn-success-gradient" id="importCSVBtn">
+                        <i class="bi bi-download"></i> Importer CSV
+                    </button>
+                </div>
+                
+                <!-- Help Section -->
+                <div class="help-section">
+                    <div class="help-title">
+                        <i class="bi bi-info-circle"></i> Format attendu
+                    </div>
+                    <pre style="background: white; padding: 10px; border-radius: 5px; overflow-x: auto;">Date;Label;Amount
+2024-01-01;NETFLIX.COM;15.99
+2024-02-01;NETFLIX.COM;15.99
+2024-01-15;SPOTIFY.COM;9.99</pre>
+                </div>
             </div>
             
-            <div class="mt-4 text-center">
-                <button class="btn btn-outline-primary me-2" onclick="loadSampleData()">
-                    <i class="bi bi-file-text"></i> Charger Exemple
-                </button>
-                <button class="btn btn-outline-secondary" onclick="downloadTemplate()">
-                    <i class="bi bi-download"></i> Télécharger Template CSV
-                </button>
-            </div>
-        </div>
-
-        <!-- Statistiques Rapprochement -->
-        <div class="bank-card" id="statsCard" style="display: none;">
-            <h3 class="mb-4"><i class="bi bi-graph-up"></i> Résultats du Rapprochement</h3>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <h2 class="text-primary" id="totalTransactions">0</h2>
-                        <p class="text-muted">Transactions</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <h2 class="text-success" id="matchedCount">0</h2>
-                        <p class="text-muted">Rapprochées</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <h2 class="text-warning" id="unmatchedCount">0</h2>
-                        <p class="text-muted">Non déclarées</p>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="text-center">
-                        <h2 class="text-danger" id="detectedCount">0</h2>
-                        <p class="text-muted">Abonnements cachés</p>
-                    </div>
+            <!-- Statistics Section -->
+            <div id="open-banking-stats"></div>
+            
+            <!-- Results Section (hidden by default) -->
+            <div id="open-banking-results" style="display: none;">
+                <div class="import-card">
+                    <h4 class="mb-4">
+                        <i class="bi bi-check2-circle"></i> Abonnements Détectés
+                    </h4>
+                    <div id="open-banking-detections"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- Abonnements Non Déclarés Détectés -->
-        <div class="bank-card" id="detectedCard" style="display: none;">
-            <h3 class="mb-4">
-                <i class="bi bi-exclamation-triangle-fill text-warning"></i> 
-                Abonnements Non Déclarés Détectés
-            </h3>
-            <div id="detectedList"></div>
-        </div>
+            <!-- ============================================ -->
+            <!-- PDF BANK STATEMENT IMPORT SECTION -->
+            <!-- ============================================ -->
+            
+            <div class="import-card mt-5">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+                    <i class="bi bi-file-pdf" style="font-size: 2.5rem; color: #dc3545;"></i>
+                    <div>
+                        <h3 class="mb-0">Importer Relevé Bancaire PDF</h3>
+                        <p class="text-muted mb-0">Convertissez automatiquement votre relevé bancaire en CSV</p>
+                    </div>
+                </div>
 
-        <!-- Transactions par Mois -->
-        <div class="bank-card" id="transactionsCard" style="display: none;">
-            <h3 class="mb-4"><i class="bi bi-calendar-week"></i> Transactions Importées</h3>
-            <div id="transactionsList"></div>
-        </div>
+                <!-- PDF Upload Zone -->
+                <div id="pdfDragZone" class="upload-zone mb-4" style="cursor: pointer;">
+                    <div class="upload-icon" style="font-size: 4rem;">
+                        <i class="bi bi-file-pdf"></i>
+                    </div>
+                    <h5>Déposer votre PDF ici</h5>
+                    <p class="text-muted mb-3">ou</p>
+                    <button class="btn btn-outline-primary" id="uploadPDFBtn" type="button">
+                        <i class="bi bi-cloud-upload"></i> Parcourir et Importer
+                    </button>
+                    <input type="file" id="pdfFileInput" class="file-input" accept=".pdf" />
+                    <p class="text-muted mt-3 small">Max 10MB • PDF uniquement</p>
+                </div>
 
-        <!-- Graphique Impact -->
-        <div class="bank-card" id="chartCard" style="display: none;">
-            <h3 class="mb-4"><i class="bi bi-bar-chart"></i> Évolution du Solde (Simulation)</h3>
-            <div class="chart-container">
-                <canvas id="balanceChart"></canvas>
+                <!-- PDF Conversion Results (hidden by default) -->
+                <div id="pdf-bank-results" style="display: none;">
+                    <!-- CSV Preview -->
+                    <div id="pdf-bank-conversion" class="mb-4"></div>
+
+                    <!-- Action Buttons -->
+                    <div class="mb-4 text-end">
+                        <button class="btn btn-sm btn-outline-secondary" id="downloadCSVBtn">
+                            <i class="bi bi-download"></i> Télécharger CSV
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" id="resetPDFBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                        </button>
+                    </div>
+
+                    <!-- Detected Subscriptions -->
+                    <div class="import-card-sub">
+                        <h5 class="mb-3">
+                            <i class="bi bi-check2-circle"></i> Abonnements Détectés
+                        </h5>
+                        <div id="pdf-bank-detections"></div>
+                    </div>
+                </div>
+
+                <!-- Help Section for PDF -->
+                <div class="help-section mt-4">
+                    <div class="help-title">
+                        <i class="bi bi-info-circle"></i> Comment ça marche?
+                    </div>
+                    <ul style="margin-bottom: 0; padding-left: 20px;">
+                        <li>Téléchargez votre relevé bancaire au format PDF</li>
+                        <li>Le système extrait automatiquement les transactions</li>
+                        <li>Les abonnements récurrents sont détectés</li>
+                        <li>Vous pouvez les ajouter à votre liste ou télécharger le CSV</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="/themes.js"></script>
+    <!-- Scripts -->
+    <script src="api-client.js"></script>
+    <script src="open-banking.js"></script>
+    <script src="pdf-bank-import.js"></script>
+    
     <script>
-        if (window.ThemeManager) {
-            window.ThemeManager.loadSavedTheme();
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            async function checkSessionAccess() {
+                try {
+                    const response = await fetch('/api/session', { credentials: 'include' });
+                    const data = await response.json();
+
+                    if (!data?.authenticated) {
+                        const warning = document.getElementById('auth-warning');
+                        if (warning) {
+                            warning.style.display = 'block';
+                            warning.innerHTML = '⚠️ Vous devez être connecté pour importer des relevés. <a href="/index.html" class="alert-link">Se connecter</a>';
+                        }
+
+                        const importBtn = document.getElementById('importCSVBtn');
+                        const uploadPdfBtn = document.getElementById('uploadPDFBtn');
+                        if (importBtn) importBtn.disabled = true;
+                        if (uploadPdfBtn) uploadPdfBtn.disabled = true;
+                    }
+                } catch (err) {
+                    console.warn('Session check impossible:', err);
+                }
+            }
+
+            checkSessionAccess();
+
+            // Drag & Drop support
+            const uploadZone = document.getElementById('uploadZone');
+            const fileInput = document.getElementById('csvFileInput');
+            
+            uploadZone.addEventListener('click', () => fileInput.click());
+            
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+            });
+            
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('dragover');
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    document.getElementById('importCSVBtn').click();
+                }
+            });
+        });
     </script>
-    <script src="/bank-integration.js"></script>
 </body>
 </html>

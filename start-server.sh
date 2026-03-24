@@ -32,6 +32,10 @@ if [ ! -d "target/classes" ]; then
     echo -e "${GREEN}✓ Compilation réussie${NC}"
 fi
 
+# Toujours synchroniser les ressources statiques (HTML/JS/CSS)
+echo -e "${BLUE}✓ Synchronisation des ressources frontend...${NC}"
+mvn -q resources:resources
+
 # Créer le répertoire de logs
 mkdir -p logs
 
