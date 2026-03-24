@@ -1726,7 +1726,12 @@
         async function loadAnalytics() {
             try {
                 const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimization));
-                const data = await response.json();
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    const serverMessage = data.error || `HTTP ${response.status}`;
+                    throw new Error(serverMessage);
+                }
 
                 document.getElementById('analytics-content').innerHTML = `
                     <div style="padding: 20px;">
@@ -1735,7 +1740,8 @@
                     </div>
                 `;
             } catch (error) {
-                document.getElementById('analytics-content').innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Erreur de chargement</div>';
+                const message = error && error.message ? error.message : 'Erreur de chargement';
+                document.getElementById('analytics-content').innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
             }
         }
 

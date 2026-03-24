@@ -20,16 +20,16 @@ const API_CONFIG = {
         abonnementsExport: '/api/abonnements/export/csv',
         
         // Analytics
-        analytics: '/analytics/optimize',
-        forecast: '/analytics/forecast',
-        anomalies: '/analytics/anomalies',
-        duplicates: '/analytics/duplicates',
-        monthlyReport: '/analytics/monthly-report',
-        optimization: '/analytics/optimization',
+        analytics: '/api/analytics/optimize',
+        forecast: '/api/analytics/forecast',
+        anomalies: '/api/analytics/anomalies',
+        duplicates: '/api/analytics/duplicates',
+        monthlyReport: '/api/analytics/monthly-report',
+        optimization: '/api/analytics/optimization',
         
         // Portfolio
-        rebalance: '/portfolio/rebalance',
-        lifecyclePlan: '/portfolio/lifecycle-plan',
+        rebalance: '/api/portfolio/rebalance',
+        lifecyclePlan: '/api/portfolio/lifecycle-plan',
         
         // Email & Notifications
         emailStatus: '/api/email/status',
