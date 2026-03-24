@@ -1,0 +1,6 @@
+5fd0a468-074b-4c3a-8cc3-ca51e3afe393;PlayStation Plus;2026-02-24;2027-02-24;9.99;aziz.tlili900@gmail.com;2026-03-24;Gaming;;;Important;;1;NON;7;Mensuel
+058707a2-36b8-49b0-bf29-7c99720f60d5;Netflix;2026-02-24;2027-02-24;13.99;aziz.tlili900@gmail.com;2026-03-24;Streaming;;;Important;;1;NON;7;Mensuel
+3cbac852-8ef9-492f-acbf-57c19cc56494;Amazon Prime;2026-02-24;2027-02-24;6.99;aziz.tlili900@gmail.com;2026-03-24;Streaming;;;Important;;1;NON;7;Mensuel
+e29de0a6-11c9-404e-aea8-a4d4b4be63f0;Microsoft 365;2026-02-24;2027-02-24;6.99;aziz.tlili900@gmail.com;2026-03-24;Productivité;;;Important;;1;NON;7;Mensuel
+f586f105-4f08-4a20-9008-327389204784;Adobe Creative Cloud;2026-02-24;2027-02-24;54.99;aziz.tlili900@gmail.com;2026-03-24;Productivité;;;Important;;1;NON;7;Mensuel
+90aa2454-5fa4-4adf-b038-d7291f390ed1;Spotify;2026-02-24;2027-02-24;9.99;aziz.tlili900@gmail.com;2026-03-24;Musique;;;Important;;1;NON;7;Mensuel
