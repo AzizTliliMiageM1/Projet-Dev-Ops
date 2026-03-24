@@ -1,2 +1,4 @@
 aziz@example.com;Pass123;true;78eb9264-2811-427e-828d-b0478724cd2d;aziztlili
 aziz.tlili900@gmail.com;Chauffage11;true;a78752bf-9208-45e4-aa90-a2bf567ded71;OnlyKnow
+test_1774361606734@test.com;Test1234!;false;17a03e47-cc80-4b29-86fa-1c21a53089a5;test_user
+test_1774361627767@test.com;Test1234!;true;bacd88f4-96f5-4785-abb1-84720d24c954;test_user

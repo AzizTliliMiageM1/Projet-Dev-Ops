@@ -239,17 +239,24 @@ const APIClient = {
         /**
          * Importer un relevé bancaire (CSV ou PDF) via un endpoint unique.
          */
-        async importFile(file) {
+        async importFile(file, options = {}) {
             if (!(file instanceof File)) {
                 throw new Error('Fichier invalide');
             }
+
+            const sourceCurrency = String(options.sourceCurrency || 'EUR').toUpperCase();
+            const targetCurrency = String(options.targetCurrency || 'EUR').toUpperCase();
 
             const headers = {
                 'Content-Type': file.type || 'application/octet-stream',
                 'X-File-Name': file.name || 'statement'
             };
 
-            return APIClient._fetch(`${APIClient.BASE_URL}/api/bank/import`, {
+            const importUrl = new URL(`${APIClient.BASE_URL}/api/bank/import`);
+            importUrl.searchParams.set('sourceCurrency', sourceCurrency);
+            importUrl.searchParams.set('targetCurrency', targetCurrency);
+
+            return APIClient._fetch(importUrl.toString(), {
                 method: 'POST',
                 headers,
                 body: file,

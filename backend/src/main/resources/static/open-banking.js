@@ -13,7 +13,7 @@ class OpenBankingManager {
     /**
      * Lire un fichier CSV et l'importer
      */
-    async importCSVFile(file) {
+    async importCSVFile(file, options = {}) {
         if (!file) {
             throw new Error('Veuillez sélectionner un fichier');
         }
@@ -24,13 +24,13 @@ class OpenBankingManager {
             throw new Error('Format non supporté. Utilisez un fichier CSV.');
         }
 
-        return this.submitCSVToBackend(file);
+        return this.submitCSVToBackend(file, options);
     }
 
     /**
      * Soumettre le CSV au backend via APIClient
      */
-    async submitCSVToBackend(file) {
+    async submitCSVToBackend(file, options = {}) {
         try {
             console.log('📤 Envoi du fichier CSV au backend via APIClient...');
             
@@ -38,7 +38,7 @@ class OpenBankingManager {
                 throw new Error('APIClient Bank non disponible');
             }
             
-            const data = await window.APIClient.bank.importFile(file);
+            const data = await window.APIClient.bank.importFile(file, options);
             this.detections = Array.isArray(data?.detections) ? data.detections : [];
             
             console.log(`✅ ${this.detections.length} abonnements détectés`);
@@ -47,7 +47,9 @@ class OpenBankingManager {
                 success: Boolean(data?.success),
                 detectedSubscriptions: this.detections,
                 count: this.detections.length,
-                transactionsProcessed: data?.transactionsProcessed || 0
+                transactionsProcessed: data?.transactionsProcessed || 0,
+                sourceCurrency: data?.sourceCurrency || options?.sourceCurrency || 'EUR',
+                targetCurrency: data?.targetCurrency || options?.targetCurrency || 'EUR'
             };
         } catch (error) {
             console.error('❌ Erreur submitCSVToBackend:', error);
@@ -105,6 +107,9 @@ class OpenBankingManager {
                         <th>Montant</th>
                         <th>Fréquence</th>
                         <th>Confiance</th>
+                        <th>Score</th>
+                        <th>Marché</th>
+                        <th>Recommandation</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -114,19 +119,38 @@ class OpenBankingManager {
         this.detections.forEach((detection, index) => {
             const name = detection.service || detection.name || 'Inconnu';
             const amount = (detection.amount || 0).toFixed(2);
+            const amountTargetValue = detection.amountTargetCurrency ?? detection.amountEUR ?? detection.amount ?? 0;
+            const amountTarget = Number(amountTargetValue).toFixed(2);
+            const targetCurrency = detection.targetCurrency || detection.sourceCurrency || 'EUR';
             const freq = detection.frequency || 'MENSUELLE';
             const confidence = Math.round((detection.confidence || 0) * 100);
+            const score = Number(detection.optimizationScore || 0).toFixed(1);
+            const marketStatus = detection.marketStatus || 'UNKNOWN';
+            const marketDeviation = Number(detection.marketDeviationPercent || 0).toFixed(1);
+            const recommendation = detection.recommendation || 'Aucune recommandation';
+
+            let marketBadge = '<span class="badge bg-secondary">Inconnu</span>';
+            if (marketStatus === 'OVERPRICED') {
+                marketBadge = `<span class="badge bg-danger">Surpayé (+${marketDeviation}%)</span>`;
+            } else if (marketStatus === 'UNDERPRICED') {
+                marketBadge = `<span class="badge bg-success">Sous le marché (${marketDeviation}%)</span>`;
+            } else if (marketStatus === 'OPTIMIZED') {
+                marketBadge = `<span class="badge bg-primary">Aligné marché (${marketDeviation}%)</span>`;
+            }
             
             html += `
                 <tr>
                     <td><strong>${this.escapeHtml(name)}</strong></td>
-                    <td>${amount} EUR</td>
+                    <td>${amount} ${this.escapeHtml(detection.sourceCurrency || 'EUR')}<br><small class="text-muted">${amountTarget} ${this.escapeHtml(targetCurrency)}</small></td>
                     <td><span class="badge bg-info">${freq}</span></td>
                     <td>
                         <div class="progress" style="height: 20px;">
                             <div class="progress-bar bg-success" style="width: ${confidence}%">${confidence}%</div>
                         </div>
                     </td>
+                    <td><span class="badge bg-warning text-dark">${score}/100</span></td>
+                    <td>${marketBadge}</td>
+                    <td style="max-width: 340px;"><small>${this.escapeHtml(recommendation)}</small></td>
                     <td>
                         <button class="btn btn-sm btn-success" onclick="openBankingMgr.addFromTable(${index})">
                             <i class="bi bi-check"></i> Ajouter
@@ -191,14 +215,21 @@ class OpenBankingManager {
         if (!container) return;
 
         const count = importResult.count || 0;
+        const sourceCurrency = importResult.sourceCurrency || 'EUR';
+        const targetCurrency = importResult.targetCurrency || 'EUR';
         const html = `
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="alert alert-info">
                         <strong>📊 Détections:</strong> ${count} abonnement(s)
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="alert alert-secondary">
+                        <strong>💱 Devises:</strong> ${sourceCurrency} → ${targetCurrency}
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="alert alert-success">
                         <strong>✅ Prêt:</strong> Cliquez sur "Ajouter" pour enregistrer
                     </div>
@@ -230,8 +261,8 @@ function initOpenBankingUI() {
     const importBtn = document.getElementById('importCSVBtn');
 
     if (importBtn && fileInput) {
-        importBtn.addEventListener('click', async () => {
-            if (!fileInput.files.length) {
+        const runImport = async (file) => {
+            if (!file) {
                 alert('Veuillez sélectionner un fichier CSV');
                 return;
             }
@@ -240,7 +271,12 @@ function initOpenBankingUI() {
             importBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Importation...';
 
             try {
-                const result = await openBankingMgr.importCSVFile(fileInput.files[0]);
+                const sourceCurrencySelect = document.getElementById('sourceCurrencySelect');
+                const targetCurrencySelect = document.getElementById('targetCurrencySelect');
+                const result = await openBankingMgr.importCSVFile(file, {
+                    sourceCurrency: sourceCurrencySelect?.value || 'EUR',
+                    targetCurrency: targetCurrencySelect?.value || 'EUR'
+                });
                 
                 // Afficher les statistiques
                 openBankingMgr.renderStats('open-banking-stats', result);
@@ -263,6 +299,18 @@ function initOpenBankingUI() {
                 importBtn.disabled = false;
                 importBtn.innerHTML = '<i class="bi bi-download"></i> Importer CSV';
             }
+        };
+
+        importBtn.addEventListener('click', async () => {
+            await runImport(fileInput.files[0]);
+        });
+
+        fileInput.addEventListener('change', async () => {
+            if (!fileInput.files.length) {
+                return;
+            }
+
+            await runImport(fileInput.files[0]);
         });
     }
 }

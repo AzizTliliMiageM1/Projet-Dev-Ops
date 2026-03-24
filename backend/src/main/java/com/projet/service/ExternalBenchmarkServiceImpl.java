@@ -6,10 +6,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Implémentation du service de benchmark de prix d'abonnements.
@@ -29,6 +31,7 @@ public class ExternalBenchmarkServiceImpl implements ExternalBenchmarkService {
     
     private static final int TIMEOUT_MS = 5000; // 5 secondes
     private static final ObjectMapper mapper = new ObjectMapper();
+    private static final String DEFAULT_BENCHMARK_SEARCH_API = "https://dummyjson.com/products/search?q=%s";
     
     /**
      * Base de données de fallback avec les prix du marché pour services populaires.
@@ -101,30 +104,106 @@ public class ExternalBenchmarkServiceImpl implements ExternalBenchmarkService {
     }
     
     /**
-     * Simule l'appel à une API externe de pricing.
-     * Dans un cas réel, cela pourrait être remplacé par un vrai appel HTTP.
+     * Appelle une API externe de pricing.
+     *
+     * Supporte deux formats de réponse :
+     * - Format direct: { averagePrice, minPrice, maxPrice, currency, region }
+     * - Format catalogue (ex: dummyjson): { products: [{ price }, ...] }
      */
     private BenchmarkData fetchFromExternalAPI(String serviceName) {
         try {
-            // Simulation : générer une réponse JSON fictive
-            // En production, ce serait un vrai appel HTTP à une API de pricing
-            
-            logger.debug("Tentative de récupération des données pour {} via API externe...", serviceName);
-            
-            // Simulation d'un appel avec délai minimal
-            Thread.sleep(100);
-            
-            // Retourner null pour signifier que l'API ne connaît pas ce service
-            // (fallback sera utilisé)
-            return null;
-            
-        } catch (InterruptedException e) {
-            logger.warn("Interruption lors de l'appel API pour {}", serviceName);
-            Thread.currentThread().interrupt();
+            String template = resolveBenchmarkApiTemplate();
+            String encodedService = java.net.URLEncoder.encode(serviceName, java.nio.charset.StandardCharsets.UTF_8);
+            String apiUrl = String.format(template, encodedService);
+
+            logger.debug("Tentative de récupération benchmark via API externe: {}", apiUrl);
+
+            HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(TIMEOUT_MS);
+            conn.setReadTimeout(TIMEOUT_MS);
+            conn.setRequestProperty("Accept", "application/json");
+
+            if (conn.getResponseCode() != 200) {
+                logger.warn("API benchmark externe status={} pour service={}", conn.getResponseCode(), serviceName);
+                return null;
+            }
+
+            String response = readResponse(conn);
+            JsonNode root = mapper.readTree(response);
+
+            // Format direct
+            if (root.has("averagePrice") && root.has("minPrice") && root.has("maxPrice")) {
+                double average = root.path("averagePrice").asDouble(0.0);
+                double min = root.path("minPrice").asDouble(0.0);
+                double max = root.path("maxPrice").asDouble(0.0);
+                String currency = root.path("currency").asText("EUR");
+                String region = root.path("region").asText("Global");
+                if (average > 0 && max > 0) {
+                    return new BenchmarkData(serviceName, average, min, max, currency, region);
+                }
+            }
+
+            // Format catalogue (dummyjson/products)
+            JsonNode products = root.path("products");
+            if (products.isArray() && products.size() > 0) {
+                double sum = 0.0;
+                double min = Double.MAX_VALUE;
+                double max = Double.MIN_VALUE;
+                int count = 0;
+
+                for (JsonNode product : products) {
+                    JsonNode priceNode = product.path("price");
+                    if (!priceNode.isNumber()) {
+                        continue;
+                    }
+                    double price = priceNode.asDouble();
+                    if (price <= 0) {
+                        continue;
+                    }
+                    sum += price;
+                    min = Math.min(min, price);
+                    max = Math.max(max, price);
+                    count++;
+                    if (count >= 10) {
+                        break;
+                    }
+                }
+
+                if (count > 0) {
+                    double average = sum / count;
+                    return new BenchmarkData(serviceName, average, min, max, "USD", "Global");
+                }
+            }
+
             return null;
         } catch (Exception e) {
             logger.error("Erreur lors de l'appel API externe : {}", e.getMessage());
             return null;
         }
+    }
+
+    private String resolveBenchmarkApiTemplate() {
+        String fromEnv = System.getenv("BENCHMARK_SEARCH_API");
+        if (fromEnv == null || fromEnv.isBlank()) {
+            return DEFAULT_BENCHMARK_SEARCH_API;
+        }
+
+        if (!fromEnv.contains("%s")) {
+            return fromEnv + "%s";
+        }
+
+        return fromEnv;
+    }
+
+    private String readResponse(HttpURLConnection conn) throws Exception {
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        }
+        return response.toString();
     }
 }

@@ -130,12 +130,37 @@
             padding: 14px 16px;
             margin-bottom: 16px;
         }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px 14px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.24);
+        }
     </style>
 </head>
 <body>
     <div class="import-container">
         <div class="container">
             <div id="auth-warning" class="auth-warning" style="display:none;"></div>
+
+            <div class="mb-3">
+                <a href="/index.html" class="back-link">
+                    <i class="bi bi-arrow-left"></i>
+                    <span>Retour a l'accueil</span>
+                </a>
+            </div>
 
             <!-- Navigation -->
             <nav class="navbar navbar-expand-lg navbar-dark mb-4" style="background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); border-radius: 12px;">
@@ -165,6 +190,29 @@
                 </div>
                 
                 <!-- Import Button -->
+                <div class="row mt-4 g-3 align-items-end">
+                    <div class="col-md-6">
+                        <label for="sourceCurrencySelect" class="form-label fw-semibold">Devise source du relevé</label>
+                        <select id="sourceCurrencySelect" class="form-select">
+                            <option value="EUR" selected>EUR</option>
+                            <option value="USD">USD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="CHF">CHF</option>
+                            <option value="CAD">CAD</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetCurrencySelect" class="form-label fw-semibold">Devise d'analyse / affichage</label>
+                        <select id="targetCurrencySelect" class="form-select">
+                            <option value="EUR" selected>EUR</option>
+                            <option value="USD">USD</option>
+                            <option value="GBP">GBP</option>
+                            <option value="CHF">CHF</option>
+                            <option value="CAD">CAD</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="mt-4 text-center">
                     <button class="btn btn-lg btn-success-gradient" id="importCSVBtn">
                         <i class="bi bi-download"></i> Importer CSV

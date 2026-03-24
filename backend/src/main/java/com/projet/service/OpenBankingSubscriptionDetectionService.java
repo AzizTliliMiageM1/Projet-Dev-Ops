@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.projet.backend.domain.BenchmarkResult;
 import com.projet.backend.domain.DetectedSubscription;
 import com.projet.backend.domain.Transaction;
 
@@ -20,6 +21,18 @@ import com.projet.backend.domain.Transaction;
  * Analyse des transactions bancaires pour identifier automatiquement les abonnements.
  */
 public class OpenBankingSubscriptionDetectionService {
+
+    private final ExchangeRateService exchangeRateService;
+    private final BenchmarkService benchmarkService;
+
+    public OpenBankingSubscriptionDetectionService() {
+        this(new ExchangeRateServiceImpl(), new BenchmarkServiceImpl());
+    }
+
+    public OpenBankingSubscriptionDetectionService(ExchangeRateService exchangeRateService, BenchmarkService benchmarkService) {
+        this.exchangeRateService = exchangeRateService;
+        this.benchmarkService = benchmarkService;
+    }
 
     // ===== DICTIONNAIRES DE RECONNAISSANCE =====
 
@@ -173,15 +186,8 @@ public class OpenBankingSubscriptionDetectionService {
      * Normalise un label de transaction en identifiant le service connu.
      */
     public String normalizeServiceName(String rawLabel) {
-        String lower = rawLabel.toLowerCase();
-
-        for (String key : SERVICE_MAPPING.keySet()) {
-            if (lower.contains(key)) {
-                return SERVICE_MAPPING.get(key);
-            }
-        }
-
-        return rawLabel; // Retourner le label original
+        String mappedService = findMappedService(rawLabel);
+        return mappedService != null ? mappedService : rawLabel;
     }
 
     /**
@@ -224,10 +230,10 @@ public class OpenBankingSubscriptionDetectionService {
                     double confidence = calculateConfidence(isStable, true, group.size());
                     sub.setConfidence(confidence);
 
-                    double score = calculateOptimizationScore(avgAmount, group.size(), confidence, category);
+                    double score = calculateOptimizationScore(avgAmount, group.size(), confidence, category, 0.0, false);
                     sub.setOptimizationScore(score);
 
-                    String recommendation = generateRecommendation(avgAmount, confidence, category, group.size());
+                    String recommendation = generateRecommendation(avgAmount, confidence, category, group.size(), 0.0, "OPTIMIZED", "");
                     sub.setRecommendation(recommendation);
 
                     detected.add(sub);
@@ -239,7 +245,7 @@ public class OpenBankingSubscriptionDetectionService {
                 sub.setFirstDetected(tx.getDate());
                 sub.setLastDetected(tx.getDate());
                 sub.setConfidence(0.55);
-                sub.setOptimizationScore(calculateOptimizationScore(tx.getAmount(), 1, 0.55, category));
+                sub.setOptimizationScore(calculateOptimizationScore(tx.getAmount(), 1, 0.55, category, 0.0, false));
                 sub.setRecommendation("Service connu détecté une fois. Vérifiez si ce paiement est récurrent.");
                 detected.add(sub);
             }
@@ -270,7 +276,22 @@ public class OpenBankingSubscriptionDetectionService {
             return false;
         }
 
-        return !normalized.equals(rawLabel);
+        return findMappedService(rawLabel) != null;
+    }
+
+    private String findMappedService(String rawLabel) {
+        if (rawLabel == null || rawLabel.isBlank()) {
+            return null;
+        }
+
+        String lower = rawLabel.toLowerCase(Locale.ROOT);
+        for (Map.Entry<String, String> entry : SERVICE_MAPPING.entrySet()) {
+            if (lower.contains(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -444,7 +465,14 @@ public class OpenBankingSubscriptionDetectionService {
     /**
      * Calcule le score d'optimisation (0-100).
      */
-    private double calculateOptimizationScore(double monthlyAmount, int occurrences, double confidence, String category) {
+    private double calculateOptimizationScore(
+        double monthlyAmount,
+        int occurrences,
+        double confidence,
+        String category,
+        double marketDeviationPercent,
+        boolean nonEurPayment
+    ) {
         double score = 0.0;
 
         // Montant élevé = plus optimisable
@@ -468,13 +496,39 @@ public class OpenBankingSubscriptionDetectionService {
             score -= 10; // Moins optimisable
         }
 
-        return Math.min(100.0, score);
+        // Déviation marché (API benchmark) = levier d'optimisation supplémentaire
+        if (marketDeviationPercent >= 30) {
+            score += 15;
+        } else if (marketDeviationPercent >= 15) {
+            score += 10;
+        } else if (marketDeviationPercent >= 5) {
+            score += 6;
+        } else if (marketDeviationPercent <= -20) {
+            score -= 5;
+        } else {
+            score += 2;
+        }
+
+        // Paiement hors EUR = légère pénalité de risque de change
+        if (nonEurPayment) {
+            score += 5;
+        }
+
+        return Math.max(0.0, Math.min(100.0, score));
     }
 
     /**
      * Génère une recommandation métier.
      */
-    private String generateRecommendation(double amount, double confidence, String category, int occurrences) {
+    private String generateRecommendation(
+        double amount,
+        double confidence,
+        String category,
+        int occurrences,
+        double marketDeviationPercent,
+        String marketStatus,
+        String benchmarkRecommendation
+    ) {
         if (confidence < 0.5) {
             return "Détection incertaine - à vérifier manuellement";
         }
@@ -497,7 +551,188 @@ public class OpenBankingSubscriptionDetectionService {
             rec.append(". Vérifiez son utilité personnelle");
         }
 
+        if ("OVERPRICED".equals(marketStatus) && marketDeviationPercent > 10) {
+            rec.append(". Potentiel d'économie marché: ")
+                .append(String.format(Locale.ROOT, "%.1f", marketDeviationPercent))
+                .append("% au-dessus de la moyenne");
+        } else if ("UNDERPRICED".equals(marketStatus) && marketDeviationPercent < -10) {
+            rec.append(". Bon tarif par rapport au marché");
+        }
+
+        if (benchmarkRecommendation != null && !benchmarkRecommendation.isBlank()) {
+            rec.append(". ").append(benchmarkRecommendation);
+        }
+
         return rec.toString();
+    }
+
+    /**
+     * Enrichit les détections avec des appels API externes :
+     * - taux de change (ExchangeRate)
+     * - benchmark de prix marché (service externe)
+     */
+    public List<Map<String, Object>> buildDetectionApiPayload(
+        List<DetectedSubscription> detected,
+        String sourceCurrency,
+        String targetCurrency
+    ) {
+        List<Map<String, Object>> payload = new ArrayList<>();
+        if (detected == null || detected.isEmpty()) {
+            return payload;
+        }
+
+        String source = normalizeCurrency(sourceCurrency);
+        String target = normalizeCurrency(targetCurrency);
+
+        for (int i = 0; i < detected.size(); i++) {
+            DetectedSubscription sub = detected.get(i);
+            double amountSource = sub.getAmount();
+            double amountEur = amountSource;
+            double amountTarget = amountSource;
+            boolean exchangeApiUsed = false;
+
+            try {
+                if (!"EUR".equals(source)) {
+                    amountEur = exchangeRateService.convertAmount(amountSource, source, "EUR");
+                    exchangeApiUsed = true;
+                }
+
+                if (!source.equals(target)) {
+                    amountTarget = exchangeRateService.convertAmount(amountSource, source, target);
+                    exchangeApiUsed = true;
+                }
+            } catch (Exception ignored) {
+                amountEur = amountSource;
+                amountTarget = amountSource;
+            }
+
+            boolean benchmarkApiUsed = false;
+            double marketAvg = 0.0;
+            double marketMin = 0.0;
+            double marketMax = 0.0;
+            double marketDeviation = 0.0;
+            String marketStatus = "UNKNOWN";
+            String benchmarkRecommendation = "";
+
+            try {
+                BenchmarkResult benchmark = benchmarkService.benchmark("detected-" + i, sub.getService(), amountEur);
+                benchmarkApiUsed = true;
+                marketAvg = benchmark.getMarketAveragePrice();
+                marketMin = benchmark.getMarketMinPrice();
+                marketMax = benchmark.getMarketMaxPrice();
+                marketDeviation = benchmark.getPriceDeviation();
+                marketStatus = benchmark.getStatus();
+                benchmarkRecommendation = benchmark.getRecommendation();
+            } catch (Exception ignored) {
+            }
+
+            double score = calculateOptimizationScore(
+                amountEur,
+                sub.getOccurrences(),
+                sub.getConfidence(),
+                sub.getCategory(),
+                marketDeviation,
+                !"EUR".equals(source)
+            );
+            sub.setOptimizationScore(score);
+
+            String recommendation = generateRecommendation(
+                amountEur,
+                sub.getConfidence(),
+                sub.getCategory(),
+                sub.getOccurrences(),
+                marketDeviation,
+                marketStatus,
+                benchmarkRecommendation
+            );
+            sub.setRecommendation(recommendation);
+
+            Map<String, Object> scoreBreakdown = new HashMap<>();
+            scoreBreakdown.put("amountWeight", getAmountWeight(amountEur));
+            scoreBreakdown.put("recurrenceWeight", getRecurrenceWeight(sub.getOccurrences()));
+            scoreBreakdown.put("confidenceWeight", round2(sub.getConfidence() * 20));
+            scoreBreakdown.put("categoryWeight", getCategoryWeight(sub.getCategory()));
+            scoreBreakdown.put("marketWeight", getMarketWeight(marketDeviation));
+            scoreBreakdown.put("currencyRiskWeight", !"EUR".equals(source) ? 5 : 0);
+            scoreBreakdown.put("total", round2(score));
+
+            Map<String, Object> item = new HashMap<>();
+            item.put("service", sub.getService());
+            item.put("category", sub.getCategory());
+            item.put("amount", round2(sub.getAmount()));
+            item.put("frequency", sub.getFrequency());
+            item.put("confidence", sub.getConfidence());
+            item.put("optimizationScore", round2(sub.getOptimizationScore()));
+            item.put("recommendation", sub.getRecommendation());
+            item.put("occurrences", sub.getOccurrences());
+            item.put("firstDetected", sub.getFirstDetected());
+            item.put("lastDetected", sub.getLastDetected());
+            item.put("sourceCurrency", source);
+            item.put("targetCurrency", target);
+            item.put("amountEUR", round2(amountEur));
+            item.put("amountTargetCurrency", round2(amountTarget));
+            item.put("marketAveragePrice", round2(marketAvg));
+            item.put("marketMinPrice", round2(marketMin));
+            item.put("marketMaxPrice", round2(marketMax));
+            item.put("marketDeviationPercent", round2(marketDeviation));
+            item.put("marketStatus", marketStatus);
+            item.put("scoreBreakdown", scoreBreakdown);
+            item.put("externalApis", Map.of(
+                "exchangeRateApi", exchangeApiUsed,
+                "benchmarkApi", benchmarkApiUsed
+            ));
+            payload.add(item);
+        }
+
+        return payload;
+    }
+
+    private String normalizeCurrency(String currency) {
+        if (currency == null || currency.isBlank()) {
+            return "EUR";
+        }
+
+        String normalized = currency.trim().toUpperCase(Locale.ROOT);
+        if (!normalized.matches("^[A-Z]{3}$")) {
+            return "EUR";
+        }
+
+        return normalized;
+    }
+
+    private double round2(double value) {
+        return Math.round(value * 100.0) / 100.0;
+    }
+
+    private int getAmountWeight(double monthlyAmount) {
+        if (monthlyAmount >= 50) return 35;
+        if (monthlyAmount >= 20) return 25;
+        if (monthlyAmount >= 10) return 15;
+        return 5;
+    }
+
+    private int getRecurrenceWeight(int occurrences) {
+        if (occurrences >= 6) return 15;
+        if (occurrences >= 3) return 10;
+        return 5;
+    }
+
+    private int getCategoryWeight(String category) {
+        if ("Streaming".equals(category) || "Musique".equals(category) || "Gaming".equals(category)) {
+            return 15;
+        }
+        if ("Professionnel".equals(category) || "Développement".equals(category)) {
+            return -10;
+        }
+        return 0;
+    }
+
+    private int getMarketWeight(double marketDeviationPercent) {
+        if (marketDeviationPercent >= 30) return 15;
+        if (marketDeviationPercent >= 15) return 10;
+        if (marketDeviationPercent >= 5) return 6;
+        if (marketDeviationPercent <= -20) return -5;
+        return 2;
     }
 
     // ===== CONVERSION EN ABONNEMENT =====

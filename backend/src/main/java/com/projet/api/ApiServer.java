@@ -192,21 +192,9 @@ public class ApiServer {
                     List<Transaction> transactions = service.parseCSV(csvContent);
                     List<DetectedSubscription> detected = service.detectRecurringSubscriptions(transactions);
 
-                    List<Map<String, Object>> result = new ArrayList<>();
-                    for (DetectedSubscription sub : detected) {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("service", sub.getService());
-                        item.put("category", sub.getCategory());
-                        item.put("amount", sub.getAmount());
-                        item.put("frequency", sub.getFrequency());
-                        item.put("confidence", sub.getConfidence());
-                        item.put("optimizationScore", sub.getOptimizationScore());
-                        item.put("recommendation", sub.getRecommendation());
-                        item.put("occurrences", sub.getOccurrences());
-                        item.put("firstDetected", sub.getFirstDetected());
-                        item.put("lastDetected", sub.getLastDetected());
-                        result.add(item);
-                    }
+                    String sourceCurrency = req.queryParamOrDefault("sourceCurrency", "EUR");
+                    String targetCurrency = req.queryParamOrDefault("targetCurrency", "EUR");
+                    List<Map<String, Object>> result = service.buildDetectionApiPayload(detected, sourceCurrency, targetCurrency);
 
                     Map<String, Object> response = new HashMap<>();
                     response.put("success", true);
@@ -214,6 +202,12 @@ public class ApiServer {
                     response.put("csvContent", csvContent);
                     response.put("transactionsProcessed", transactions.size());
                     response.put("subscriptionsDetected", detected.size());
+                    response.put("sourceCurrency", sourceCurrency);
+                    response.put("targetCurrency", targetCurrency);
+                    response.put("externalApisUsed", Map.of(
+                        "exchangeRateApi", true,
+                        "benchmarkApi", true
+                    ));
                     response.put("detections", result);
 
                     return mapper.writeValueAsString(response);
@@ -243,26 +237,20 @@ public class ApiServer {
                     List<Transaction> transactions = service.parseCSV(csvContent);
                     List<DetectedSubscription> detected = service.detectRecurringSubscriptions(transactions);
 
-                    List<Map<String, Object>> result = new ArrayList<>();
-                    for (DetectedSubscription sub : detected) {
-                        Map<String, Object> item = new HashMap<>();
-                        item.put("service", sub.getService());
-                        item.put("category", sub.getCategory());
-                        item.put("amount", sub.getAmount());
-                        item.put("frequency", sub.getFrequency());
-                        item.put("confidence", sub.getConfidence());
-                        item.put("optimizationScore", sub.getOptimizationScore());
-                        item.put("recommendation", sub.getRecommendation());
-                        item.put("occurrences", sub.getOccurrences());
-                        item.put("firstDetected", sub.getFirstDetected());
-                        item.put("lastDetected", sub.getLastDetected());
-                        result.add(item);
-                    }
+                    String sourceCurrency = req.queryParamOrDefault("sourceCurrency", "EUR");
+                    String targetCurrency = req.queryParamOrDefault("targetCurrency", "EUR");
+                    List<Map<String, Object>> result = service.buildDetectionApiPayload(detected, sourceCurrency, targetCurrency);
 
                     Map<String, Object> response = new HashMap<>();
                     response.put("success", true);
                     response.put("transactionsProcessed", transactions.size());
                     response.put("subscriptionsDetected", detected.size());
+                    response.put("sourceCurrency", sourceCurrency);
+                    response.put("targetCurrency", targetCurrency);
+                    response.put("externalApisUsed", Map.of(
+                        "exchangeRateApi", true,
+                        "benchmarkApi", true
+                    ));
                     response.put("detections", result);
 
                     return mapper.writeValueAsString(response);
