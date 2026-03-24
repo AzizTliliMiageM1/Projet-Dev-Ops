@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Sous-compte</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="api-config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #667eea, #764ba2 70%);
+            color: var(--gray-900);
+            padding: 22px 14px 36px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 14px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.18);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.35);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            padding: 16px;
+        }
+
+        .metric-label {
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 14px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body { padding: 16px; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 10px 8px;
+            text-align: left;
+        }
+
+        th {
+            color: var(--gray-600);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .pill {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 4px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pill-active { background: rgba(16,185,129,0.12); color: #047857; }
+        .pill-other { background: rgba(245,158,11,0.14); color: #92400e; }
+
+        .empty {
+            color: var(--gray-600);
+            font-size: 14px;
+            padding: 14px;
+        }
+
+        .alert {
+            display: none;
+            margin-bottom: 12px;
+            background: rgba(239,68,68,0.12);
+            color: #b91c1c;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+
+        @media (max-width: 980px) {
+            .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 620px) {
+            .top { flex-direction: column; align-items: flex-start; }
+            .metrics { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="top">
+        <div>
+            <div class="title"><i class="fas fa-chart-pie"></i> Dashboard du sous-compte</div>
+            <div class="subtitle" id="subaccount-identity">Chargement...</div>
+        </div>
+        <button class="btn btn-back" onclick="window.location.href='subaccounts.html'"><i class="fas fa-arrow-left"></i> Retour sous-comptes</button>
+    </div>
+
+    <div id="error-alert" class="alert"></div>
+
+    <div class="metrics">
+        <div class="metric">
+            <div class="metric-label">Abonnements</div>
+            <div class="metric-value" id="m-count">0</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Actifs</div>
+            <div class="metric-value" id="m-active">0</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Depense mensuelle</div>
+            <div class="metric-value" id="m-monthly">0.00</div>
+        </div>
+        <div class="metric">
+            <div class="metric-label">Depense annuelle</div>
+            <div class="metric-value" id="m-annual">0.00</div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 14px;">
+        <div class="card-header"><i class="fas fa-star"></i> Service principal</div>
+        <div class="card-body">
+            <div id="top-service" class="empty">Aucun service pour le moment.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header"><i class="fas fa-list"></i> Abonnements du sous-compte</div>
+        <div class="card-body" style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Montant</th>
+                        <th>Devise</th>
+                        <th>Status</th>
+                        <th>Provider</th>
+                        <th>Date creation</th>
+                    </tr>
+                </thead>
+                <tbody id="subs-body">
+                    <tr><td colspan="6" class="empty">Aucun abonnement.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const subAccountId = params.get('subAccountId') || '';
+
+    function showError(message) {
+        const alert = document.getElementById('error-alert');
+        alert.textContent = message;
+        alert.style.display = 'block';
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    async function requireSession() {
+        const session = await API_CONFIG.fetchJson(API_CONFIG.endpoints.session);
+        if (!session.authenticated) {
+            window.location.href = 'index.html';
+            return false;
+        }
+        return true;
+    }
+
+    async function loadDashboard() {
+        if (!subAccountId) {
+            showError('Sous-compte manquant dans l URL.');
+            return;
+        }
+
+        const endpoint = `${API_CONFIG.endpoints.subAccountDashboard}/${encodeURIComponent(subAccountId)}/dashboard`;
+        const payload = await API_CONFIG.fetchJson(endpoint);
+
+        const sub = payload.subAccount || {};
+        const metrics = payload.metrics || {};
+        const subscriptions = payload.subscriptions || [];
+
+        document.getElementById('subaccount-identity').textContent = `${sub.firstName || ''} ${sub.lastName || ''} (${sub.email || ''})`;
+        document.getElementById('m-count').textContent = Number(metrics.count || 0);
+        document.getElementById('m-active').textContent = Number(metrics.activeCount || 0);
+
+        const displayCurrency = subscriptions.length > 0 ? (subscriptions[0].currency || 'EUR') : 'EUR';
+        document.getElementById('m-monthly').textContent = `${Number(metrics.monthlyTotal || 0).toFixed(2)} ${displayCurrency}`;
+        document.getElementById('m-annual').textContent = `${Number(metrics.annualTotal || 0).toFixed(2)} ${displayCurrency}`;
+
+        document.getElementById('top-service').textContent = metrics.topService && metrics.topService !== 'Aucun'
+            ? metrics.topService
+            : 'Aucun service pour le moment.';
+
+        const tbody = document.getElementById('subs-body');
+        if (!Array.isArray(subscriptions) || subscriptions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty">Aucun abonnement.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = subscriptions.map(s => {
+            const status = String(s.status || 'unknown');
+            const statusClass = status.toLowerCase() === 'active' ? 'pill-active' : 'pill-other';
+            return `
+                <tr>
+                    <td>${escapeHtml(s.serviceName)}</td>
+                    <td>${Number(s.amount || 0).toFixed(2)}</td>
+                    <td>${escapeHtml(s.currency || 'EUR')}</td>
+                    <td><span class="pill ${statusClass}">${escapeHtml(status)}</span></td>
+                    <td>${escapeHtml(s.provider || 'local')}</td>
+                    <td>${escapeHtml(String(s.createdAt || '').replace('T', ' '))}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    (async function init() {
+        try {
+            const ok = await requireSession();
+            if (!ok) return;
+            await loadDashboard();
+        } catch (e) {
+            showError(e.message || 'Erreur chargement dashboard');
+        }
+    })();
+</script>
+</body>
+</html>

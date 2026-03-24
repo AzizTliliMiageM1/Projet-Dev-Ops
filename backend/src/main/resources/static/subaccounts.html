@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sous-comptes & Facturation</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="api-config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-xl: 0 12px 24px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at top, #667eea, #764ba2 70%);
+            min-height: 100vh;
+            color: var(--gray-900);
+            padding: 24px 14px 40px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 12px;
+        }
+
+        .title {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .actions { display: flex; gap: 10px; }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #fff;
+        }
+
+        .btn-refresh { background: #fff; color: var(--gray-700); }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f8f9ff, #eef1ff);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body { padding: 18px; }
+
+        .form-group { margin-bottom: 14px; }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            background: var(--gray-50);
+        }
+
+        .form-control:focus { border-color: var(--primary); background: #fff; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-700); }
+
+        .sub-list { display: grid; gap: 12px; }
+
+        .sub-item {
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .sub-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .sub-name { font-weight: 700; }
+        .sub-mail { font-size: 13px; color: var(--gray-500); }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-active { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge-disabled { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+        .muted { color: var(--gray-500); font-size: 13px; }
+
+        .sub-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 4px 0 10px;
+            color: var(--gray-700);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border-bottom: 1px solid var(--gray-200);
+            text-align: left;
+            padding: 10px 8px;
+        }
+
+        th { color: var(--gray-500); font-size: 12px; text-transform: uppercase; }
+
+        .alert {
+            display: none;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .alert-ok { background: rgba(16,185,129,0.12); color: #047857; }
+        .alert-ko { background: rgba(239,68,68,0.12); color: #b91c1c; }
+
+        .inline-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 1020px) {
+            .grid { grid-template-columns: 1fr; }
+            .inline-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .inline-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <div class="title"><i class="fas fa-users-cog"></i> Gestion des Sous-comptes</div>
+        <div class="actions">
+            <button class="btn btn-refresh" onclick="refreshAll()"><i class="fas fa-rotate"></i> Rafraichir</button>
+            <button class="btn btn-back" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> Dashboard</button>
+        </div>
+    </div>
+
+    <div id="alert-ok" class="alert alert-ok"></div>
+    <div id="alert-ko" class="alert alert-ko"></div>
+
+    <div class="grid">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-user-plus"></i> Creer un sous-compte</div>
+            <div class="card-body">
+                <form id="create-sub-form">
+                    <div class="form-group">
+                        <label class="form-label" for="sub-first">Prenom</label>
+                        <input id="sub-first" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="sub-last">Nom</label>
+                        <input id="sub-last" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="sub-email">Email</label>
+                        <input id="sub-email" type="email" class="form-control" required>
+                    </div>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-plus"></i> Creer</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="fas fa-people-roof"></i> Sous-comptes du compte principal</div>
+            <div class="card-body">
+                <div id="sub-list" class="sub-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div style="height: 16px;"></div>
+
+    <div class="grid" style="grid-template-columns: 1fr;">
+        <div class="card">
+            <div class="card-header"><i class="fas fa-credit-card"></i> Abonner un sous-compte (Stripe)</div>
+            <div class="card-body">
+                <form id="subscription-form">
+                    <div class="inline-grid">
+                        <div>
+                            <label class="form-label" for="sub-id-select">Sous-compte</label>
+                            <select id="sub-id-select" class="form-control" required></select>
+                        </div>
+                        <div>
+                            <label class="form-label" for="service-name">Service</label>
+                            <input id="service-name" class="form-control" placeholder="Netflix" required>
+                        </div>
+                        <div>
+                            <label class="form-label" for="price-id">Stripe Price ID</label>
+                            <input id="price-id" class="form-control" placeholder="price_xxx (optionnel en local)">
+                        </div>
+                        <div>
+                            <label class="form-label" for="sub-amount">Montant</label>
+                            <input id="sub-amount" class="form-control" type="number" value="9.99" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="inline-grid" style="grid-template-columns: 260px 1fr;">
+                        <div>
+                            <label class="form-label" for="sub-currency">Devise</label>
+                            <select id="sub-currency" class="form-control">
+                                <option>EUR</option>
+                                <option>USD</option>
+                                <option>GBP</option>
+                                <option>CHF</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; align-items:end;">
+                            <button class="btn btn-primary" type="submit" style="width: 100%;"><i class="fas fa-link"></i> Creer abonnement sous-compte</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 16px;">
+            <div class="card-header"><i class="fas fa-receipt"></i> Paiements sous-comptes</div>
+            <div class="card-body" style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sous-compte</th>
+                            <th>Service</th>
+                            <th>Montant</th>
+                            <th>Devise</th>
+                            <th>Status</th>
+                            <th>Provider</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payments-tbody">
+                        <tr><td colspan="7" class="muted">Aucun paiement pour le moment.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let subAccounts = [];
+
+    function showMessage(type, text) {
+        const ok = document.getElementById('alert-ok');
+        const ko = document.getElementById('alert-ko');
+        ok.style.display = 'none';
+        ko.style.display = 'none';
+
+        const target = type === 'ok' ? ok : ko;
+        target.textContent = text;
+        target.style.display = 'block';
+        setTimeout(() => { target.style.display = 'none'; }, 3500);
+    }
+
+    async function requireSession() {
+        const session = await API_CONFIG.fetchJson(API_CONFIG.endpoints.session);
+        if (!session.authenticated) {
+            window.location.href = 'index.html';
+            return false;
+        }
+        return true;
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderSubAccounts() {
+        const container = document.getElementById('sub-list');
+        const select = document.getElementById('sub-id-select');
+
+        if (!Array.isArray(subAccounts) || subAccounts.length === 0) {
+            container.innerHTML = '<div class="muted">Aucun sous-compte pour ce compte principal.</div>';
+            select.innerHTML = '<option value="">--</option>';
+            return;
+        }
+
+        select.innerHTML = subAccounts
+            .filter(s => s.status === 'ACTIVE')
+            .map(s => `<option value="${s.id}">${escapeHtml(s.firstName)} ${escapeHtml(s.lastName)} (${escapeHtml(s.email)})</option>`)
+            .join('');
+
+        container.innerHTML = subAccounts.map(sub => {
+            const badgeClass = sub.status === 'ACTIVE' ? 'badge-active' : 'badge-disabled';
+            const prefs = sub.preferences || {};
+            const prefGenre = escapeHtml(prefs.genre || '');
+            const prefPlaylist = escapeHtml(prefs.playlist || '');
+            const prefService = escapeHtml(prefs.serviceAccess || '');
+
+            return `
+                <div class="sub-item">
+                    <div class="sub-top">
+                        <div>
+                            <div class="sub-name">${escapeHtml(sub.firstName)} ${escapeHtml(sub.lastName)}</div>
+                            <div class="sub-mail">${escapeHtml(sub.email)}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${escapeHtml(sub.status || 'UNKNOWN')}</span>
+                    </div>
+                    <div class="muted">Provider: ${escapeHtml(sub.provider || 'local')} | Souscriptions: ${(sub.subscriptions || []).length}</div>
+                    <div class="muted" style="margin-top:6px;">Preferences: genre=${prefGenre || '-'}, playlist=${prefPlaylist || '-'}, serviceAccess=${prefService || '-'}</div>
+                    <div class="sub-actions">
+                        <button class="btn btn-secondary" onclick="openSubDashboard('${sub.id}')"><i class="fas fa-chart-line"></i> Dashboard</button>
+                        <button class="btn btn-secondary" onclick="savePreferences('${sub.id}')"><i class="fas fa-sliders"></i> Sauver preferences</button>
+                        ${sub.status === 'ACTIVE' ? `<button class="btn btn-danger" onclick="disableSubAccount('${sub.id}')"><i class="fas fa-user-slash"></i> Desactiver</button>` : ''}
+                        <button class="btn btn-danger" onclick="deleteSubAccount('${sub.id}')"><i class="fas fa-trash"></i> Supprimer</button>
+                    </div>
+                    <div class="inline-grid" style="margin-top:8px;">
+                        <input id="genre-${sub.id}" class="form-control" placeholder="genre" value="${prefGenre}">
+                        <input id="playlist-${sub.id}" class="form-control" placeholder="playlist" value="${prefPlaylist}">
+                        <input id="service-${sub.id}" class="form-control" placeholder="serviceAccess" value="${prefService}">
+                        <div></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderPayments(payments) {
+        const tbody = document.getElementById('payments-tbody');
+        if (!Array.isArray(payments) || payments.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="muted">Aucun paiement pour le moment.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = payments
+            .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
+            .map(p => `
+                <tr>
+                    <td>${escapeHtml(String(p.createdAt || '').replace('T', ' '))}</td>
+                    <td>${escapeHtml(p.subAccountId)}</td>
+                    <td>${escapeHtml(p.serviceName)}</td>
+                    <td>${Number(p.amount || 0).toFixed(2)}</td>
+                    <td>${escapeHtml(p.currency || 'EUR')}</td>
+                    <td>${escapeHtml(p.status || 'UNKNOWN')}</td>
+                    <td>${escapeHtml(p.provider || 'local')}</td>
+                </tr>
+            `).join('');
+    }
+
+    async function loadSubAccounts() {
+        const payload = await API_CONFIG.fetchJson(API_CONFIG.endpoints.subAccounts);
+        subAccounts = payload.subAccounts || [];
+        renderSubAccounts();
+    }
+
+    async function loadPayments() {
+        const payload = await API_CONFIG.fetchJson(API_CONFIG.endpoints.stripePayments);
+        renderPayments(payload.payments || []);
+    }
+
+    async function refreshAll() {
+        try {
+            await loadSubAccounts();
+            await loadPayments();
+        } catch (e) {
+            showMessage('ko', e.message || 'Erreur chargement');
+        }
+    }
+
+    async function disableSubAccount(id) {
+        try {
+            await API_CONFIG.fetchJson(`${API_CONFIG.endpoints.subAccounts}/${encodeURIComponent(id)}`, {
+                method: 'DELETE'
+            });
+            showMessage('ok', 'Sous-compte desactive.');
+            await refreshAll();
+        } catch (e) {
+            showMessage('ko', e.message || 'Erreur desactivation');
+        }
+    }
+
+    async function deleteSubAccount(id) {
+        if (!confirm('Supprimer definitivement ce sous-compte ? Cette action est irreversible.')) {
+            return;
+        }
+
+        try {
+            await API_CONFIG.fetchJson(`${API_CONFIG.endpoints.subAccounts}/${encodeURIComponent(id)}/permanent`, {
+                method: 'DELETE'
+            });
+            showMessage('ok', 'Sous-compte supprime.');
+            await refreshAll();
+        } catch (e) {
+            showMessage('ko', e.message || 'Erreur suppression');
+        }
+    }
+
+    function openSubDashboard(id) {
+        window.location.href = `subaccount-dashboard.html?subAccountId=${encodeURIComponent(id)}`;
+    }
+
+    async function savePreferences(id) {
+        try {
+            const body = {
+                genre: document.getElementById(`genre-${id}`).value,
+                playlist: document.getElementById(`playlist-${id}`).value,
+                serviceAccess: document.getElementById(`service-${id}`).value
+            };
+            await API_CONFIG.fetchJson(`${API_CONFIG.endpoints.subAccountPreferences}/${encodeURIComponent(id)}/preferences`, {
+                method: 'PUT',
+                body: JSON.stringify(body)
+            });
+            showMessage('ok', 'Preferences enregistrees.');
+            await refreshAll();
+        } catch (e) {
+            showMessage('ko', e.message || 'Erreur sauvegarde preferences');
+        }
+    }
+
+    document.getElementById('create-sub-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const body = {
+                firstName: document.getElementById('sub-first').value.trim(),
+                lastName: document.getElementById('sub-last').value.trim(),
+                email: document.getElementById('sub-email').value.trim()
+            };
+
+            await API_CONFIG.fetchJson(API_CONFIG.endpoints.subAccounts, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+
+            e.target.reset();
+            showMessage('ok', 'Sous-compte cree avec succes.');
+            await refreshAll();
+        } catch (err) {
+            showMessage('ko', err.message || 'Erreur creation sous-compte');
+        }
+    });
+
+    document.getElementById('subscription-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+            const body = {
+                subAccountId: document.getElementById('sub-id-select').value,
+                serviceName: document.getElementById('service-name').value.trim(),
+                priceId: document.getElementById('price-id').value.trim(),
+                amount: Number(document.getElementById('sub-amount').value || 0),
+                currency: document.getElementById('sub-currency').value
+            };
+
+            await API_CONFIG.fetchJson(API_CONFIG.endpoints.stripeSubscription, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+
+            showMessage('ok', 'Abonnement sous-compte cree.');
+            await refreshAll();
+        } catch (err) {
+            showMessage('ko', err.message || 'Erreur creation abonnement');
+        }
+    });
+
+    (async function init() {
+        try {
+            const ok = await requireSession();
+            if (!ok) return;
+            await refreshAll();
+        } catch (e) {
+            showMessage('ko', e.message || 'Erreur initialisation');
+        }
+    })();
+</script>
+</body>
+</html>

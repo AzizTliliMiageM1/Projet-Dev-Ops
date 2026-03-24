@@ -1153,6 +1153,7 @@ public class ApiServer {
             });
 
             InternationalPricingController.register(mapper);
+            SubAccountController.register(mapper);
 
         // ===== SERVICES DISTANTS UNIQUEMENT =====
 

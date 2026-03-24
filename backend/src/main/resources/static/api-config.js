@@ -47,7 +47,14 @@ const API_CONFIG = {
         userCountry: '/api/user/country',
         convertAbonnements: '/api/convert/abonnements',
         paymentSimulate: '/api/payment/simulate',
-        allCurrencies: '/api/get-all-currencies'
+        allCurrencies: '/api/get-all-currencies',
+
+        // Sub-accounts and Stripe family billing
+        subAccounts: '/api/users/subaccounts',
+        subAccountPreferences: '/api/users/subaccounts',
+        subAccountDashboard: '/api/users/subaccounts',
+        stripeSubscription: '/api/stripe/subscription',
+        stripePayments: '/api/stripe/payments'
     },
     
     /**
