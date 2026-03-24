@@ -37,6 +37,9 @@ public class Abonnement {
     
     /** Prix mensuel de l'abonnement en euros */
     private double prixMensuel;
+
+    /** Devise source de l'abonnement (EUR par defaut) */
+    private String currency;
     
     /** Nom du client/personne responsable */
     private String clientName;
@@ -107,6 +110,7 @@ public class Abonnement {
         this.dateDebut = LocalDate.now();
         this.dateFin = LocalDate.now();
         this.prixMensuel = 0.0;
+        this.currency = "EUR";
         this.clientName = "";
         this.derniereUtilisation = null;
         this.categorie = "Non classé";
@@ -171,6 +175,7 @@ public class Abonnement {
         this.dateDebut = dateDebut;
         this.dateFin = dateFin;
         this.prixMensuel = prixMensuel;
+        this.currency = "EUR";
         this.clientName = clientName;
         this.derniereUtilisation = derniereUtilisation;
         this.categorie = (categorie == null || categorie.isBlank()) ? "Non classé" : categorie;
@@ -208,6 +213,7 @@ public class Abonnement {
     public LocalDate getDateDebut() { return dateDebut; }
     public LocalDate getDateFin() { return dateFin; }
     public double getPrixMensuel() { return prixMensuel; }
+    public String getCurrency() { return currency == null || currency.isBlank() ? "EUR" : currency; }
     public String getClientName() { return clientName; }
     public LocalDate getDerniereUtilisation() { return derniereUtilisation; }
     public String getCategorie() { return categorie; }
@@ -216,6 +222,7 @@ public class Abonnement {
     public void setDateDebut(LocalDate dateDebut) { this.dateDebut = dateDebut; }
     public void setDateFin(LocalDate dateFin) { this.dateFin = dateFin; }
     public void setPrixMensuel(double prixMensuel) { this.prixMensuel = prixMensuel; }
+    public void setCurrency(String currency) { this.currency = (currency == null || currency.isBlank()) ? "EUR" : currency.toUpperCase(); }
     public void setClientName(String clientName) { this.clientName = clientName; }
     public void setDerniereUtilisation(LocalDate derniereUtilisation) { this.derniereUtilisation = derniereUtilisation; }
     public void setCategorie(String categorie) { this.categorie = categorie; }

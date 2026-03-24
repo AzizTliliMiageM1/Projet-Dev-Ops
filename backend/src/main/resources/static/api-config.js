@@ -41,7 +41,13 @@ const API_CONFIG = {
         currencyStatus: '/api/currency/status',
         currencyConvert: '/api/currency/convert',
         currencyToEur: '/api/currency/to-eur',
-        currencyStability: '/api/currency/stabilite'
+        currencyStability: '/api/currency/stabilite',
+
+        // International pricing and payment simulation
+        userCountry: '/api/user/country',
+        convertAbonnements: '/api/convert/abonnements',
+        paymentSimulate: '/api/payment/simulate',
+        allCurrencies: '/api/get-all-currencies'
     },
     
     /**

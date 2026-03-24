@@ -973,6 +973,8 @@ public class ApiServer {
                     email, user.getPseudo());
             });
 
+            InternationalPricingController.register(mapper);
+
         // ===== SERVICES DISTANTS UNIQUEMENT =====
 
         path("/api/email", () -> {

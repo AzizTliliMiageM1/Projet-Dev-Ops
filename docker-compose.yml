@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   db:
     image: mysql:8.0
@@ -29,15 +28,8 @@ services:
     volumes:
       - ./:/workspace
 
-volumes:
-  db_data:
-
-  flyway:
-    driver: local
-
   # Flyway service (one-shot) to apply migrations against the db service
   # Use `docker-compose run --rm flyway migrate` to apply migrations
-services:
   flyway:
     image: flyway/flyway:9
     depends_on:
@@ -50,3 +42,6 @@ services:
       FLYWAY_PASSWORD: apassword
     entrypoint: ["/bin/sh","-c"]
     command: ["/flyway/flyway migrate"]
+
+volumes:
+  db_data:

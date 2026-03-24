@@ -926,6 +926,33 @@
 
                     <!-- Abonnements Tab -->
                     <div class="tab-pane" id="abonnements-pane">
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header">
+                                <i class="fas fa-globe-africa"></i> 🌍 Paramètres régionaux
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row" style="align-items: end; margin-bottom: 8px;">
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label" for="country-dropdown">Pays</label>
+                                        <select id="country-dropdown" class="form-control" onchange="onCountryChange()">
+                                            <option value="FR" data-currency="EUR" data-country-name="France">France (EUR)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Pays sélectionné</label>
+                                        <div id="selected-country" class="form-control" style="display: flex; align-items: center;">FR</div>
+                                    </div>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label class="form-label">Devise locale</label>
+                                        <div id="selected-currency" class="form-control" style="display: flex; align-items: center;">EUR</div>
+                                    </div>
+                                </div>
+                                <div id="payment-feedback" class="alert alert-success" style="display: none; margin-top: 12px;">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span id="payment-feedback-text">Paiement réussi !</span>
+                                </div>
+                            </div>
+                        </div>
                         <button class="btn btn-success" onclick="showNewForm()" style="margin-bottom: 20px;">
                             <i class="fas fa-plus"></i> Nouveau
                         </button>
@@ -1027,6 +1054,13 @@
 
     <script src="api-config.js"></script>
     <script>
+        let selectedCountry = 'FR';
+        let selectedCountryName = 'France';
+        let selectedCurrency = 'EUR';
+        let allCountries = [];
+        let allCurrencies = [];
+        const DEFAULT_SUPPORTED_CURRENCIES = ['USD', 'GBP', 'EUR', 'CHF'];
+
         function toggleAuth() {
             const loginForm = document.getElementById('login-form');
             const registerForm = document.getElementById('register-form');
@@ -1043,6 +1077,8 @@
                     document.getElementById('auth-section').style.display = 'none';
                     document.getElementById('dashboard-section').classList.add('active');
                     document.getElementById('user-email').textContent = data.email || 'User';
+                    await loadAllCountriesAndCurrencies();
+                    await initRegionalSettings();
                     loadDashboard();
                 } else {
                     document.getElementById('auth-section').style.display = 'flex';
@@ -1106,21 +1142,29 @@
 
         async function loadDashboard() {
             try {
-                // Fetch all data in parallel
-                const aboRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.abonnements));
+                // Utiliser les prix convertis pour refléter la devise locale sur le dashboard.
+                const aboRes = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.convertAbonnements));
                 const abonnements = aboRes.ok ? await aboRes.json() : [];
+
+                if (Array.isArray(abonnements) && abonnements.length > 0) {
+                    selectedCountry = abonnements[0].country || selectedCountry;
+                    selectedCountryName = abonnements[0].countryName || selectedCountryName;
+                    selectedCurrency = abonnements[0].targetCurrency || selectedCurrency;
+                    updateRegionalDisplay(selectedCountryName, selectedCurrency);
+                }
 
                 // Calculate base metrics
                 const count = abonnements.length;
-                const total = abonnements.reduce((sum, a) => sum + (a.prixMensuel || 0), 0);
+                const total = abonnements.reduce((sum, a) => sum + Number(a.convertedPrice ?? a.prixMensuel ?? 0), 0);
                 const yearly = total * 12;
                 const savings = total * 0.15;
+                const activeCurrency = selectedCurrency || 'EUR';
 
                 // Update top KPIs
                 document.getElementById('stat-count').textContent = count;
-                document.getElementById('stat-total').textContent = '€' + total.toFixed(2);
+                document.getElementById('stat-total').textContent = total.toFixed(2) + ' ' + activeCurrency;
                 document.getElementById('stat-health').textContent = Math.round(Math.min((count / 10) * 100, 100)) + '%';
-                document.getElementById('stat-savings').textContent = '€' + savings.toFixed(2);
+                document.getElementById('stat-savings').textContent = savings.toFixed(2) + ' ' + activeCurrency;
 
                 // Fetch analytics data (non-blocking)
                 let insights = [];
@@ -1128,7 +1172,7 @@
                 let anomalies = [];
 
                 try {
-                    const res = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimize));
+                    const res = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimization));
                     if (res.ok) insights = await res.json();
                     if (!Array.isArray(insights)) insights = [];
                 } catch (e) {}
@@ -1146,7 +1190,7 @@
                 } catch (e) {}
 
                 // Sort subscriptions by price
-                const sorted = [...abonnements].sort((a, b) => (b.prixMensuel || 0) - (a.prixMensuel || 0));
+                const sorted = [...abonnements].sort((a, b) => Number(b.convertedPrice ?? b.prixMensuel ?? 0) - Number(a.convertedPrice ?? a.prixMensuel ?? 0));
                 const topExpensive = sorted.slice(0, 3);
 
                 // Build HTML content
@@ -1160,7 +1204,7 @@
                     <div class="dashboard-grid">
                         <div class="insight-card">
                             <div class="insight-title">💵 Dépense Annuelle</div>
-                            <div class="insight-value">€${yearly.toFixed(2)}</div>
+                            <div class="insight-value">${yearly.toFixed(2)} ${activeCurrency}</div>
                             <div class="insight-desc">Projection 12 mois</div>
                         </div>
                         <div class="insight-card">
@@ -1170,7 +1214,7 @@
                         </div>
                         <div class="insight-card">
                             <div class="insight-title">💾 Économies Possibles</div>
-                            <div class="insight-value">€${savings.toFixed(2)}</div>
+                            <div class="insight-value">${savings.toFixed(2)} ${activeCurrency}</div>
                             <div class="insight-desc">~15% de réduction</div>
                         </div>
                     </div>
@@ -1194,7 +1238,7 @@
                                     ${badge}
                                 </div>
                                 <div class="list-value" style="color: var(--danger); font-weight: 700;">
-                                    €${(sub.prixMensuel || 0).toFixed(2)}/mois
+                                    ${(Number(sub.convertedPrice ?? sub.prixMensuel ?? 0)).toFixed(2)} ${activeCurrency}/mois
                                 </div>
                             </div>
                         `;
@@ -1325,7 +1369,7 @@
                     abonnements.slice(0, 5).forEach(sub => {
                         const service = sub.nomService || 'Service';
                         const client = sub.clientName || 'Client';
-                        const price = parseFloat(sub.prixMensuel || 0).toFixed(2);
+                        const price = Number(sub.convertedPrice ?? sub.prixMensuel ?? 0).toFixed(2);
                         const startDate = sub.dateDebut || 'N/A';
 
                         html += `
@@ -1335,7 +1379,7 @@
                                     <span class="badge badge-success" style="background: rgba(16, 185, 129, 0.1);">${client}</span>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div class="list-value">€${price}/mois</div>
+                                    <div class="list-value">${price} ${activeCurrency}/mois</div>
                                     <div style="font-size: 12px; color: var(--gray-500);">Depuis ${startDate}</div>
                                 </div>
                             </div>
@@ -1372,7 +1416,7 @@
                 const categories = {};
                 abonnements.forEach(a => {
                     const cat = (a.categorie || 'Autre').trim();
-                    categories[cat] = (categories[cat] || 0) + (parseFloat(a.prixMensuel) || 0);
+                    categories[cat] = (categories[cat] || 0) + Number(a.convertedPrice ?? a.prixMensuel ?? 0);
                 });
 
                 const labels = Object.keys(categories);
@@ -1462,33 +1506,204 @@
             });
         });
 
+        async function initRegionalSettings() {
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.convertAbonnements));
+                if (!response.ok) {
+                    return;
+                }
+                const rows = await response.json();
+                if (Array.isArray(rows) && rows.length > 0) {
+                    selectedCountry = rows[0].country || 'FR';
+                    selectedCountryName = rows[0].countryName || selectedCountry;
+                    selectedCurrency = rows[0].targetCurrency || 'EUR';
+                }
+                const countryDropdown = document.getElementById('country-dropdown');
+                if (countryDropdown) {
+                    const option = Array.from(countryDropdown.options).find(o => o.value === selectedCountry || o.dataset.countryName === selectedCountryName);
+                    if (option) {
+                        countryDropdown.value = option.value;
+                        selectedCountryName = option.dataset.countryName || selectedCountryName;
+                        selectedCurrency = option.dataset.currency || selectedCurrency;
+                    }
+                }
+                updateRegionalDisplay(selectedCountryName, selectedCurrency);
+            } catch (error) {
+                console.error('Regional settings init failed:', error);
+            }
+        }
+
+        async function loadAllCountriesAndCurrencies() {
+            try {
+                const [countriesResponse, currenciesResponse] = await Promise.all([
+                    fetch('https://restcountries.com/v3.1/all'),
+                    fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.allCurrencies))
+                ]);
+
+                if (!countriesResponse.ok) {
+                    throw new Error('Impossible de charger les pays');
+                }
+                if (!currenciesResponse.ok) {
+                    throw new Error('Impossible de charger les devises');
+                }
+
+                const currencyData = await currenciesResponse.json();
+                allCurrencies = Array.isArray(currencyData.currencies) ? currencyData.currencies : [];
+                if (allCurrencies.length === 0) {
+                    allCurrencies = [...DEFAULT_SUPPORTED_CURRENCIES];
+                }
+                const supportedCurrencies = new Set(allCurrencies);
+
+                const data = await countriesResponse.json();
+                const countries = data
+                    .map(country => {
+                        const currencyCode = country.currencies ? Object.keys(country.currencies)[0] : null;
+                        const iso2 = country.cca2 || null;
+                        return {
+                            name: country?.name?.common || null,
+                            iso2,
+                            currency: currencyCode
+                        };
+                    })
+                    .filter(c => c.name && c.iso2 && c.currency)
+                    .filter(c => supportedCurrencies.size === 0 || supportedCurrencies.has(c.currency))
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                allCountries = countries;
+                populateCountryDropdown(countries);
+            } catch (error) {
+                console.error('Countries loading failed:', error);
+                const fallback = [
+                    { name: 'France', iso2: 'FR', currency: 'EUR' },
+                    { name: 'United States', iso2: 'US', currency: 'USD' },
+                    { name: 'United Kingdom', iso2: 'GB', currency: 'GBP' },
+                    { name: 'Switzerland', iso2: 'CH', currency: 'CHF' }
+                ];
+                allCurrencies = [...DEFAULT_SUPPORTED_CURRENCIES];
+                allCountries = fallback;
+                populateCountryDropdown(fallback);
+            }
+        }
+
+        function populateCountryDropdown(countries) {
+            const countryDropdown = document.getElementById('country-dropdown');
+            if (!countryDropdown) return;
+
+            countryDropdown.innerHTML = '';
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.iso2;
+                option.dataset.currency = country.currency;
+                option.dataset.countryName = country.name;
+                option.textContent = `${country.name} (${country.currency})`;
+                countryDropdown.appendChild(option);
+            });
+        }
+
+        function updateRegionalDisplay(country, currency) {
+            const countryNode = document.getElementById('selected-country');
+            const currencyNode = document.getElementById('selected-currency');
+            if (countryNode) countryNode.textContent = country;
+            if (currencyNode) currencyNode.textContent = currency;
+        }
+
+        async function onCountryChange() {
+            const dropdown = document.getElementById('country-dropdown');
+            const selectedOption = dropdown.options[dropdown.selectedIndex];
+            const country = selectedOption.value;
+            const countryName = selectedOption.dataset.countryName || country;
+            const currency = selectedOption.dataset.currency || 'EUR';
+
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.userCountry), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ country, countryName, currency })
+                });
+                const data = await response.json();
+                selectedCountry = data.country || country;
+                selectedCountryName = data.countryName || countryName;
+                selectedCurrency = data.currency || currency;
+                updateRegionalDisplay(selectedCountryName, selectedCurrency);
+                await loadAbonnements();
+                await loadDashboard();
+            } catch (error) {
+                showAlert('error', 'Erreur paramètres régionaux: ' + error.message);
+            }
+        }
+
+        function goToPayment(amount, currency, encodedService) {
+            const url = `payment.html?amount=${encodeURIComponent(amount)}&currency=${encodeURIComponent(currency)}&service=${encodedService}`;
+            window.location.href = url;
+        }
+
+        async function simulatePayment(amount, currency) {
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.paymentSimulate), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, currency })
+                });
+                const result = await response.json();
+                if (result.status === 'SUCCESS') {
+                    showAlert('success', result.message);
+                    const feedback = document.getElementById('payment-feedback');
+                    const feedbackText = document.getElementById('payment-feedback-text');
+                    if (feedback && feedbackText) {
+                        feedbackText.textContent = `Paiement réussi : ${Number(amount).toFixed(2)} ${currency}`;
+                        feedback.style.display = 'flex';
+                        setTimeout(() => {
+                            feedback.style.display = 'none';
+                        }, 2500);
+                    }
+                } else {
+                    showAlert('error', result.message);
+                }
+            } catch (error) {
+                showAlert('error', 'Erreur paiement: ' + error.message);
+            }
+        }
+
         async function loadAbonnements() {
             try {
-                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.abonnements));
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.convertAbonnements));
                 const abonnements = await response.json();
 
-                let html = '<table><thead><tr><th>Service</th><th>Client</th><th>Début</th><th>Fin</th><th>Prix</th><th>Actions</th></tr></thead><tbody>';
+                if (!Array.isArray(abonnements) || abonnements.length === 0) {
+                    document.getElementById('abonnements-content').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Aucun abonnement</p></div>';
+                    return;
+                }
+
+                selectedCountry = abonnements[0].country || selectedCountry;
+                selectedCountryName = abonnements[0].countryName || selectedCountryName;
+                selectedCurrency = abonnements[0].targetCurrency || selectedCurrency;
+                updateRegionalDisplay(selectedCountryName, selectedCurrency);
+
+                let html = '<table><thead><tr><th>Service</th><th>Client</th><th>Début</th><th>Fin</th><th>Prix original</th><th>Prix local</th><th>Actions</th></tr></thead><tbody>';
 
                 abonnements.forEach(a => {
+                    const originalPrice = Number(a.originalPrice || 0);
+                    const convertedPrice = Number(a.convertedPrice || 0);
+                    const sourceCurrency = a.originalCurrency || 'EUR';
+                    const targetCurrency = a.targetCurrency || selectedCurrency;
+
                     html += `<tr>
                         <td>${a.nomService}</td>
                         <td>${a.clientName}</td>
                         <td>${a.dateDebut}</td>
                         <td>${a.dateFin}</td>
-                        <td>€${a.prixMensuel.toFixed(2)}</td>
+                        <td>${originalPrice.toFixed(2)} ${sourceCurrency}</td>
+                        <td style="font-weight: 700; color: var(--primary);">${convertedPrice.toFixed(2)} ${targetCurrency}</td>
                         <td>
-                            <button class="btn btn-warning" style="padding: 6px 12px; font-size: 13px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger" style="padding: 6px 12px; font-size: 13px;">
-                                <i class="fas fa-trash"></i>
+                            <button class="btn btn-primary-sm" style="padding: 6px 12px; font-size: 13px;" onclick="goToPayment(${convertedPrice.toFixed(4)}, '${targetCurrency}', encodeURIComponent('${a.nomService.replace(/'/g, "\\'")}'))">
+                                <i class="fas fa-credit-card"></i> Pay
                             </button>
                         </td>
                     </tr>`;
                 });
 
                 html += '</tbody></table>';
-                document.getElementById('abonnements-content').innerHTML = html || '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Aucun abonnement</p></div>';
+                document.getElementById('abonnements-content').innerHTML = html;
             } catch (error) {
                 document.getElementById('abonnements-content').innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> Erreur de chargement</div>';
             }
@@ -1496,7 +1711,7 @@
 
         async function loadAnalytics() {
             try {
-                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimize));
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimization));
                 const data = await response.json();
 
                 document.getElementById('analytics-content').innerHTML = `
