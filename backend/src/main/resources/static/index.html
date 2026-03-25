@@ -354,15 +354,24 @@
         }
 
         .tabs-header {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 8px;
             border-bottom: 1px solid var(--gray-200);
-            padding: 0;
-            overflow-x: auto;
+            padding: 10px;
+            overflow-x: hidden !important;
+            overflow-y: hidden !important;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tabs-header::-webkit-scrollbar {
+            display: none;
         }
 
         .tab-button {
-            flex: 1;
-            min-width: 140px;
+            width: 100%;
+            min-width: 0;
             padding: 16px 20px;
             background: transparent;
             border: none;
@@ -373,8 +382,12 @@
             transition: all 0.3s ease;
             position: relative;
             border-bottom: 2px solid transparent;
-            margin: 6px;
+            margin: 0;
             border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
 
         .tab-button:hover {
@@ -748,6 +761,308 @@
             color: var(--success);
         }
 
+        .analytics-layout {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .analytics-summary {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .analytics-stat {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .analytics-stat-label {
+            font-size: 12px;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .analytics-stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-top: 6px;
+        }
+
+        .analytics-main {
+            grid-column: span 8;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .analytics-side {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .analytics-panel {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .analytics-panel h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: var(--gray-800);
+        }
+
+        .suggestion-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-left: 4px solid var(--gray-300);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .suggestion-card.keep {
+            border-left-color: var(--success);
+        }
+
+        .suggestion-card.optimize {
+            border-left-color: var(--warning);
+        }
+
+        .suggestion-card.cancel {
+            border-left-color: var(--danger);
+        }
+
+        .suggestion-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .suggestion-title {
+            font-size: 16px;
+            color: var(--gray-900);
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .suggestion-subtitle {
+            margin-top: 6px;
+            color: var(--gray-600);
+            font-size: 13px;
+        }
+
+        .suggestion-meta {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .suggestion-meta-item {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .suggestion-meta-label {
+            font-size: 11px;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .suggestion-meta-value {
+            margin-top: 3px;
+            font-size: 13px;
+            color: var(--gray-800);
+            font-weight: 700;
+        }
+
+        .suggestion-actions {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-inline {
+            border: 1px solid var(--gray-300);
+            background: white;
+            color: var(--gray-800);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-inline:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-inline.keep {
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #047857;
+            background: rgba(16, 185, 129, 0.08);
+        }
+
+        .btn-inline.cancel {
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #b91c1c;
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .suggestion-details {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed var(--gray-300);
+            background: var(--gray-50);
+            display: none;
+        }
+
+        .suggestion-details.visible {
+            display: block;
+        }
+
+        .analytics-error {
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.08);
+            color: #991b1b;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .empty-analytics {
+            border: 1px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 22px;
+            text-align: center;
+            color: var(--gray-600);
+            background: var(--gray-50);
+        }
+
+        .analytics-forecast-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 13px;
+        }
+
+        .analytics-forecast-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .result-card {
+            grid-column: span 3;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.08));
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .result-card-label {
+            color: var(--gray-600);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .result-card-value {
+            margin-top: 6px;
+            color: var(--gray-900);
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .result-columns {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .result-column {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 180px;
+        }
+
+        .result-column h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--gray-800);
+        }
+
+        .result-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 999px;
+            padding: 6px 10px;
+            margin: 4px 4px 0 0;
+            font-size: 12px;
+            color: var(--gray-700);
+            font-weight: 600;
+        }
+
+        .timeline-table-wrap {
+            margin-top: 14px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow-x: auto;
+        }
+
+        .timeline-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .timeline-table th,
+        .timeline-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--gray-100);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .timeline-table th {
+            background: var(--gray-50);
+            color: var(--gray-700);
+            font-weight: 700;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .metrics-grid {
@@ -760,11 +1075,15 @@
             }
 
             .tabs-header {
-                overflow-x: auto;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                overflow-x: hidden;
+                overflow-y: hidden;
+                gap: 8px;
+                padding: 8px;
             }
 
             .tab-button {
-                min-width: 120px;
+                min-width: 0;
                 padding: 14px 12px;
                 font-size: 13px;
             }
@@ -787,6 +1106,42 @@
 
             td, th {
                 padding: 10px 8px;
+            }
+
+            .analytics-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .analytics-main,
+            .analytics-side {
+                grid-column: span 12;
+            }
+
+            .suggestion-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .suggestion-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .result-card {
+                grid-column: span 6;
+            }
+
+            .result-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 460px) {
+            .tabs-header {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-button {
+                width: 100%;
             }
         }
     </style>
@@ -923,6 +1278,15 @@
                     </button>
                     <button class="tab-button" data-tab="lifecycle">
                         <i class="fas fa-calendar"></i> Lifecycle
+                    </button>
+                    <button class="tab-button" data-tab="openbanking">
+                        <i class="fas fa-file-import"></i> Open Banking
+                    </button>
+                    <button class="tab-button" data-tab="emailcenter">
+                        <i class="fas fa-envelope-open-text"></i> Email Center
+                    </button>
+                    <button class="tab-button" data-tab="currencylab">
+                        <i class="fas fa-coins"></i> Currency Lab
                     </button>
                 </div>
 
@@ -1065,6 +1429,189 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Open Banking Tab -->
+                    <div class="tab-pane" id="openbanking-pane">
+                        <div class="card">
+                            <div class="card-header">
+                                <i class="fas fa-file-import"></i> Import Bancaire Intelligent (CSV/PDF)
+                            </div>
+                            <div class="card-body">
+                                <form onsubmit="submitBankImport(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Fichier (CSV ou PDF)</label>
+                                            <input type="file" class="form-control" id="bank-file" accept=".csv,.txt,.pdf" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Devise source</label>
+                                            <select class="form-control" id="bank-source-currency"></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Devise cible</label>
+                                            <select class="form-control" id="bank-target-currency"></select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm">
+                                        <i class="fas fa-play"></i> Lancer l'analyse
+                                    </button>
+                                    <button type="button" class="btn btn-success" style="margin-left: 8px;" onclick="addAllDetectedToSubscriptions()">
+                                        <i class="fas fa-plus-circle"></i> Ajouter tous les détectés
+                                    </button>
+                                </form>
+                                <div id="bank-import-results" style="margin-top: 24px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email Center Tab -->
+                    <div class="tab-pane" id="emailcenter-pane">
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header">
+                                <i class="fas fa-satellite-dish"></i> Statut Service Email
+                            </div>
+                            <div class="card-body" id="email-status-block">
+                                <div class="loading"><div class="spinner spinner-small"></div> Vérification du statut...</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header"><i class="fas fa-hourglass-half"></i> Alerte Expiration</div>
+                            <div class="card-body">
+                                <form onsubmit="sendExpirationEmail(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Service</label>
+                                            <input class="form-control" id="email-service" value="Netflix" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Prix</label>
+                                            <input type="number" step="0.01" class="form-control" id="email-price" value="15.99" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Date expiration</label>
+                                            <input type="date" class="form-control" id="email-exp-date" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header"><i class="fas fa-file-invoice"></i> Rapport Mensuel</div>
+                            <div class="card-body">
+                                <form onsubmit="sendMonthlyReportEmail(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Mois</label>
+                                            <input class="form-control" id="email-report-month" value="Mars 2026" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Coût total</label>
+                                            <input type="number" step="0.01" class="form-control" id="email-report-total" value="120.50" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Nombre abonnements</label>
+                                            <input type="number" class="form-control" id="email-report-count" value="5" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-triangle-exclamation"></i> Alerte Dépassement Budget</div>
+                            <div class="card-body">
+                                <form onsubmit="sendBudgetAlertEmail(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Budget</label>
+                                            <input type="number" step="0.01" class="form-control" id="email-budget" value="100" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Dépense</label>
+                                            <input type="number" step="0.01" class="form-control" id="email-spent" value="132.75" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-paper-plane"></i> Envoyer</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div id="email-actions-results" style="margin-top: 16px;"></div>
+                    </div>
+
+                    <!-- Currency Lab Tab -->
+                    <div class="tab-pane" id="currencylab-pane">
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header"><i class="fas fa-wave-square"></i> Statut et Santé API Devises</div>
+                            <div class="card-body" id="currency-status-block">
+                                <div class="loading"><div class="spinner spinner-small"></div> Vérification du statut...</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header"><i class="fas fa-right-left"></i> Conversion devise</div>
+                            <div class="card-body">
+                                <form onsubmit="convertCurrencyLab(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Montant</label>
+                                            <input type="number" step="0.01" class="form-control" id="currency-amount" value="100" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">De</label>
+                                            <select class="form-control" id="currency-from"></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Vers</label>
+                                            <select class="form-control" id="currency-to"></select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-calculator"></i> Convertir</button>
+                                </form>
+                                <div id="currency-convert-result" style="margin-top: 12px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="margin-bottom: 16px;">
+                            <div class="card-header"><i class="fas fa-euro-sign"></i> Conversion vers EUR</div>
+                            <div class="card-body">
+                                <form onsubmit="convertToEurLab(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Montant</label>
+                                            <input type="number" step="0.01" class="form-control" id="currency-eur-amount" value="100" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Devise</label>
+                                            <select class="form-control" id="currency-eur-source"></select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-calculator"></i> Convertir vers EUR</button>
+                                </form>
+                                <div id="currency-eur-result" style="margin-top: 12px;"></div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><i class="fas fa-magnifying-glass-chart"></i> Analyse stabilité devise</div>
+                            <div class="card-body">
+                                <form onsubmit="analyzeCurrencyStabilityLab(event)">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Devise</label>
+                                            <select class="form-control" id="currency-stability-code"></select>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary-sm"><i class="fas fa-search"></i> Analyser</button>
+                                </form>
+                                <div id="currency-stability-result" style="margin-top: 12px;"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1077,6 +1624,9 @@
         let selectedCurrency = 'EUR';
         let allCountries = [];
         let allCurrencies = [];
+        let analyticsSuggestions = [];
+        let analyticsActionState = {};
+        let bankDetections = [];
         const DEFAULT_SUPPORTED_CURRENCIES = ['USD', 'GBP', 'EUR', 'CHF'];
 
         function toggleAuth() {
@@ -1097,6 +1647,7 @@
                     document.getElementById('user-email').textContent = data.email || 'User';
                     await loadAllCountriesAndCurrencies();
                     await initRegionalSettings();
+                    initializeAdvancedTools();
                     loadDashboard();
                 } else {
                     document.getElementById('auth-section').style.display = 'flex';
@@ -1521,8 +2072,39 @@
                 
                 if (tabName === 'abonnements') loadAbonnements();
                 if (tabName === 'analytics') loadAnalytics();
+                if (tabName === 'emailcenter') loadEmailStatus();
+                if (tabName === 'currencylab') loadCurrencyStatus();
             });
         });
+
+        function initializeAdvancedTools() {
+            const source = allCurrencies.length > 0 ? allCurrencies : DEFAULT_SUPPORTED_CURRENCIES;
+            const uniqueCodes = [...new Set(source.map(c => String(c || '').trim().toUpperCase()).filter(Boolean))];
+            const fallback = uniqueCodes.length > 0 ? uniqueCodes : DEFAULT_SUPPORTED_CURRENCIES;
+
+            const fillSelect = (id, selected) => {
+                const node = document.getElementById(id);
+                if (!node) return;
+                node.innerHTML = fallback.map(code => `<option value="${code}">${code}</option>`).join('');
+                if (selected && fallback.includes(selected)) {
+                    node.value = selected;
+                }
+            };
+
+            fillSelect('bank-source-currency', 'USD');
+            fillSelect('bank-target-currency', selectedCurrency || 'EUR');
+            fillSelect('currency-from', 'USD');
+            fillSelect('currency-to', selectedCurrency || 'EUR');
+            fillSelect('currency-eur-source', 'USD');
+            fillSelect('currency-stability-code', 'EUR');
+
+            const expInput = document.getElementById('email-exp-date');
+            if (expInput && !expInput.value) {
+                const d = new Date();
+                d.setDate(d.getDate() + 30);
+                expInput.value = d.toISOString().slice(0, 10);
+            }
+        }
 
         async function initRegionalSettings() {
             try {
@@ -1723,26 +2305,283 @@
             }
         }
 
-        async function loadAnalytics() {
-            try {
-                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.optimization));
-                const data = await response.json().catch(() => ({}));
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
 
+        function formatCurrencyValue(amount, currency = 'EUR') {
+            const safeAmount = Number(amount) || 0;
+            return `${safeAmount.toFixed(2)} ${currency}`;
+        }
+
+        function formatDateValue(value) {
+            if (!value) return 'N/A';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return escapeHtml(value);
+            return date.toLocaleDateString('fr-FR');
+        }
+
+        async function fetchJsonWithFallback(endpoint) {
+            try {
+                const response = await fetch(API_CONFIG.getUrl(endpoint));
+                const payload = await response.json().catch(() => ({}));
                 if (!response.ok) {
-                    const serverMessage = data.error || `HTTP ${response.status}`;
-                    throw new Error(serverMessage);
+                    return {
+                        ok: false,
+                        data: null,
+                        error: payload.error || `HTTP ${response.status}`
+                    };
+                }
+                return { ok: true, data: payload, error: null };
+            } catch (error) {
+                return {
+                    ok: false,
+                    data: null,
+                    error: error && error.message ? error.message : 'Erreur réseau'
+                };
+            }
+        }
+
+        function actionPresentation(action) {
+            if (action === 'RESILIER') {
+                return { badgeClass: 'badge-danger', cardClass: 'cancel', titlePrefix: 'Abonnement à annuler' };
+            }
+            if (action === 'CONSERVER') {
+                return { badgeClass: 'badge-success', cardClass: 'keep', titlePrefix: 'Abonnement à conserver' };
+            }
+            return { badgeClass: 'badge-warning', cardClass: 'optimize', titlePrefix: 'Abonnement à optimiser' };
+        }
+
+        function toggleSuggestionDetails(index) {
+            const detailsNode = document.getElementById(`suggestion-details-${index}`);
+            if (!detailsNode) return;
+            detailsNode.classList.toggle('visible');
+        }
+
+        function keepSuggestion(index) {
+            analyticsActionState[index] = 'CONSERVER';
+            showAlert('success', 'Suggestion marquée comme conservée.');
+            loadAnalytics();
+        }
+
+        async function cancelSuggestion(index) {
+            const suggestion = analyticsSuggestions[index];
+            if (!suggestion || !suggestion.abonnement || !suggestion.abonnement.id) {
+                showAlert('error', 'Impossible de retrouver cet abonnement.');
+                return;
+            }
+
+            const subscription = suggestion.abonnement;
+            const serviceName = subscription.nomService || 'cet abonnement';
+            const confirmed = confirm(`Annuler ${serviceName} ? Cette action supprime l'abonnement.`);
+            if (!confirmed) return;
+
+            try {
+                const response = await fetch(
+                    `${API_CONFIG.getUrl(API_CONFIG.endpoints.abonnements)}/${encodeURIComponent(subscription.id)}`,
+                    { method: 'DELETE' }
+                );
+
+                if (!response.ok && response.status !== 204) {
+                    const err = await response.json().catch(() => ({}));
+                    throw new Error(err.error || `HTTP ${response.status}`);
                 }
 
-                document.getElementById('analytics-content').innerHTML = `
-                    <div style="padding: 20px;">
-                        <p><strong>Analyses d'optimisation:</strong></p>
-                        <pre style="background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px;">${JSON.stringify(data, null, 2)}</pre>
+                analyticsActionState[index] = 'RESILIER';
+                showAlert('success', `${serviceName} a été annulé.`);
+
+                await Promise.all([
+                    loadAnalytics(),
+                    loadAbonnements(),
+                    loadDashboard()
+                ]);
+            } catch (error) {
+                showAlert('error', `Erreur d'annulation: ${error.message}`);
+            }
+        }
+
+        async function loadAnalytics() {
+            const container = document.getElementById('analytics-content');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Analyse en cours des optimisations...
+                </div>
+            `;
+
+            const [optimizationRes, anomaliesRes, forecastRes] = await Promise.all([
+                fetchJsonWithFallback(API_CONFIG.endpoints.optimization),
+                fetchJsonWithFallback(API_CONFIG.endpoints.anomalies),
+                fetchJsonWithFallback(API_CONFIG.endpoints.forecast + '?months=6')
+            ]);
+
+            if (!optimizationRes.ok) {
+                container.innerHTML = `
+                    <div class="analytics-error">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Erreur de chargement: ${escapeHtml(optimizationRes.error)}
+                        <div style="margin-top: 10px;">
+                            <button class="btn-inline" onclick="loadAnalytics()"><i class="fas fa-rotate-right"></i> Réessayer</button>
+                        </div>
                     </div>
                 `;
-            } catch (error) {
-                const message = error && error.message ? error.message : 'Erreur de chargement';
-                document.getElementById('analytics-content').innerHTML = `<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> ${message}</div>`;
+                return;
             }
+
+            const optimizationData = optimizationRes.data || {};
+            const suggestions = Array.isArray(optimizationData.suggestions) ? optimizationData.suggestions : [];
+            analyticsSuggestions = suggestions;
+
+            const anomaliesData = anomaliesRes.data || {};
+            const duplicateSubscriptions = Array.isArray(anomaliesData.duplicateSubscriptions) ? anomaliesData.duplicateSubscriptions : [];
+            const underutilizedSubscriptions = Array.isArray(anomaliesData.underutilizedSubscriptions) ? anomaliesData.underutilizedSubscriptions : [];
+            const forecastData = forecastRes.data || {};
+            const projectedCosts = forecastData.projectedCosts && typeof forecastData.projectedCosts === 'object'
+                ? forecastData.projectedCosts
+                : {};
+
+            const totalSavings = Number(optimizationData.totalEconomiePotentielle) || 0;
+            const cancelCount = suggestions.filter(s => (analyticsActionState[suggestions.indexOf(s)] || s.action) === 'RESILIER').length;
+            const keepCount = suggestions.filter(s => (analyticsActionState[suggestions.indexOf(s)] || s.action) === 'CONSERVER').length;
+            const optimizeCount = suggestions.filter(s => (analyticsActionState[suggestions.indexOf(s)] || s.action) === 'OPTIMISER').length;
+
+            let suggestionsHtml = '';
+
+            if (suggestions.length === 0) {
+                suggestionsHtml = `
+                    <div class="empty-analytics">
+                        <div style="font-size: 30px; margin-bottom: 10px;">🎉</div>
+                        <strong>Aucune optimisation urgente détectée</strong>
+                        <p style="margin-top: 6px;">Vos abonnements semblent déjà bien équilibrés.</p>
+                    </div>
+                `;
+            } else {
+                suggestionsHtml = suggestions.map((suggestion, index) => {
+                    const subscription = suggestion.abonnement || {};
+                    const action = analyticsActionState[index] || suggestion.action || 'OPTIMISER';
+                    const style = actionPresentation(action);
+                    const serviceName = subscription.nomService || 'Service inconnu';
+                    const monthlyPrice = Number(subscription.prixMensuel) || 0;
+                    const score = Number(suggestion.score) || 0;
+                    const potential = Number(suggestion.economiePotentielle) || 0;
+                    const title = `${style.titlePrefix}: ${serviceName} - ${monthlyPrice.toFixed(2)} EUR`;
+
+                    return `
+                        <div class="suggestion-card ${style.cardClass}">
+                            <div class="suggestion-header">
+                                <div>
+                                    <div class="suggestion-title">${escapeHtml(title)}</div>
+                                    <div class="suggestion-subtitle">${escapeHtml(subscription.clientName || 'Client non renseigné')} · ${escapeHtml(subscription.categorie || 'Non classé')}</div>
+                                </div>
+                                <span class="badge ${style.badgeClass}">${escapeHtml(action)}</span>
+                            </div>
+
+                            <div class="suggestion-meta">
+                                <div class="suggestion-meta-item">
+                                    <div class="suggestion-meta-label">Prix mensuel</div>
+                                    <div class="suggestion-meta-value">${formatCurrencyValue(monthlyPrice)}</div>
+                                </div>
+                                <div class="suggestion-meta-item">
+                                    <div class="suggestion-meta-label">Score IA</div>
+                                    <div class="suggestion-meta-value">${score.toFixed(1)}</div>
+                                </div>
+                                <div class="suggestion-meta-item">
+                                    <div class="suggestion-meta-label">Début</div>
+                                    <div class="suggestion-meta-value">${formatDateValue(subscription.dateDebut)}</div>
+                                </div>
+                                <div class="suggestion-meta-item">
+                                    <div class="suggestion-meta-label">Fin</div>
+                                    <div class="suggestion-meta-value">${formatDateValue(subscription.dateFin)}</div>
+                                </div>
+                            </div>
+
+                            <div class="suggestion-actions">
+                                <button class="btn-inline" onclick="toggleSuggestionDetails(${index})">
+                                    <i class="fas fa-circle-info"></i> Détails
+                                </button>
+                                <button class="btn-inline keep" onclick="keepSuggestion(${index})">
+                                    <i class="fas fa-check"></i> Garder
+                                </button>
+                                <button class="btn-inline cancel" onclick="cancelSuggestion(${index})">
+                                    <i class="fas fa-xmark"></i> Annuler
+                                </button>
+                            </div>
+
+                            <div class="suggestion-details" id="suggestion-details-${index}">
+                                <div><strong>Justification:</strong> ${escapeHtml(suggestion.justification || 'Aucune justification fournie')}</div>
+                                <div style="margin-top: 6px;"><strong>Impact financier estimé:</strong> ${formatCurrencyValue(potential)} / mois</div>
+                                <div style="margin-top: 6px;"><strong>ID abonnement:</strong> ${escapeHtml(subscription.id || 'N/A')}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const forecastEntries = Object.entries(projectedCosts);
+            const forecastHtml = forecastEntries.length === 0
+                ? '<div class="empty-analytics" style="padding: 14px;">Prévision indisponible</div>'
+                : forecastEntries.slice(0, 6).map(([month, cost]) => `
+                    <div class="analytics-forecast-item">
+                        <span>${escapeHtml(month)}</span>
+                        <strong>${formatCurrencyValue(cost)}</strong>
+                    </div>
+                `).join('');
+
+            container.innerHTML = `
+                <div class="analytics-layout">
+                    <div class="analytics-summary">
+                        <div class="analytics-stat">
+                            <div class="analytics-stat-label">Suggestions totales</div>
+                            <div class="analytics-stat-value">${suggestions.length}</div>
+                        </div>
+                        <div class="analytics-stat">
+                            <div class="analytics-stat-label">Économie potentielle</div>
+                            <div class="analytics-stat-value">${formatCurrencyValue(totalSavings)}</div>
+                        </div>
+                        <div class="analytics-stat">
+                            <div class="analytics-stat-label">À annuler</div>
+                            <div class="analytics-stat-value">${cancelCount}</div>
+                        </div>
+                        <div class="analytics-stat">
+                            <div class="analytics-stat-label">À garder / optimiser</div>
+                            <div class="analytics-stat-value">${keepCount + optimizeCount}</div>
+                        </div>
+                    </div>
+
+                    <div class="analytics-main">
+                        ${suggestionsHtml}
+                    </div>
+
+                    <div class="analytics-side">
+                        <div class="analytics-panel">
+                            <h4><i class="fas fa-triangle-exclamation"></i> Signaux de risque</h4>
+                            <div class="list-item"><span class="list-label">Sous-utilisés</span><span class="list-value warning">${underutilizedSubscriptions.length}</span></div>
+                            <div class="list-item"><span class="list-label">Doublons</span><span class="list-value danger">${duplicateSubscriptions.length}</span></div>
+                            <div class="list-item"><span class="list-label">Santé globale</span><span class="list-value">${suggestions.length === 0 ? 'Stable' : 'À surveiller'}</span></div>
+                        </div>
+
+                        <div class="analytics-panel">
+                            <h4><i class="fas fa-chart-line"></i> Projection 6 mois</h4>
+                            ${forecastHtml}
+                        </div>
+
+                        <div class="analytics-panel">
+                            <h4><i class="fas fa-gears"></i> Actions rapides</h4>
+                            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="btn-inline" onclick="loadAnalytics()"><i class="fas fa-rotate-right"></i> Actualiser</button>
+                                <button class="btn-inline" onclick="loadAbonnements()"><i class="fas fa-list"></i> Voir abonnements</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function showAlert(type, message) {
@@ -1762,16 +2601,67 @@
             const riskWeight = document.getElementById('risk-weight').value;
             const comfortWeight = document.getElementById('comfort-weight').value;
 
+            const resultNode = document.getElementById('portfolio-results');
+            resultNode.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Optimisation en cours...</div>';
+
             try {
                 const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.rebalance), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ budgetTarget, valueWeight, riskWeight, comfortWeight })
                 });
-                const data = await response.json();
-                document.getElementById('portfolio-results').innerHTML = `<pre style="background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px;">${JSON.stringify(data, null, 2)}</pre>`;
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                const kept = Array.isArray(data.kept) ? data.kept : [];
+                const optimized = Array.isArray(data.optimized) ? data.optimized : [];
+                const cancelled = Array.isArray(data.cancelled) ? data.cancelled : [];
+
+                const chips = (arr) => {
+                    if (!arr.length) return '<p class="empty-analytics" style="padding: 10px;">Aucun élément</p>';
+                    return arr.map(item => `<span class="result-chip">${escapeHtml(item.nomService || 'Service')} · ${formatCurrencyValue(item.prixMensuel)}</span>`).join('');
+                };
+
+                resultNode.innerHTML = `
+                    <div class="result-grid">
+                        <div class="result-card">
+                            <div class="result-card-label">Score objectif</div>
+                            <div class="result-card-value">${(Number(data.objectiveScore) || 0).toFixed(1)}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Économie potentielle</div>
+                            <div class="result-card-value">${formatCurrencyValue(data.savingsPotential)}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Temps de calcul</div>
+                            <div class="result-card-value">${Number(data.processingTimeMs) || 0} ms</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Recommandation</div>
+                            <div class="result-card-value" style="font-size: 14px; line-height: 1.4;">${escapeHtml(data.recommendation || 'Aucune')}</div>
+                        </div>
+                    </div>
+
+                    <div class="result-columns">
+                        <div class="result-column">
+                            <h4><i class="fas fa-check-circle" style="color: var(--success);"></i> Conservés (${kept.length})</h4>
+                            ${chips(kept)}
+                        </div>
+                        <div class="result-column">
+                            <h4><i class="fas fa-sliders" style="color: var(--warning);"></i> Optimisés (${optimized.length})</h4>
+                            ${chips(optimized)}
+                        </div>
+                        <div class="result-column">
+                            <h4><i class="fas fa-trash" style="color: var(--danger);"></i> À annuler (${cancelled.length})</h4>
+                            ${chips(cancelled)}
+                        </div>
+                    </div>
+                `;
             } catch (error) {
-                showAlert('error', 'Erreur: ' + error.message);
+                resultNode.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur optimisation: ${escapeHtml(error.message)}</div>`;
             }
         }
 
@@ -1780,16 +2670,391 @@
             const months = document.getElementById('plan-months').value;
             const budget = document.getElementById('plan-budget').value;
 
+            const resultNode = document.getElementById('lifecycle-results');
+            resultNode.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Génération du plan lifecycle...</div>';
+
             try {
                 const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.lifecyclePlan), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ months, budget })
                 });
-                const data = await response.json();
-                document.getElementById('lifecycle-results').innerHTML = `<pre style="background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 12px;">${JSON.stringify(data, null, 2)}</pre>`;
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                const plan = data.plan || {};
+                const monthlyPlans = Array.isArray(plan.monthlyPlans) ? plan.monthlyPlans : [];
+
+                const rows = monthlyPlans.length
+                    ? monthlyPlans.map(m => {
+                        const active = Array.isArray(m.activeSubscriptions) ? m.activeSubscriptions.length : 0;
+                        const decisions = m.decisions && typeof m.decisions === 'object'
+                            ? Object.entries(m.decisions).map(([k, v]) => `${escapeHtml(k)}: ${escapeHtml(v)}`).join('<br>')
+                            : 'N/A';
+                        return `
+                            <tr>
+                                <td>${escapeHtml(m.month || 'N/A')}</td>
+                                <td>${active}</td>
+                                <td>${formatCurrencyValue(m.monthlyCost)}</td>
+                                <td>${(Number(m.monthlyScore) || 0).toFixed(2)}</td>
+                                <td>${decisions}</td>
+                            </tr>
+                        `;
+                    }).join('')
+                    : '<tr><td colspan="5" style="text-align:center; color: var(--gray-500);">Aucun mois calculé</td></tr>';
+
+                resultNode.innerHTML = `
+                    <div class="result-grid">
+                        <div class="result-card">
+                            <div class="result-card-label">Mois planifiés</div>
+                            <div class="result-card-value">${Number(plan.months) || 0}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Budget cible</div>
+                            <div class="result-card-value">${formatCurrencyValue(plan.budgetTarget)}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Coût total prévisionnel</div>
+                            <div class="result-card-value">${formatCurrencyValue(plan.totalCost)}</div>
+                        </div>
+                        <div class="result-card">
+                            <div class="result-card-label">Score global</div>
+                            <div class="result-card-value">${(Number(plan.globalObjectiveScore) || 0).toFixed(2)}</div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-table-wrap">
+                        <table class="timeline-table">
+                            <thead>
+                                <tr>
+                                    <th>Mois</th>
+                                    <th>Abonnements actifs</th>
+                                    <th>Coût mensuel</th>
+                                    <th>Score</th>
+                                    <th>Décisions</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
             } catch (error) {
-                showAlert('error', 'Erreur: ' + error.message);
+                resultNode.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur lifecycle: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function submitBankImport(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('bank-file');
+            const sourceCurrency = document.getElementById('bank-source-currency')?.value || 'EUR';
+            const targetCurrency = document.getElementById('bank-target-currency')?.value || 'EUR';
+            const resultNode = document.getElementById('bank-import-results');
+            const file = fileInput?.files?.[0];
+
+            if (!file) {
+                resultNode.innerHTML = '<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Sélectionnez un fichier CSV ou PDF.</div>';
+                return;
+            }
+
+            resultNode.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Analyse et extraction en cours...</div>';
+
+            try {
+                const query = `?sourceCurrency=${encodeURIComponent(sourceCurrency)}&targetCurrency=${encodeURIComponent(targetCurrency)}`;
+                const headers = { 'X-File-Name': file.name };
+                let body;
+                let contentType;
+
+                if ((file.type || '').toLowerCase().includes('pdf') || file.name.toLowerCase().endsWith('.pdf')) {
+                    body = await file.arrayBuffer();
+                    contentType = 'application/pdf';
+                } else {
+                    body = await file.text();
+                    contentType = 'text/plain';
+                }
+
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.bankImport) + query, {
+                    method: 'POST',
+                    headers: { ...headers, 'Content-Type': contentType },
+                    body
+                });
+
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+
+                bankDetections = Array.isArray(data.detections) ? data.detections : [];
+
+                const rows = bankDetections.length
+                    ? bankDetections.map((d, i) => {
+                        const service = d.service || 'Inconnu';
+                        const category = d.category || 'N/A';
+                        const score = Number(d.optimizationScore || 0).toFixed(1);
+                        const amount = Number(d.amountTargetCurrency ?? d.amountEUR ?? d.amount ?? 0).toFixed(2);
+                        const recommendation = d.recommendation || 'Aucune recommandation';
+                        return `
+                            <tr>
+                                <td>${escapeHtml(service)}</td>
+                                <td>${escapeHtml(category)}</td>
+                                <td>${amount} ${escapeHtml(targetCurrency)}</td>
+                                <td>${score}</td>
+                                <td>${escapeHtml(recommendation)}</td>
+                                <td><button class="btn-inline" onclick="addDetectedToSubscriptions(${i})"><i class="fas fa-plus"></i> Ajouter</button></td>
+                            </tr>
+                        `;
+                    }).join('')
+                    : '<tr><td colspan="6" style="text-align:center; color: var(--gray-500);">Aucune détection</td></tr>';
+
+                resultNode.innerHTML = `
+                    <div class="result-grid">
+                        <div class="result-card"><div class="result-card-label">Transactions traitées</div><div class="result-card-value">${Number(data.transactionsProcessed) || 0}</div></div>
+                        <div class="result-card"><div class="result-card-label">Abonnements détectés</div><div class="result-card-value">${Number(data.subscriptionsDetected) || 0}</div></div>
+                        <div class="result-card"><div class="result-card-label">Format import</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.importedFormat || 'N/A')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Devises</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(sourceCurrency)} → ${escapeHtml(targetCurrency)}</div></div>
+                    </div>
+                    <div class="timeline-table-wrap">
+                        <table class="timeline-table">
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Catégorie</th>
+                                    <th>Montant</th>
+                                    <th>Score</th>
+                                    <th>Recommandation</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                resultNode.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur import bancaire: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function addDetectedToSubscriptions(index) {
+            const detection = bankDetections[index];
+            if (!detection) {
+                showAlert('error', 'Détection introuvable.');
+                return;
+            }
+
+            const payload = {
+                service: detection.service || 'Service détecté',
+                category: detection.category || 'Autre',
+                amount: Number(detection.amountTargetCurrency ?? detection.amountEUR ?? detection.amount ?? 0)
+            };
+
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.openBankingAddDetected), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    throw new Error(data.error || `HTTP ${response.status}`);
+                }
+                showAlert('success', `Ajouté: ${payload.service}`);
+                loadAbonnements();
+                loadDashboard();
+            } catch (error) {
+                showAlert('error', `Erreur ajout abonnement détecté: ${error.message}`);
+            }
+        }
+
+        async function addAllDetectedToSubscriptions() {
+            if (!Array.isArray(bankDetections) || bankDetections.length === 0) {
+                showAlert('error', 'Aucune détection à ajouter.');
+                return;
+            }
+
+            let ok = 0;
+            for (let i = 0; i < bankDetections.length; i++) {
+                try {
+                    await addDetectedToSubscriptions(i);
+                    ok += 1;
+                } catch (_) {}
+            }
+            showAlert('success', `${ok}/${bankDetections.length} détections ajoutées.`);
+        }
+
+        async function loadEmailStatus() {
+            const node = document.getElementById('email-status-block');
+            if (!node) return;
+            node.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Vérification du statut...</div>';
+
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.emailStatus));
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                node.innerHTML = `
+                    <div class="result-grid" style="margin-top: 0;">
+                        <div class="result-card"><div class="result-card-label">Service</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.service || 'Mailgun')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Statut</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.status || 'N/A')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Mode</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.mode || 'N/A')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Fallback</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(String(data.fallback || false))}</div></div>
+                    </div>
+                `;
+            } catch (error) {
+                node.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur statut email: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function sendExpirationEmail(e) {
+            e.preventDefault();
+            const service = document.getElementById('email-service').value;
+            const prix = document.getElementById('email-price').value;
+            const dateExpiration = document.getElementById('email-exp-date').value;
+            await sendEmailRequest(
+                API_CONFIG.endpoints.emailAlertExpiration,
+                { service, prix, dateExpiration },
+                'Alerte expiration envoyée.'
+            );
+        }
+
+        async function sendMonthlyReportEmail(e) {
+            e.preventDefault();
+            const mois = document.getElementById('email-report-month').value;
+            const coutTotal = document.getElementById('email-report-total').value;
+            const nombreAbos = document.getElementById('email-report-count').value;
+            await sendEmailRequest(
+                API_CONFIG.endpoints.emailRapport,
+                { mois, coutTotal, nombreAbos },
+                'Rapport mensuel envoyé.'
+            );
+        }
+
+        async function sendBudgetAlertEmail(e) {
+            e.preventDefault();
+            const budget = document.getElementById('email-budget').value;
+            const depense = document.getElementById('email-spent').value;
+            await sendEmailRequest(
+                API_CONFIG.endpoints.emailAlert,
+                { budget, depense },
+                'Alerte budget envoyée.'
+            );
+        }
+
+        async function sendEmailRequest(endpoint, params, successMessage) {
+            const resultNode = document.getElementById('email-actions-results');
+            const query = new URLSearchParams(params).toString();
+            resultNode.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Envoi en cours...</div>';
+
+            try {
+                const response = await fetch(`${API_CONFIG.getUrl(endpoint)}?${query}`, { method: 'POST' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok || data.success === false) {
+                    throw new Error(data.erreur || data.error || `HTTP ${response.status}`);
+                }
+                resultNode.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> ${successMessage} (id: ${escapeHtml(data.messageId || 'N/A')})</div>`;
+            } catch (error) {
+                resultNode.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur email: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function loadCurrencyStatus() {
+            const node = document.getElementById('currency-status-block');
+            if (!node) return;
+            node.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Vérification du statut...</div>';
+            try {
+                const response = await fetch(API_CONFIG.getUrl(API_CONFIG.endpoints.currencyStatus));
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                node.innerHTML = `
+                    <div class="result-grid" style="margin-top: 0;">
+                        <div class="result-card"><div class="result-card-label">Service</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.service || 'ExchangeRate')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Statut</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.status || 'N/A')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Mode</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(data.mode || 'N/A')}</div></div>
+                        <div class="result-card"><div class="result-card-label">Fallback</div><div class="result-card-value" style="font-size:16px;">${escapeHtml(String(data.fallback || false))}</div></div>
+                    </div>
+                `;
+            } catch (error) {
+                node.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur statut devises: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function convertCurrencyLab(e) {
+            e.preventDefault();
+            const amount = document.getElementById('currency-amount').value;
+            const source = document.getElementById('currency-from').value;
+            const cible = document.getElementById('currency-to').value;
+            const node = document.getElementById('currency-convert-result');
+            node.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Conversion en cours...</div>';
+
+            try {
+                const query = new URLSearchParams({ montant: amount, source, cible }).toString();
+                const response = await fetch(`${API_CONFIG.getUrl(API_CONFIG.endpoints.currencyConvert)}?${query}`, { method: 'POST' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                node.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        ${formatCurrencyValue(amount, source)} = <strong>${formatCurrencyValue(data.montantConverti || data.resultat || 0, cible)}</strong>
+                    </div>
+                `;
+            } catch (error) {
+                node.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur conversion: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function convertToEurLab(e) {
+            e.preventDefault();
+            const montant = document.getElementById('currency-eur-amount').value;
+            const devise = document.getElementById('currency-eur-source').value;
+            const node = document.getElementById('currency-eur-result');
+            node.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Conversion en cours...</div>';
+
+            try {
+                const query = new URLSearchParams({ montant, devise }).toString();
+                const response = await fetch(`${API_CONFIG.getUrl(API_CONFIG.endpoints.currencyToEur)}?${query}`, { method: 'POST' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                node.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        ${formatCurrencyValue(montant, devise)} = <strong>${formatCurrencyValue(data.montantConverti || data.resultat || 0, 'EUR')}</strong>
+                    </div>
+                `;
+            } catch (error) {
+                node.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur conversion EUR: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        async function analyzeCurrencyStabilityLab(e) {
+            e.preventDefault();
+            const devise = document.getElementById('currency-stability-code').value;
+            const node = document.getElementById('currency-stability-result');
+            node.innerHTML = '<div class="loading"><div class="spinner spinner-small"></div> Analyse en cours...</div>';
+
+            try {
+                const query = new URLSearchParams({ devise }).toString();
+                const response = await fetch(`${API_CONFIG.getUrl(API_CONFIG.endpoints.currencyStability)}?${query}`, { method: 'POST' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+
+                node.innerHTML = `
+                    <div class="timeline-table-wrap">
+                        <table class="timeline-table">
+                            <tbody>
+                                <tr><th>Devise</th><td>${escapeHtml(devise)}</td></tr>
+                                <tr><th>Niveau stabilité</th><td>${escapeHtml(String(data.niveauStabilite || data.stabilite || 'N/A'))}</td></tr>
+                                <tr><th>Indice</th><td>${escapeHtml(String(data.indice || data.score || 'N/A'))}</td></tr>
+                                <tr><th>Tendance</th><td>${escapeHtml(String(data.tendance || 'N/A'))}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                node.innerHTML = `<div class="analytics-error"><i class="fas fa-exclamation-circle"></i> Erreur stabilité: ${escapeHtml(error.message)}</div>`;
             }
         }
 

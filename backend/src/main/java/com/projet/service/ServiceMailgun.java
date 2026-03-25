@@ -1,5 +1,6 @@
 package com.projet.service;
 
+import com.projet.config.AppConfig;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -18,15 +19,11 @@ import java.util.Map;
  */
 public class ServiceMailgun {
 
-    private static final String MAILGUN_DOMAIN = System.getenv().getOrDefault(
-        "MAILGUN_DOMAIN", "sandboxa1b2c3d4e5f6g7h8.mailgun.org"
-    );
-    
-    private static final String MAILGUN_API_KEY = System.getenv().getOrDefault(
-        "MAILGUN_API_KEY", "key-demo-123456789"
-    );
-    
-    private static final String MAILGUN_API_URL = "https://api.mailgun.net/v3/" + MAILGUN_DOMAIN;
+    // Les clés sont lues à chaque appel via AppConfig pour prendre en compte le fichier .env
+    private static String mailgunDomain()  { return AppConfig.get("MAILGUN_DOMAIN",  "sandboxa1b2c3d4e5f6g7h8.mailgun.org"); }
+    private static String mailgunApiKey()  { return AppConfig.get("MAILGUN_API_KEY",  "key-demo-123456789"); }
+    private static String mailgunApiUrl()  { return "https://api.mailgun.net/v3/" + mailgunDomain(); }
+
     private static final HttpClient httpClient = HttpClient.newHttpClient();
 
     public static class ResultatEnvoiEmail {
@@ -110,7 +107,7 @@ public class ServiceMailgun {
                                                     String texte, long debut) {
         try {
             // Préparation authentification Basic Auth
-            String auth = Base64.getEncoder().encodeToString(("api:" + MAILGUN_API_KEY).getBytes());
+            String auth = Base64.getEncoder().encodeToString(("api:" + mailgunApiKey()).getBytes());
 
             // Données du formulaire
             String body = "from=noreply@gestion-abonnements.com" +
@@ -120,7 +117,7 @@ public class ServiceMailgun {
 
             // Requête POST
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(MAILGUN_API_URL + "/messages"))
+                    .uri(URI.create(mailgunApiUrl() + "/messages"))
                     .header("Authorization", "Basic " + auth)
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .POST(HttpRequest.BodyPublishers.ofString(body))
@@ -166,10 +163,10 @@ public class ServiceMailgun {
      */
     public static boolean verifierConnexion() {
         try {
-            String auth = Base64.getEncoder().encodeToString(("api:" + MAILGUN_API_KEY).getBytes());
+            String auth = Base64.getEncoder().encodeToString(("api:" + mailgunApiKey()).getBytes());
 
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(MAILGUN_API_URL + "/messages"))
+                    .uri(URI.create(mailgunApiUrl() + "/messages"))
                     .header("Authorization", "Basic " + auth)
                     .GET()
                     .build();
@@ -187,10 +184,18 @@ public class ServiceMailgun {
      */
     public static Map<String, Object> obtenirInfos() {
         Map<String, Object> infos = new HashMap<>();
+        boolean connecte = verifierConnexion();
+        boolean sandbox = mailgunDomain().startsWith("sandbox");
+
         infos.put("service", "Mailgun");
-        infos.put("domaine", MAILGUN_DOMAIN);
-        infos.put("apiUrl", MAILGUN_API_URL);
-        infos.put("connecte", verifierConnexion());
+        infos.put("domaine", mailgunDomain());
+        infos.put("apiUrl", mailgunApiUrl());
+        infos.put("connecte", connecte);
+
+        // Champs normalisés utilisés par l'UI dashboard
+        infos.put("status", connecte ? "online" : "offline");
+        infos.put("mode", sandbox ? "sandbox" : "production");
+        infos.put("fallback", !connecte);
         return infos;
     }
 }

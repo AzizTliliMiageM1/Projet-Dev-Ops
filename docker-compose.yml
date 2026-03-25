@@ -18,6 +18,8 @@ services:
     depends_on:
       - db
       - flyway
+    env_file:
+      - .env          # charge MAILGUN_API_KEY, STRIPE_SECRET_KEY, OKTA_ORG_URL, OKTA_API_TOKEN, etc.
     environment:
       DB_URL: jdbc:mysql://db:3306/abonnementsdb?useSSL=false&serverTimezone=UTC
       DB_USER: appuser

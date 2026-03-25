@@ -1,1 +1,4 @@
 40016084@parisnanterre.fr;Nhocmiko01!;true;558c00f6-1a25-4fd0-b36f-de5fca9557fe;alex
+qa.currency@test.com;Pass123!;true;6e86bc8f-1ee9-46ec-bec2-02a2bcb181a3;qa.currency
+demo.fx@test.com;Pass123!;true;5d0ea541-f61a-4c82-b3cc-532fa27ae2cb;demo.fx
+qa.verify@test.com;Pass123!;true;3664376c-7098-4fd8-8b3f-b9ff5c41e840;qa.verify

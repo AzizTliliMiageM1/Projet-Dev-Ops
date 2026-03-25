@@ -264,11 +264,18 @@ public class ServiceTauxChange {
      */
     public static Map<String, Object> obtenirInfos() {
         Map<String, Object> infos = new HashMap<>();
+        boolean connecte = verifierConnexion();
+
         infos.put("service", "ExchangeRate-API");
         infos.put("apiUrl", API_URL);
         infos.put("cacheTTL", "5 minutes");
         infos.put("devisesCachees", cacheTaux.size());
-        infos.put("connecte", verifierConnexion());
+        infos.put("connecte", connecte);
+
+        // Champs normalisés utilisés par l'UI dashboard
+        infos.put("status", connecte ? "online" : "offline");
+        infos.put("mode", "remote");
+        infos.put("fallback", !connecte);
         return infos;
     }
 }

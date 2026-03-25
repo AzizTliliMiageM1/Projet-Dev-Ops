@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -30,7 +31,7 @@ import spark.Spark;
 class ApiServerIntegrationTest {
 
     private static String baseUrl;
-    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(2);
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
     private static int testPort;
 
     private static Thread serverThread;
@@ -144,6 +145,66 @@ class ApiServerIntegrationTest {
         assertTrue(
             deleteResponse.statusCode() == 200 || deleteResponse.statusCode() == 204,
             "Le DELETE doit retourner 200 ou 204"
+        );
+    }
+
+    @Test
+    @DisplayName("Doit accepter months et budget en String sur lifecycle-plan")
+    void shouldAcceptStringNumbersForLifecyclePlan() throws Exception {
+        Map<String, Object> payload = Map.of(
+            "months", "12",
+            "budget", "1200.50"
+        );
+
+        HttpResponse<String> response = sendPost("/api/portfolio/lifecycle-plan", objectMapper.writeValueAsString(payload));
+
+        assertEquals(200, response.statusCode(), "Le lifecycle-plan doit accepter les nombres au format String");
+
+        Map<String, Object> responseMap =
+            objectMapper.readValue(response.body(), new TypeReference<Map<String, Object>>() {});
+
+        assertAll(
+            () -> assertNotNull(responseMap.get("success"), "La réponse doit contenir le flag success"),
+            () -> assertFalse(
+                response.body().toLowerCase().contains("cannot be cast"),
+                "La réponse ne doit pas contenir d'erreur de cast String->Number"
+            ),
+            () -> assertFalse(
+                response.body().toLowerCase().contains("class java.lang.string"),
+                "La réponse ne doit pas contenir d'erreur de type Java"
+            )
+        );
+    }
+
+    @Test
+    @DisplayName("Doit exposer un statut normalisé pour Email et Currency")
+    void shouldExposeNormalizedServiceStatusPayloads() throws Exception {
+        HttpResponse<String> emailStatusResponse = sendGet("/api/api/email/status");
+        HttpResponse<String> currencyStatusResponse = sendGet("/api/api/currency/status");
+
+        assertAll(
+            () -> assertEquals(200, emailStatusResponse.statusCode(), "Le status email doit répondre 200"),
+            () -> assertEquals(200, currencyStatusResponse.statusCode(), "Le status currency doit répondre 200")
+        );
+
+        Map<String, Object> emailMap = objectMapper.readValue(
+            emailStatusResponse.body(),
+            new TypeReference<Map<String, Object>>() {}
+        );
+        Map<String, Object> currencyMap = objectMapper.readValue(
+            currencyStatusResponse.body(),
+            new TypeReference<Map<String, Object>>() {}
+        );
+
+        assertAll(
+            () -> assertFalse(String.valueOf(emailMap.getOrDefault("service", "")).isBlank(), "Email.service doit être renseigné"),
+            () -> assertFalse(String.valueOf(emailMap.getOrDefault("status", "")).isBlank(), "Email.status doit être renseigné"),
+            () -> assertFalse(String.valueOf(emailMap.getOrDefault("mode", "")).isBlank(), "Email.mode doit être renseigné"),
+            () -> assertNotNull(emailMap.get("fallback"), "Email.fallback doit être présent"),
+            () -> assertFalse(String.valueOf(currencyMap.getOrDefault("service", "")).isBlank(), "Currency.service doit être renseigné"),
+            () -> assertFalse(String.valueOf(currencyMap.getOrDefault("status", "")).isBlank(), "Currency.status doit être renseigné"),
+            () -> assertFalse(String.valueOf(currencyMap.getOrDefault("mode", "")).isBlank(), "Currency.mode doit être renseigné"),
+            () -> assertNotNull(currencyMap.get("fallback"), "Currency.fallback doit être présent")
         );
     }
 

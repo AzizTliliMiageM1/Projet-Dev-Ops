@@ -1,0 +1,78 @@
+[ {
+  "id" : "08fa53ba-8cdb-40d6-a634-da5e8bdd842b",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "299f2690-2f58-4218-aac8-e135423367b2",
+  "serviceName" : "Spotify",
+  "amount" : 6.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-9e8b3ce7-187a-4e9b-8a40-41cfc9163aff",
+  "createdAt" : [ 2026, 3, 24, 18, 33, 52, 150925600 ]
+}, {
+  "id" : "66d29b48-eca8-4317-9d71-245c8c4879e7",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "f9169b3e-2e56-4c7f-baa5-7c1c8df63421",
+  "serviceName" : "AMAZON",
+  "amount" : 10.0,
+  "currency" : "CHF",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-f48e55fa-aef6-48ba-a05b-2e38e3f8aec6",
+  "createdAt" : [ 2026, 3, 24, 22, 57, 17, 789277000 ]
+}, {
+  "id" : "a335f678-d4a2-489a-980d-887fb33b13f7",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "f3537d6c-ee63-41cb-b2fa-0bad28f5991d",
+  "serviceName" : "Netflix",
+  "amount" : 12.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-289054ae-eabe-4b11-8414-dc2675f2726c",
+  "createdAt" : [ 2026, 3, 24, 23, 27, 48, 397157400 ]
+}, {
+  "id" : "c8e0b52d-d656-4894-ae02-af65580d1851",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "53074928-20cb-4b49-80a1-2425c73e3e82",
+  "serviceName" : "Netflix",
+  "amount" : 12.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-0d39a48e-6243-4cd6-a923-77e8f76c0257",
+  "createdAt" : [ 2026, 3, 24, 23, 34, 10, 80972600 ]
+}, {
+  "id" : "55a82c94-d771-44c5-92af-9a67f8264622",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "f6147ef2-4f7d-4c3f-b250-72dbbc254c43",
+  "serviceName" : "Netflix",
+  "amount" : 12.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-9aad247d-2997-4cb6-a3b9-8d762a80bf9a",
+  "createdAt" : [ 2026, 3, 24, 23, 37, 23, 75109900 ]
+}, {
+  "id" : "050ef286-b7bb-4e0a-bcf5-9cd950dce0e2",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "0e828141-5507-4c18-adb3-7f9f92124cff",
+  "serviceName" : "Netflix",
+  "amount" : 12.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-d1bd9c14-6266-4aac-937f-afbc73c6ae70",
+  "createdAt" : [ 2026, 3, 24, 23, 37, 40, 860978900 ]
+}, {
+  "id" : "2354e6e8-9ed2-46cb-8097-25687bcb14cf",
+  "parentEmail" : "qa.currency@test.com",
+  "subAccountId" : "13370932-422b-41a4-8d4c-a9dff999ceb7",
+  "serviceName" : "Netflix",
+  "amount" : 12.99,
+  "currency" : "EUR",
+  "status" : "SUCCESS",
+  "provider" : "local",
+  "externalPaymentId" : "local-sub-ccb2d4d6-fcb6-4631-b9b4-93517ebec578",
+  "createdAt" : [ 2026, 3, 24, 23, 41, 54, 79343400 ]
+} ]

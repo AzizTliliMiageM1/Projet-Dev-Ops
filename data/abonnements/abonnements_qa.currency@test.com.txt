@@ -1,0 +1,3 @@
+d77346e2-78e2-4301-8596-a7c8e5097886;Netflix;2026-03-01;2026-12-31;15,00;QA;;Streaming;;;Important;;1;NON;7;Mensuel
+c5ee4bc3-b4cf-449f-955f-f39e445353cd;Netflix;2024-01-01;2025-01-01;15,00;Aziz;2024-03-01;Streaming;;;Important;;1;NON;7;Mensuel
+db40cc0b-d166-4b64-9b3a-bda058a13290;PlayStation Plus;2026-02-24;2027-02-24;9,99;qa.currency@test.com;2026-03-24;Gaming;;;Important;;1;NON;7;Mensuel

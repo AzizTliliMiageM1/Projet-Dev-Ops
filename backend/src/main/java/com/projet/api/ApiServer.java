@@ -949,10 +949,10 @@ public class ApiServer {
                 try {
                     Map<String, Object> requestBody = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
                     
-                    double budgetTarget = ((Number) requestBody.getOrDefault("budgetTarget", 100)).doubleValue();
-                    double valueWeight = ((Number) requestBody.getOrDefault("valueWeight", 0.4)).doubleValue();
-                    double riskWeight = ((Number) requestBody.getOrDefault("riskWeight", 0.3)).doubleValue();
-                    double comfortWeight = ((Number) requestBody.getOrDefault("comfortWeight", 0.3)).doubleValue();
+                    double budgetTarget = parseDoubleBodyValue(requestBody.get("budgetTarget"), 100d, "budgetTarget");
+                    double valueWeight = parseDoubleBodyValue(requestBody.get("valueWeight"), 0.4d, "valueWeight");
+                    double riskWeight = parseDoubleBodyValue(requestBody.get("riskWeight"), 0.3d, "riskWeight");
+                    double comfortWeight = parseDoubleBodyValue(requestBody.get("comfortWeight"), 0.3d, "comfortWeight");
 
                     AbonnementRepository repo = getOrCreateRepo(req);
                     List<Abonnement> abonnements = repo.findAll();
@@ -967,6 +967,9 @@ public class ApiServer {
 
                     return mapper.writeValueAsString(result);
 
+                } catch (IllegalArgumentException e) {
+                    res.status(400);
+                    return mapper.writeValueAsString(Map.of("error", e.getMessage()));
                 } catch (Exception e) {
                     res.status(500);
                     return mapper.writeValueAsString(Map.of("error", "Erreur lors du rééquilibrage: " + e.getMessage()));
@@ -989,8 +992,8 @@ public class ApiServer {
                 try {
                     Map<String, Object> requestBody = mapper.readValue(req.body(), new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
                     
-                    int months = ((Number) requestBody.getOrDefault("months", 12)).intValue();
-                    double budget = ((Number) requestBody.getOrDefault("budget", 100)).doubleValue();
+                    int months = parseIntBodyValue(requestBody.get("months"), 12, "months");
+                    double budget = parseDoubleBodyValue(requestBody.get("budget"), 100d, "budget");
 
                     AbonnementRepository repo = getOrCreateRepo(req);
                     List<Abonnement> abonnements = repo.findAll();
@@ -1000,6 +1003,9 @@ public class ApiServer {
 
                     return mapper.writeValueAsString(result);
 
+                } catch (IllegalArgumentException e) {
+                    res.status(400);
+                    return mapper.writeValueAsString(Map.of("error", e.getMessage()));
                 } catch (Exception e) {
                     res.status(500);
                     return mapper.writeValueAsString(Map.of("error", "Erreur lors de la planification: " + e.getMessage()));
@@ -1329,7 +1335,47 @@ public class ApiServer {
         System.out.println("API server démarré sur http://localhost:" + httpPort);
     }
 
-        private static String safeCsv(String s) {
+    private static int parseIntBodyValue(Object value, int defaultValue, String fieldName) {
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof Number n) {
+            return n.intValue();
+        }
+
+        String raw = String.valueOf(value).trim();
+        if (raw.isEmpty()) {
+            return defaultValue;
+        }
+
+        try {
+            return (int) Math.round(Double.parseDouble(raw.replace(',', '.')));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Le champ '" + fieldName + "' doit être numérique");
+        }
+    }
+
+    private static double parseDoubleBodyValue(Object value, double defaultValue, String fieldName) {
+        if (value == null) {
+            return defaultValue;
+        }
+        if (value instanceof Number n) {
+            return n.doubleValue();
+        }
+
+        String raw = String.valueOf(value).trim();
+        if (raw.isEmpty()) {
+            return defaultValue;
+        }
+
+        try {
+            return Double.parseDouble(raw.replace(',', '.'));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Le champ '" + fieldName + "' doit être numérique");
+        }
+    }
+
+    private static String safeCsv(String s) {
     if (s == null) return "";
     return s.replace(";", ",");
 }

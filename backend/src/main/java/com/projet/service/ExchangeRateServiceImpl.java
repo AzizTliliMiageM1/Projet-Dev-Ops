@@ -9,16 +9,17 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projet.config.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implémentation du service de taux de change avec ExchangeRate-API.
+ * Implémentation du service de taux de change avec ExchangeRate-API v6.
  * 
  * Cette implémentation utilise HttpURLConnection (built-in) pour éviter
  * les dépendances externes inutiles.
  * 
- * Utilise l'API : https://api.exchangerate-api.com/v4/latest/{base}
+ * Utilise l'API v6 : https://v6.exchangerate-api.com/v6/{API_KEY}/latest/{base}
  * 
  * Gestion des erreurs :
  * - Timeout : 5 secondes par défaut
@@ -29,7 +30,8 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
     
     private static final Logger logger = LoggerFactory.getLogger(ExchangeRateServiceImpl.class);
     
-    private static final String API_BASE = "https://api.exchangerate-api.com/v4/latest/";
+    private static final String API_BASE_V6 = "https://v6.exchangerate-api.com/v6/";
+    private static final String API_BASE_V4 = "https://api.exchangerate-api.com/v4/latest/";
     private static final int TIMEOUT_MS = 5000; // 5 secondes
     private static final ObjectMapper mapper = new ObjectMapper();
     
@@ -57,8 +59,17 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
         baseCurrency = baseCurrency.toUpperCase();
         
         try {
-            String url = API_BASE + baseCurrency;
-            logger.info("Récupération des taux de change depuis {}", url);
+            String apiKey = AppConfig.get("EXCHANGERATE_API_KEY", "");
+            String url;
+            
+            // Utiliser l'API v6 si la clé est disponible, sinon v4 (public)
+            if (apiKey != null && !apiKey.isEmpty()) {
+                url = API_BASE_V6 + apiKey + "/latest/" + baseCurrency;
+                logger.info("Récupération des taux de change via API v6 (avec clé) depuis {}", url);
+            } else {
+                url = API_BASE_V4 + baseCurrency;
+                logger.info("Récupération des taux de change via API v4 (public) depuis {}", url);
+            }
             
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
             conn.setRequestMethod("GET");
@@ -76,6 +87,11 @@ public class ExchangeRateServiceImpl implements ExchangeRateService {
             String response = readResponse(conn);
             JsonNode root = mapper.readTree(response);
             JsonNode rates = root.get("rates");
+            
+            if (rates == null) {
+                logger.warn("Champ 'rates' non trouvé dans la réponse JSON");
+                return getFallbackRates(targetCurrencies);
+            }
             
             // Extraire les devises demandées
             Map<String, Double> result = new HashMap<>();

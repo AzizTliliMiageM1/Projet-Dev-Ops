@@ -26,6 +26,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.projet.backend.domain.SubAccount;
 import com.projet.backend.domain.SubAccountPayment;
 import com.projet.backend.domain.SubAccountSubscription;
+import com.projet.config.AppConfig;
 
 public class SubAccountManagementServiceImpl implements SubAccountManagementService {
 
@@ -335,7 +336,7 @@ public class SubAccountManagementServiceImpl implements SubAccountManagementServ
                 "customerId", customerId,
                 "subscriptionId", String.valueOf(subscription.getOrDefault("id", ""))
             );
-        } catch (IOException | InterruptedException ex) {
+        } catch (Exception ex) {
             return Map.of(
                 "provider", "local",
                 "status", "active",
@@ -367,8 +368,7 @@ public class SubAccountManagementServiceImpl implements SubAccountManagementServ
     }
 
     private static String env(String key) {
-        String value = System.getenv(key);
-        return value == null ? "" : value.trim();
+        return AppConfig.get(key);
     }
 
     private SubAccount findSubAccount(String parentEmail, String subAccountId, List<SubAccount> all) {

@@ -32,22 +32,25 @@ const API_CONFIG = {
         lifecyclePlan: '/api/portfolio/lifecycle-plan',
         
         // Email & Notifications
-        emailStatus: '/api/email/status',
-        emailAlertExpiration: '/api/email/send-alert-expiration',
-        emailRapport: '/api/email/send-rapport-mensuel',
-        emailAlert: '/api/email/send-alerte-budget',
+        emailStatus: '/api/api/email/status',
+        emailAlertExpiration: '/api/api/email/send-alert-expiration',
+        emailRapport: '/api/api/email/send-rapport-mensuel',
+        emailAlert: '/api/api/email/send-alerte-budget',
         
         // Currency
-        currencyStatus: '/api/currency/status',
-        currencyConvert: '/api/currency/convert',
-        currencyToEur: '/api/currency/to-eur',
-        currencyStability: '/api/currency/stabilite',
+        currencyStatus: '/api/api/currency/status',
+        currencyConvert: '/api/api/currency/convert',
+        currencyToEur: '/api/api/currency/to-eur',
+        currencyStability: '/api/api/currency/stabilite',
 
         // International pricing and payment simulation
         userCountry: '/api/user/country',
         convertAbonnements: '/api/convert/abonnements',
         paymentSimulate: '/api/payment/simulate',
         allCurrencies: '/api/get-all-currencies',
+        bankImport: '/api/bank/import',
+        openBankingImport: '/api/open-banking/import',
+        openBankingAddDetected: '/api/open-banking/add-detected',
 
         // Sub-accounts and Stripe family billing
         subAccounts: '/api/users/subaccounts',

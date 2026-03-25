@@ -98,10 +98,25 @@ docker-compose exec backend java -jar app.jar dashboard file=/app/data/abonnemen
 ### Configuration Environment
 
 ```env
-# docker-compose.yml variables
+# Copy .env.example -> .env then fill your keys
+
+# Mailgun (emails real-time)
+MAILGUN_API_KEY=key_xxxxxxxxxxxxxxxxxxxxxxxx
+MAILGUN_DOMAIN=mg.your-domain.com
+
+# Okta (sub-account identity management)
+OKTA_ORG_URL=https://dev-xxxxxxxx.okta.com
+OKTA_API_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Stripe (real payment processing)
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxx
+
+# Optional app settings
 JAVA_OPTS=-Xmx512m -Xms128m
 LOG_LEVEL=INFO
 ```
+
+If these keys are missing or invalid, the application automatically falls back to local mode for Mailgun/Okta/Stripe.
 
 ## 🔄 Pipeline CI/CD
 
