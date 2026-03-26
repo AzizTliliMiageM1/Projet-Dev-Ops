@@ -37,6 +37,11 @@ import com.projet.service.OpenBankingSubscriptionDetectionService;
 import com.projet.service.PDFToCsvConverter;
 import com.projet.analytics.optimization.SubscriptionOptimizationService;
 import com.projet.analytics.optimization.SubscriptionOptimizationServiceImpl;
+import student40006741.recommendation.client.OpenAiRecommendationClient;
+import student40006741.recommendation.config.RestConfig;
+import student40006741.recommendation.controller.RecommendationController;
+import student40006741.recommendation.service.RecommendationCatalogService;
+import student40006741.recommendation.service.RecommendationService;
 
 import spark.Request;
 import static spark.Spark.before;
@@ -123,6 +128,15 @@ public class ApiServer {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        RecommendationController recommendationController = new RecommendationController(
+                new RecommendationService(
+                        new OpenAiRecommendationClient(new RestConfig().openAiHttpClient(), mapper),
+                        new RecommendationCatalogService()
+                ),
+                mapper
+        );
+        recommendationController.registerRoutes();
 
 
         // =================================================
