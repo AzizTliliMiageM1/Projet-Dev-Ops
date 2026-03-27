@@ -170,6 +170,13 @@ java -jar target/gestion-abonnements-1.0-SNAPSHOT.jar help
 - ✅ Quotas configurables (imports/mois, storage, max users)
 - ✅ Intégration Open Banking (PARTIE 3 appliquée par sous-compte)
 
+### Thi Mai Chi DOAN:
+
+- ✅ Tester l’application
+- ✅ Mettre à jour le code
+- ✅ Améliorer le Front-End
+- ✅ Créer des fonctionnalités liées aux utilisateurs
+
 ### Infrastructure & Qualité
 - ✅ 28 tests integration + unit (100% pass rate)
 - ✅ APIs distantes intégrées : ExchangeRate-API, DummyJSON, Mailgun
