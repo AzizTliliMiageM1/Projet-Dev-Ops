@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker — Mes Abonnements</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 30px; }
+        h1 { color: #2c3e50; margin-bottom: 25px; }
+        h2 { color: #34495e; margin-bottom: 15px; font-size: 1.1em; }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .total-box {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-top: 10px;
+        }
+
+        ul { list-style: none; }
+        ul li {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 12px 16px;
+            margin: 6px 0;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input, select {
+            padding: 8px 12px;
+            margin: 4px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+
+        button {
+            padding: 8px 18px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+        button:hover { background: #2980b9; }
+        button.danger { background: #e74c3c; padding: 5px 10px; }
+        button.danger:hover { background: #c0392b; }
+
+        .convert-result {
+            background: #eafaf1;
+            border: 1px solid #82e0aa;
+            border-radius: 6px;
+            padding: 14px;
+            margin-top: 12px;
+            font-size: 1.05em;
+        }
+
+        .error { background: #fdecea; border-color: #f1948a; color: #c0392b; }
+        .stats { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+        .stat-item { background: #eaf2fb; border-radius: 8px; padding: 12px 18px; }
+        .stat-label { font-size: 0.8em; color: #7f8c8d; }
+        .stat-value { font-size: 1.3em; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <h1>💰 Budget Tracker — Mes Abonnements</h1>
+
+    <!-- Total mensuel -->
+    <div class="card">
+        <h2>Résumé du budget</h2>
+        <div class="stats" id="stats-box">
+            <div class="stat-item">
+                <div class="stat-label">Total mensuel</div>
+                <div class="stat-value" id="total-mensuel">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Total annuel</div>
+                <div class="stat-value" id="total-annuel">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Nombre d'abonnements</div>
+                <div class="stat-value" id="nb-abonnements">--</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Catégorie la + chère</div>
+                <div class="stat-value" id="cat-plus-chere">--</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des abonnements -->
+    <div class="card">
+        <h2>Mes abonnements</h2>
+        <ul id="liste-abonnements"><li>Chargement...</li></ul>
+    </div>
+
+    <!-- Formulaire d'ajout -->
+    <div class="card">
+        <h2>Ajouter un abonnement</h2>
+        <input type="text" id="inp-nom" placeholder="Nom (ex: Netflix)">
+        <input type="number" id="inp-prix" placeholder="Prix/mois (€)" step="0.01" min="0">
+        <input type="text" id="inp-categorie" placeholder="Catégorie (streaming...)">
+        <button onclick="ajouterAbonnement()">+ Ajouter</button>
+    </div>
+
+    <!-- Conversion de devise via API Frankfurter -->
+    <div class="card">
+        <h2>Convertir mon budget en devise étrangère</h2>
+        <small style="color: #7f8c8d">Taux en temps réel via api.frankfurter.app</small><br><br>
+        <select id="select-devise">
+            <option value="USD">USD — Dollar américain</option>
+            <option value="GBP">GBP — Livre sterling</option>
+            <option value="JPY">JPY — Yen japonais</option>
+            <option value="CHF">CHF — Franc suisse</option>
+            <option value="CAD">CAD — Dollar canadien</option>
+            <option value="AUD">AUD — Dollar australien</option>
+            <option value="MAD">MAD — Dirham marocain</option>
+        </select>
+        <button onclick="convertirBudget()">Convertir</button>
+        <div id="convert-result" style="display:none;"></div>
+    </div>
+
+    <script>
+        const API = '';  // vide = meme origine (Spark sert aussi le HTML)
+
+        async function chargerTout() {
+            await chargerAbonnements();
+            await chargerStats();
+        }
+
+        async function chargerAbonnements() {
+            const res = await fetch(`${API}/api/abonnements`);
+            const data = await res.json();
+            const ul = document.getElementById('liste-abonnements');
+            ul.innerHTML = '';
+            if (data.length === 0) {
+                ul.innerHTML = '<li>Aucun abonnement pour l\'instant.</li>';
+                return;
+            }
+            data.forEach(a => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span><strong>${a.nom}</strong> — ${a.prixMensuel.toFixed(2)} €/mois
+                    <small style="color:#7f8c8d"> (${a.categorie})</small></span>
+                    <button class="danger" onclick="supprimer('${a.id}')">✕</button>`;
+                ul.appendChild(li);
+            });
+        }
+
+        async function chargerStats() {
+            const res = await fetch(`${API}/api/budget/stats`);
+            const data = await res.json();
+            document.getElementById('total-mensuel').textContent = data.totalMensuel.toFixed(2) + ' €';
+            document.getElementById('total-annuel').textContent = data.totalAnnuel.toFixed(2) + ' €';
+            document.getElementById('nb-abonnements').textContent = data.nombreAbonnements;
+            document.getElementById('cat-plus-chere').textContent = data.categoriePlusChere;
+        }
+
+        async function ajouterAbonnement() {
+            const nom = document.getElementById('inp-nom').value.trim();
+            const prix = parseFloat(document.getElementById('inp-prix').value);
+            const cat = document.getElementById('inp-categorie').value.trim();
+
+            if (!nom || !prix || !cat || prix <= 0) {
+                alert('Remplissez tous les champs correctement.');
+                return;
+            }
+
+            const res = await fetch(`${API}/api/abonnements`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nom, prixMensuel: prix, categorie: cat })
+            });
+
+            if (res.ok) {
+                document.getElementById('inp-nom').value = '';
+                document.getElementById('inp-prix').value = '';
+                document.getElementById('inp-categorie').value = '';
+                await chargerTout();
+            } else {
+                const err = await res.json();
+                alert('Erreur: ' + err.erreur);
+            }
+        }
+
+        async function supprimer(id) {
+            await fetch(`${API}/api/abonnements/${id}`, { method: 'DELETE' });
+            await chargerTout();
+        }
+
+        async function convertirBudget() {
+            const devise = document.getElementById('select-devise').value;
+            const div = document.getElementById('convert-result');
+            div.style.display = 'block';
+            div.className = 'convert-result';
+            div.textContent = 'Appel à l\'API Frankfurter en cours...';
+
+            const res = await fetch(`${API}/api/budget/convertir?devise=${devise}`);
+            const data = await res.json();
+
+            if (data.erreur) {
+                div.className = 'convert-result error';
+                div.innerHTML = '❌ ' + data.erreur;
+            } else {
+                div.innerHTML = `
+                    ✅ <strong>${data.montantOriginal.toFixed(2)} EUR</strong>
+                    = <strong>${data.montantConverti} ${data.deviseCible}</strong><br>
+                    <small>Taux : 1 EUR = ${data.taux} ${data.deviseCible} — Source : ${data.source}</small>`;
+            }
+        }
+
+        // chargement initial
+        chargerTout();
+    </script>
+</body>
+</html>
