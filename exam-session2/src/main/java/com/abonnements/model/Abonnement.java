@@ -2,10 +2,6 @@ package com.abonnements.model;
 
 import java.util.UUID;
 
-/**
- * Entite représentant un abonnement mensuel.
- * Ex: Netflix, Spotify, Amazon Prime...
- */
 public class Abonnement {
 
     private String id;
@@ -14,7 +10,7 @@ public class Abonnement {
     private String categorie;
     private boolean actif;
 
-    // constructeur vide requis par Jackson pour la deserialisation JSON
+    // constructeur vide requis par Jackson
     public Abonnement() {
         this.id = UUID.randomUUID().toString();
         this.actif = true;
@@ -27,7 +23,6 @@ public class Abonnement {
         this.categorie = categorie;
     }
 
-    // --- getters / setters ---
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

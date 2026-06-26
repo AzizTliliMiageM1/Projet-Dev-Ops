@@ -5,16 +5,12 @@ import com.abonnements.model.Abonnement;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Service metier principal pour la gestion des abonnements.
- * Stockage en memoire (pas de BDD, pas de persistence).
- */
+// Stockage en memoire, pas de BDD (cf. sujet : pas de persistence requise)
 public class AbonnementService {
 
     private final List<Abonnement> abonnements = new ArrayList<>();
 
     public AbonnementService() {
-        // donnees de demo pour tester sans avoir a tout configurer
         abonnements.add(new Abonnement("Netflix", 13.99, "streaming"));
         abonnements.add(new Abonnement("Spotify", 9.99, "musique"));
         abonnements.add(new Abonnement("Amazon Prime", 8.99, "streaming"));
@@ -40,10 +36,6 @@ public class AbonnementService {
         return abonnements.removeIf(a -> a.getId().equals(id));
     }
 
-    /**
-     * Calcul du total mensuel de tous les abonnements actifs.
-     * C'est la fonctionnalite metier principale.
-     */
     public double calculerTotalMensuel() {
         return abonnements.stream()
                 .filter(Abonnement::isActif)
@@ -51,10 +43,7 @@ public class AbonnementService {
                 .sum();
     }
 
-    /**
-     * Regroupe les abonnements par categorie et somme les prix.
-     * Utile pour savoir ou part le plus d'argent.
-     */
+    // groupe par categorie et somme les prix -> Map<categorie, total>
     public Map<String, Double> getStatsParCategorie() {
         return abonnements.stream()
                 .filter(Abonnement::isActif)
@@ -64,9 +53,6 @@ public class AbonnementService {
                 ));
     }
 
-    /**
-     * Retourne la categorie qui coute le plus cher au total.
-     */
     public String getCategoriesPlusChere() {
         return getStatsParCategorie().entrySet().stream()
                 .max(Map.Entry.comparingByValue())
@@ -74,9 +60,6 @@ public class AbonnementService {
                 .orElse("aucune");
     }
 
-    /**
-     * Retourne une analyse complete du budget: total, annuel, par categorie, moyenne.
-     */
     public Map<String, Object> getAnalyseBudget() {
         double total = calculerTotalMensuel();
         long nbActifs = abonnements.stream().filter(Abonnement::isActif).count();
